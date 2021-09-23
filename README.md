@@ -2,6 +2,8 @@
 
 Use [Warrant](https://warrant.dev/) in server-side Go projects.
 
+[![Discord](https://img.shields.io/discord/865661082203193365?label=discord)](https://discord.gg/QNCMKWzqET)
+
 ## Installation
 
 ```shell
