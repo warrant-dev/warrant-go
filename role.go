@@ -1,5 +1,5 @@
 package warrant
 
 type Role struct {
-	RoleId string `json: "roleId"`
+	RoleId string `json:"roleId"`
 }
