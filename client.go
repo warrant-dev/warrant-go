@@ -10,6 +10,7 @@ import (
 
 const API_URL_BASE = "https://api.warrant.dev"
 const API_VERSION = "/v1"
+const SELF_SERVICE_DASH_URL_BASE = "https://self-serve.warrant.dev"
 
 //const WARRANT_IGNORE_ID = "WARRANT_IGNORE_ID"
 
@@ -23,6 +24,10 @@ type WarrantClient struct {
 }
 
 func NewClient(config ClientConfig) WarrantClient {
+	if config.ApiKey == "" {
+		panic("You must provide an ApiKey to initialize the Warrant Client")
+	}
+
 	return WarrantClient{
 		httpClient: http.DefaultClient,
 		config:     config,
@@ -36,8 +41,9 @@ func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -52,6 +58,21 @@ func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
 	return &newTenant, nil
 }
 
+func (client WarrantClient) DeleteTenant(tenantId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/tenants/%s", tenantId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
 func (client WarrantClient) CreateUser(user User) (*User, error) {
 	resp, err := client.makeRequest("POST", "/users", user)
 	if err != nil {
@@ -59,8 +80,9 @@ func (client WarrantClient) CreateUser(user User) (*User, error) {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -75,6 +97,21 @@ func (client WarrantClient) CreateUser(user User) (*User, error) {
 	return &newUser, nil
 }
 
+func (client WarrantClient) DeleteUser(userId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/users/%s", userId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
 func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (*Warrant, error) {
 	resp, err := client.makeRequest("POST", fmt.Sprintf("/tenants/%s/users/%s", tenantId, userId), nil)
 	if err != nil {
@@ -82,8 +119,9 @@ func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -105,8 +143,9 @@ func (client WarrantClient) RemoveUserFromTenant(tenantId string, userId string)
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	return nil
@@ -121,8 +160,9 @@ func (client WarrantClient) CreateRole(roleId string) (*Role, error) {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -144,8 +184,9 @@ func (client WarrantClient) DeleteRole(roleId string) error {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	return nil
@@ -160,8 +201,9 @@ func (client WarrantClient) CreatePermission(permissionId string) (*Permission, 
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -183,8 +225,9 @@ func (client WarrantClient) DeletePermission(permissionId string) error {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	return nil
@@ -197,8 +240,9 @@ func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Rol
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -220,18 +264,10 @@ func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) err
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return wrapError("Error reading response", err)
-	}
-	var newRole Role
-	err = json.Unmarshal([]byte(body), &newRole)
-	if err != nil {
-		return wrapError("Invalid response from server", err)
 	}
 	return nil
 }
@@ -243,8 +279,9 @@ func (client WarrantClient) AssignPermissionToUser(userId string, permissionId s
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -266,8 +303,9 @@ func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	return nil
@@ -280,8 +318,9 @@ func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId s
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -303,8 +342,9 @@ func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	return nil
@@ -324,7 +364,7 @@ func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, er
 	if respStatus < 200 || respStatus >= 400 {
 		msg, _ := ioutil.ReadAll(resp.Body)
 		return nil, Error{
-			Message: fmt.Sprintf("Http %d %s", respStatus, string(msg)),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -354,8 +394,9 @@ func (client WarrantClient) CreateAuthorizationSession(session Session) (string,
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return "", Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -370,7 +411,7 @@ func (client WarrantClient) CreateAuthorizationSession(session Session) (string,
 	return response["token"], nil
 }
 
-func (client WarrantClient) CreateSelfServiceSession(session Session) (string, error) {
+func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUrl string) (string, error) {
 	requestBody := map[string]string{
 		"type":   "ssdash",
 		"userId": session.UserId,
@@ -385,8 +426,9 @@ func (client WarrantClient) CreateSelfServiceSession(session Session) (string, e
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
 		return "", Error{
-			Message: fmt.Sprintf("Http %d", respStatus),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
@@ -398,7 +440,7 @@ func (client WarrantClient) CreateSelfServiceSession(session Session) (string, e
 	if err != nil {
 		return "", wrapError("Invalid response from server", err)
 	}
-	return response["url"], nil
+	return fmt.Sprintf("%s/%s?redirectUrl=%s", SELF_SERVICE_DASH_URL_BASE, response["token"], redirectUrl), nil
 }
 
 func (client WarrantClient) IsAuthorized(toCheck Warrant) (bool, error) {
@@ -412,8 +454,9 @@ func (client WarrantClient) IsAuthorized(toCheck Warrant) (bool, error) {
 	} else if respStatus == 401 {
 		return false, nil
 	}
+	msg, _ := ioutil.ReadAll(resp.Body)
 	return false, Error{
-		Message: fmt.Sprintf("Http %d", respStatus),
+		Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 	}
 }
 
