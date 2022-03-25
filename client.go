@@ -52,6 +52,20 @@ func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
 	return &newTenant, nil
 }
 
+func (client WarrantClient) DeleteTenant(tenantId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/tenants/%s", tenantId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		return Error{
+			Message: fmt.Sprintf("Http %d", respStatus),
+		}
+	}
+	return nil
+}
+
 func (client WarrantClient) CreateUser(user User) (*User, error) {
 	resp, err := client.makeRequest("POST", "/users", user)
 	if err != nil {
@@ -73,6 +87,20 @@ func (client WarrantClient) CreateUser(user User) (*User, error) {
 		return nil, wrapError("Invalid response from server", err)
 	}
 	return &newUser, nil
+}
+
+func (client WarrantClient) DeleteUser(userId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/users/%s", userId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		return Error{
+			Message: fmt.Sprintf("Http %d", respStatus),
+		}
+	}
+	return nil
 }
 
 func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (*Warrant, error) {
