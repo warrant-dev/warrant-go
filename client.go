@@ -10,6 +10,7 @@ import (
 
 const API_URL_BASE = "https://api.warrant.dev"
 const API_VERSION = "/v1"
+const SELF_SERVICE_DASH_URL_BASE = "https://self-serve.warrant.dev"
 
 //const WARRANT_IGNORE_ID = "WARRANT_IGNORE_ID"
 
@@ -389,7 +390,7 @@ func (client WarrantClient) CreateAuthorizationSession(session Session) (string,
 	return response["token"], nil
 }
 
-func (client WarrantClient) CreateSelfServiceSession(session Session) (string, error) {
+func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUrl string) (string, error) {
 	requestBody := map[string]string{
 		"type":   "ssdash",
 		"userId": session.UserId,
@@ -417,7 +418,7 @@ func (client WarrantClient) CreateSelfServiceSession(session Session) (string, e
 	if err != nil {
 		return "", wrapError("Invalid response from server", err)
 	}
-	return response["url"], nil
+	return fmt.Sprintf("%s/%s?redirectUrl=%s", SELF_SERVICE_DASH_URL_BASE, response["token"], redirectUrl), nil
 }
 
 func (client WarrantClient) IsAuthorized(toCheck Warrant) (bool, error) {
