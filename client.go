@@ -224,15 +224,6 @@ func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) err
 			Message: fmt.Sprintf("Http %d", respStatus),
 		}
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return wrapError("Error reading response", err)
-	}
-	var newRole Role
-	err = json.Unmarshal([]byte(body), &newRole)
-	if err != nil {
-		return wrapError("Invalid response from server", err)
-	}
 	return nil
 }
 
