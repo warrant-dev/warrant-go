@@ -121,6 +121,18 @@ func example(client warrant.WarrantClient) {
 		fmt.Printf("Created self service session %s for user %s\n", selfServiceDashUrl, newUser.UserId)
 	}
 
+	// List all warrants for organization
+	warrants, err := client.ListWarrants(warrant.ListWarrantFilters{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println("Warrants: ")
+		for _, w := range warrants {
+			fmt.Printf("%+v\n", w)
+		}
+	}
+
 	// Check authorization (tenant membership) for a user
 	isAuthorized, err := client.IsAuthorized(warrant.Warrant{
 		ObjectType: "tenant",
