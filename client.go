@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 const API_URL_BASE = "https://api.warrant.dev"
 const API_VERSION = "/v1"
 const SELF_SERVICE_DASH_URL_BASE = "https://self-serve.warrant.dev"
-
-//const WARRANT_IGNORE_ID = "WARRANT_IGNORE_ID"
 
 type ClientConfig struct {
 	ApiKey string
@@ -377,6 +377,37 @@ func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, er
 		return nil, wrapError("Invalid response from server", err)
 	}
 	return &newWarrant, nil
+}
+
+func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]*Warrant, error) {
+	filterQuery, err := query.Values(warrantFilters)
+	if err != nil {
+		return nil, wrapError("Could not parse filters", err)
+	}
+
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/warrants?%s", filterQuery.Encode()), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+
+	var warrants []*Warrant
+	err = json.Unmarshal([]byte(body), &warrants)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+
+	return warrants, nil
 }
 
 func (client WarrantClient) CreateAuthorizationSession(session Session) (string, error) {
