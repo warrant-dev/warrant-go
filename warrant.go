@@ -17,3 +17,10 @@ type Userset struct {
 	ObjectId   string `json:"objectId"`
 	Relation   string `json:"relation"`
 }
+
+type ListWarrantFilters struct {
+	ObjectType string `json:"objectType" url:"objectType,omitempty"`
+	ObjectId   string `json:"objectId" url:"objectId,omitempty"`
+	Relation   string `json:"relation" url:"relation,omitempty"`
+	UserId     string `json:"userId" url:"userId,omitempty"`
+}
