@@ -1,21 +1,15 @@
 package warrant
 
 type Warrant struct {
-	ObjectType string      `json:"objectType"`
-	ObjectId   string      `json:"objectId"`
-	Relation   string      `json:"relation"`
-	User       WarrantUser `json:"user"`
+	ObjectType string         `json:"objectType"`
+	ObjectId   string         `json:"objectId"`
+	Relation   string         `json:"relation"`
+	Subject    WarrantSubject `json:"subject"`
 }
 
-type WarrantUser struct {
-	UserId string `json:"userId,omitempty"`
-	*Userset
-}
-
-type Userset struct {
+type WarrantSubject struct {
 	ObjectType string `json:"objectType"`
 	ObjectId   string `json:"objectId"`
-	Relation   string `json:"relation"`
 }
 
 type ListWarrantFilters struct {

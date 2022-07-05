@@ -41,7 +41,7 @@ func example(client warrant.WarrantClient) {
 		fmt.Println(err)
 		return
 	} else {
-		fmt.Printf("Assigned user %s to tenant %s\n", newWarrant.User.UserId, newWarrant.ObjectId)
+		fmt.Printf("Assigned user %s to tenant %s\n", newWarrant.Subject.ObjectId, newWarrant.ObjectId)
 	}
 
 	// Create test-role
@@ -95,7 +95,7 @@ func example(client warrant.WarrantClient) {
 		fmt.Println(err)
 		return
 	} else {
-		fmt.Printf("Assigned role %s to user %s\n", testRole.RoleId, newWarrant.User.UserId)
+		fmt.Printf("Assigned role %s to user %s\n", testRole.RoleId, newWarrant.Subject.ObjectId)
 	}
 
 	// Create a session for user
@@ -138,8 +138,9 @@ func example(client warrant.WarrantClient) {
 		ObjectType: "tenant",
 		ObjectId:   newTenant.TenantId,
 		Relation:   "member",
-		User: warrant.WarrantUser{
-			UserId: newUser.UserId,
+		Subject: warrant.WarrantSubject{
+			ObjectType: "user",
+			ObjectId:   newUser.UserId,
 		},
 	})
 	if err != nil {
@@ -170,7 +171,7 @@ func example(client warrant.WarrantClient) {
 		fmt.Println(err)
 		return
 	} else {
-		fmt.Printf("Removed role %s from user %s\n", testRole.RoleId, newWarrant.User.UserId)
+		fmt.Printf("Removed role %s from user %s\n", testRole.RoleId, newWarrant.Subject.ObjectId)
 	}
 
 	// Remove view-self-service-dashboard from test-role
