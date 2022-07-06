@@ -10,6 +10,7 @@ type Warrant struct {
 type WarrantSubject struct {
 	ObjectType string `json:"objectType"`
 	ObjectId   string `json:"objectId"`
+	Relation   string `json:"relation"`
 }
 
 type ListWarrantFilters struct {
