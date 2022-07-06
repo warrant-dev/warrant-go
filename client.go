@@ -351,11 +351,6 @@ func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId
 }
 
 func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, error) {
-	if warrantToCreate.User.UserId != "" && warrantToCreate.User.Userset != nil {
-		return nil, Error{
-			Message: "Warrant cannot contain both a userId and userset",
-		}
-	}
 	resp, err := client.makeRequest("POST", "/warrants", warrantToCreate)
 	if err != nil {
 		return nil, err
@@ -496,8 +491,9 @@ func (client WarrantClient) HasPermission(permissionId string, userId string) (b
 		ObjectType: "permission",
 		ObjectId:   permissionId,
 		Relation:   "member",
-		User: WarrantUser{
-			UserId: userId,
+		Subject: Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
 		},
 	})
 }

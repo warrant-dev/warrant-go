@@ -69,8 +69,9 @@ func (eia *EnsureIsAuthorized) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		ObjectType: eia.options.ObjectType,
 		ObjectId:   objectId,
 		Relation:   eia.options.Relation,
-		User: WarrantUser{
-			UserId: userId,
+		Subject: Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
 		},
 	})
 	if err != nil {
