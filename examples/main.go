@@ -138,7 +138,7 @@ func example(client warrant.WarrantClient) {
 		ObjectType: "tenant",
 		ObjectId:   newTenant.TenantId,
 		Relation:   "member",
-		Subject: warrant.WarrantSubject{
+		Subject: warrant.Subject{
 			ObjectType: "user",
 			ObjectId:   newUser.UserId,
 		},

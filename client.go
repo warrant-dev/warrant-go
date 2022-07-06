@@ -491,7 +491,7 @@ func (client WarrantClient) HasPermission(permissionId string, userId string) (b
 		ObjectType: "permission",
 		ObjectId:   permissionId,
 		Relation:   "member",
-		Subject: WarrantSubject{
+		Subject: Subject{
 			ObjectType: "user",
 			ObjectId:   userId,
 		},
