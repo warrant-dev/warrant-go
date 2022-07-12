@@ -1,4 +1,4 @@
-package warrant
+package warrantdev
 
 import "fmt"
 
@@ -14,7 +14,7 @@ func (err Error) Error() string {
 	return fmt.Sprintf("Warrant error: %s", err.Message)
 }
 
-func wrapError(message string, err error) Error {
+func WrapError(message string, err error) Error {
 	return Error{
 		Message:      message,
 		WrappedError: err,
