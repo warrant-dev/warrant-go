@@ -35,7 +35,7 @@ func NewClient(config ClientConfig) WarrantClient {
 }
 
 func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
-	resp, err := client.makeRequest("POST", "/tenants", tenant)
+	resp, err := client.makeRequest("POST", "/v1/tenants", tenant)
 	if err != nil {
 		return nil, err
 	}
@@ -58,23 +58,8 @@ func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
 	return &newTenant, nil
 }
 
-func (client WarrantClient) DeleteTenant(tenantId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/tenants/%s", tenantId), nil)
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	return nil
-}
-
-func (client WarrantClient) CreateUser(user User) (*User, error) {
-	resp, err := client.makeRequest("POST", "/users", user)
+func (client WarrantClient) UpdateTenant(tenantId string, tenant Tenant) (*Tenant, error) {
+	resp, err := client.makeRequest("PUT", fmt.Sprintf("/v1/tenants/%s", tenantId), tenant)
 	if err != nil {
 		return nil, err
 	}
@@ -89,31 +74,88 @@ func (client WarrantClient) CreateUser(user User) (*User, error) {
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var newUser User
-	err = json.Unmarshal([]byte(body), &newUser)
+	var updatedTenant Tenant
+	err = json.Unmarshal([]byte(body), &updatedTenant)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
 	}
-	return &newUser, nil
+	return &updatedTenant, nil
 }
 
-func (client WarrantClient) DeleteUser(userId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/users/%s", userId), nil)
+func (client WarrantClient) ListTenants() ([]Tenant, error) {
+	resp, err := client.makeRequest("GET", "/v1/tenants", nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
 		msg, _ := ioutil.ReadAll(resp.Body)
-		return Error{
+		return nil, Error{
 			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
-	return nil
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var tenants []Tenant
+	err = json.Unmarshal([]byte(body), &tenants)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return tenants, nil
+}
+
+func (client WarrantClient) GetTenant(tenantId string) (*Tenant, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/tenants/%s", tenantId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var foundTenant Tenant
+	err = json.Unmarshal([]byte(body), &foundTenant)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &foundTenant, nil
+}
+
+func (client WarrantClient) GetUsersForTenant(tenantId string) ([]User, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/tenants/%s/users", tenantId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var tenantUsers []User
+	err = json.Unmarshal([]byte(body), &tenantUsers)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return tenantUsers, nil
 }
 
 func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (*Warrant, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/tenants/%s/users/%s", tenantId, userId), nil)
+	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +179,283 @@ func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (
 }
 
 func (client WarrantClient) RemoveUserFromTenant(tenantId string, userId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/tenants/%s/users/%s", tenantId, userId), nil)
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
+func (client WarrantClient) DeleteTenant(tenantId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s", tenantId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
+func (client WarrantClient) CreateUser(user User) (*User, error) {
+	resp, err := client.makeRequest("POST", "/v1/users", user)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var newUser User
+	err = json.Unmarshal([]byte(body), &newUser)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &newUser, nil
+}
+
+func (client WarrantClient) UpdateUser(userId string, user User) (*User, error) {
+	resp, err := client.makeRequest("PUT", fmt.Sprintf("/v1/users/%s", userId), user)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var updatedUser User
+	err = json.Unmarshal([]byte(body), &updatedUser)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &updatedUser, nil
+}
+
+func (client WarrantClient) ListUsers() ([]User, error) {
+	resp, err := client.makeRequest("GET", "/v1/users", nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var users []User
+	err = json.Unmarshal([]byte(body), &users)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return users, nil
+}
+
+func (client WarrantClient) GetUser(userId string) (*User, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s", userId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var foundUser User
+	err = json.Unmarshal([]byte(body), &foundUser)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &foundUser, nil
+}
+
+func (client WarrantClient) GetTenantsForUser(userId string) ([]Tenant, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/tenants", userId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var userTenants []Tenant
+	err = json.Unmarshal([]byte(body), &userTenants)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return userTenants, nil
+}
+
+func (client WarrantClient) GetRolesForUser(userId string) ([]Role, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/roles", userId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var userRoles []Role
+	err = json.Unmarshal([]byte(body), &userRoles)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return userRoles, nil
+}
+
+func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Role, error) {
+	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var newRole Role
+	err = json.Unmarshal([]byte(body), &newRole)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &newRole, nil
+}
+
+func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
+func (client WarrantClient) AssignPermissionToUser(userId string, permissionId string) (*Permission, error) {
+	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var newPermission Permission
+	err = json.Unmarshal([]byte(body), &newPermission)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &newPermission, nil
+}
+
+func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
+func (client WarrantClient) GetPermissionsForUser(userId string) ([]Permission, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions", userId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var userPermissions []Permission
+	err = json.Unmarshal([]byte(body), &userPermissions)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return userPermissions, nil
+}
+
+func (client WarrantClient) DeleteUser(userId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s", userId), nil)
 	if err != nil {
 		return err
 	}
@@ -152,7 +470,7 @@ func (client WarrantClient) RemoveUserFromTenant(tenantId string, userId string)
 }
 
 func (client WarrantClient) CreateRole(roleId string) (*Role, error) {
-	resp, err := client.makeRequest("POST", "/roles", Role{
+	resp, err := client.makeRequest("POST", "/v1/roles", Role{
 		RoleId: roleId,
 	})
 	if err != nil {
@@ -177,8 +495,119 @@ func (client WarrantClient) CreateRole(roleId string) (*Role, error) {
 	return &newRole, nil
 }
 
+func (client WarrantClient) ListRoles() ([]Role, error) {
+	resp, err := client.makeRequest("GET", "/v1/roles", nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var roles []Role
+	err = json.Unmarshal([]byte(body), &roles)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return roles, nil
+}
+
+func (client WarrantClient) GetRole(roleId string) (*Role, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var foundRole Role
+	err = json.Unmarshal([]byte(body), &foundRole)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &foundRole, nil
+}
+
+func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId string) (*Permission, error) {
+	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var newPermission Permission
+	err = json.Unmarshal([]byte(body), &newPermission)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &newPermission, nil
+}
+
+func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId string) error {
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
+}
+
+func (client WarrantClient) GetPermissionsForRole(roleId string) ([]Permission, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions", roleId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var rolePermissions []Permission
+	err = json.Unmarshal([]byte(body), &rolePermissions)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return rolePermissions, nil
+}
+
 func (client WarrantClient) DeleteRole(roleId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/roles/%s", roleId), nil)
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil)
 	if err != nil {
 		return err
 	}
@@ -193,7 +622,7 @@ func (client WarrantClient) DeleteRole(roleId string) error {
 }
 
 func (client WarrantClient) CreatePermission(permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("POST", "/permissions", Permission{
+	resp, err := client.makeRequest("POST", "/v1/permissions", Permission{
 		PermissionId: permissionId,
 	})
 	if err != nil {
@@ -218,125 +647,56 @@ func (client WarrantClient) CreatePermission(permissionId string) (*Permission, 
 	return &newPermission, nil
 }
 
+func (client WarrantClient) ListPermissions() ([]Permission, error) {
+	resp, err := client.makeRequest("GET", "/v1/permissions", nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var permissions []Permission
+	err = json.Unmarshal([]byte(body), &permissions)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return permissions, nil
+}
+
+func (client WarrantClient) GetPermission(permissionId string) (*Permission, error) {
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+	var foundPermission Permission
+	err = json.Unmarshal([]byte(body), &foundPermission)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+	return &foundPermission, nil
+}
+
 func (client WarrantClient) DeletePermission(permissionId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/permissions/%s", permissionId), nil)
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	return nil
-}
-
-func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Role, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/users/%s/roles/%s", userId, roleId), nil)
-	if err != nil {
-		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, wrapError("Error reading response", err)
-	}
-	var newRole Role
-	err = json.Unmarshal([]byte(body), &newRole)
-	if err != nil {
-		return nil, wrapError("Invalid response from server", err)
-	}
-	return &newRole, nil
-}
-
-func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/users/%s/roles/%s", userId, roleId), nil)
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	return nil
-}
-
-func (client WarrantClient) AssignPermissionToUser(userId string, permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/users/%s/permissions/%s", userId, permissionId), nil)
-	if err != nil {
-		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, wrapError("Error reading response", err)
-	}
-	var newPermission Permission
-	err = json.Unmarshal([]byte(body), &newPermission)
-	if err != nil {
-		return nil, wrapError("Invalid response from server", err)
-	}
-	return &newPermission, nil
-}
-
-func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/users/%s/permissions/%s", userId, permissionId), nil)
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	return nil
-}
-
-func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/roles/%s/permissions/%s", roleId, permissionId), nil)
-	if err != nil {
-		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, wrapError("Error reading response", err)
-	}
-	var newPermission Permission
-	err = json.Unmarshal([]byte(body), &newPermission)
-	if err != nil {
-		return nil, wrapError("Invalid response from server", err)
-	}
-	return &newPermission, nil
-}
-
-func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/roles/%s/permissions/%s", roleId, permissionId), nil)
+	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
 	if err != nil {
 		return err
 	}
@@ -351,7 +711,7 @@ func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId
 }
 
 func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, error) {
-	resp, err := client.makeRequest("POST", "/warrants", warrantToCreate)
+	resp, err := client.makeRequest("POST", "/v1/warrants", warrantToCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -374,13 +734,13 @@ func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, er
 	return &newWarrant, nil
 }
 
-func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]*Warrant, error) {
+func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]Warrant, error) {
 	filterQuery, err := query.Values(warrantFilters)
 	if err != nil {
 		return nil, wrapError("Could not parse filters", err)
 	}
 
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/warrants?%s", filterQuery.Encode()), nil)
+	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/warrants?%s", filterQuery.Encode()), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -396,13 +756,28 @@ func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]*
 		return nil, wrapError("Error reading response", err)
 	}
 
-	var warrants []*Warrant
+	var warrants []Warrant
 	err = json.Unmarshal([]byte(body), &warrants)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
 	}
 
 	return warrants, nil
+}
+
+func (client WarrantClient) DeleteWarrant(warrantToDelete Warrant) error {
+	resp, err := client.makeRequest("DELETE", "/v1/warrants", warrantToDelete)
+	if err != nil {
+		return err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	return nil
 }
 
 func (client WarrantClient) CreateAuthorizationSession(session Session) (string, error) {
@@ -414,7 +789,7 @@ func (client WarrantClient) CreateAuthorizationSession(session Session) (string,
 		requestBody["tenantId"] = session.TenantId
 	}
 
-	resp, err := client.makeRequest("POST", "/sessions", requestBody)
+	resp, err := client.makeRequest("POST", "/v1/sessions", requestBody)
 	if err != nil {
 		return "", err
 	}
@@ -446,7 +821,7 @@ func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUr
 		requestBody["tenantId"] = session.TenantId
 	}
 
-	resp, err := client.makeRequest("POST", "/sessions", requestBody)
+	resp, err := client.makeRequest("POST", "/v1/sessions", requestBody)
 	if err != nil {
 		return "", err
 	}
@@ -469,31 +844,48 @@ func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUr
 	return fmt.Sprintf("%s/%s?redirectUrl=%s", SELF_SERVICE_DASH_URL_BASE, response["token"], redirectUrl), nil
 }
 
-func (client WarrantClient) IsAuthorized(toCheck Warrant) (bool, error) {
-	resp, err := client.makeRequest("POST", "/authorize", toCheck)
+func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, error) {
+	resp, err := client.makeRequest("POST", "/v2/authorize", toCheck)
 	if err != nil {
 		return false, err
 	}
 	respStatus := resp.StatusCode
-	if respStatus == 200 {
-		return true, nil
-	} else if respStatus == 401 {
-		return false, nil
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return false, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
 	}
-	msg, _ := ioutil.ReadAll(resp.Body)
-	return false, Error{
-		Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, wrapError("Error reading response", err)
+	}
+
+	var result WarrantCheckResult
+	err = json.Unmarshal([]byte(body), &result)
+	if err != nil {
+		return false, wrapError("Invalid response from server", err)
+	}
+
+	if result.Result == "Authorized" {
+		return true, nil
+	} else {
+		return false, nil
 	}
 }
 
 func (client WarrantClient) HasPermission(permissionId string, userId string) (bool, error) {
-	return client.IsAuthorized(Warrant{
-		ObjectType: "permission",
-		ObjectId:   permissionId,
-		Relation:   "member",
-		Subject: Subject{
-			ObjectType: "user",
-			ObjectId:   userId,
+	return client.IsAuthorized(WarrantCheckParams{
+		Warrants: []Warrant{
+			{
+				ObjectType: "permission",
+				ObjectId:   permissionId,
+				Relation:   "member",
+				Subject: Subject{
+					ObjectType: "user",
+					ObjectId:   userId,
+				},
+			},
 		},
 	})
 }
@@ -504,7 +896,7 @@ func (client WarrantClient) makeRequest(method string, requestUri string, payloa
 		return nil, wrapError("Invalid request payload", err)
 	}
 	requestBody := bytes.NewBuffer(postBody)
-	req, err := http.NewRequest(method, API_URL_BASE+API_VERSION+requestUri, requestBody)
+	req, err := http.NewRequest(method, API_URL_BASE+requestUri, requestBody)
 	if err != nil {
 		return nil, wrapError("Unable to create request", err)
 	}
