@@ -845,7 +845,7 @@ func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUr
 }
 
 func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, error) {
-	resp, err := client.makeAuthorizeRequest("POST", "/v2/authorize", toCheck)
+	resp, err := client.makeRequest("POST", "/v2/authorize", toCheck)
 	if err != nil {
 		return false, err
 	}
@@ -897,24 +897,6 @@ func (client WarrantClient) makeRequest(method string, requestUri string, payloa
 	}
 	requestBody := bytes.NewBuffer(postBody)
 	req, err := http.NewRequest(method, API_URL_BASE+requestUri, requestBody)
-	if err != nil {
-		return nil, wrapError("Unable to create request", err)
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.config.ApiKey))
-	resp, err := client.httpClient.Do(req)
-	if err != nil {
-		return nil, wrapError("Error making request", err)
-	}
-	return resp, nil
-}
-
-func (client WarrantClient) makeAuthorizeRequest(method string, requestUri string, payload interface{}) (*http.Response, error) {
-	postBody, err := json.Marshal(payload)
-	if err != nil {
-		return nil, wrapError("Invalid request payload", err)
-	}
-	requestBody := bytes.NewBuffer(postBody)
-	req, err := http.NewRequest(method, AUTHZ_URL_BASE+requestUri, requestBody)
 	if err != nil {
 		return nil, wrapError("Unable to create request", err)
 	}
