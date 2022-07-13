@@ -19,3 +19,13 @@ type ListWarrantFilters struct {
 	Relation   string `json:"relation" url:"relation,omitempty"`
 	UserId     string `json:"userId" url:"userId,omitempty"`
 }
+
+type WarrantCheckParams struct {
+	Op       string    `json:"op"`
+	Warrants []Warrant `json:"warrants"`
+}
+
+type WarrantCheckResult struct {
+	Code   int64  `json:"code"`
+	Result string `json:"result"`
+}
