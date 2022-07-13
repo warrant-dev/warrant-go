@@ -29,3 +29,8 @@ type WarrantCheckResult struct {
 	Code   int64  `json:"code"`
 	Result string `json:"result"`
 }
+
+type PermissionCheckParams struct {
+	PermissionId string `json:"permissionId"`
+	UserId       string `json:"userId"`
+}
