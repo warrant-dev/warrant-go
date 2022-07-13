@@ -850,10 +850,11 @@ func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, erro
 		return false, err
 	}
 	respStatus := resp.StatusCode
-	if respStatus == 200 {
-		return true, nil
-	} else if respStatus == 401 {
-		return false, nil
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return false, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
