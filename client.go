@@ -870,16 +870,16 @@ func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, erro
 	}
 }
 
-func (client WarrantClient) HasPermission(permissionId string, userId string) (bool, error) {
+func (client WarrantClient) HasPermission(permissionCheck PermissionCheckParams) (bool, error) {
 	return client.IsAuthorized(WarrantCheckParams{
 		Warrants: []Warrant{
 			{
 				ObjectType: "permission",
-				ObjectId:   permissionId,
+				ObjectId:   permissionCheck.PermissionId,
 				Relation:   "member",
 				Subject: Subject{
 					ObjectType: "user",
-					ObjectId:   userId,
+					ObjectId:   permissionCheck.UserId,
 				},
 			},
 		},

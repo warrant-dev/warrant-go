@@ -395,7 +395,10 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Check if user has assigned-permission
-	hasPermission, err := client.HasPermission(assignedPermission.PermissionId, newUser.UserId)
+	hasPermission, err := client.HasPermission(warrant.PermissionCheckParams{
+		PermissionId: assignedPermission.PermissionId,
+		UserId:       newUser.UserId,
+	})
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
@@ -403,7 +406,10 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Check if user has unassigned-permission
-	hasPermission, err = client.HasPermission(unassignedPermission.PermissionId, newUser.UserId)
+	hasPermission, err = client.HasPermission(warrant.PermissionCheckParams{
+		PermissionId: unassignedPermission.PermissionId,
+		UserId:       newUser.UserId,
+	})
 	if err != nil {
 		fmt.Println(err.Error())
 	} else {
