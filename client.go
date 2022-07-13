@@ -82,7 +82,7 @@ func (client WarrantClient) UpdateTenant(tenantId string, tenant Tenant) (*Tenan
 	return &updatedTenant, nil
 }
 
-func (client WarrantClient) ListTenants() ([]*Tenant, error) {
+func (client WarrantClient) ListTenants() ([]Tenant, error) {
 	resp, err := client.makeRequest("GET", "/v1/tenants", nil)
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (client WarrantClient) ListTenants() ([]*Tenant, error) {
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var tenants []*Tenant
+	var tenants []Tenant
 	err = json.Unmarshal([]byte(body), &tenants)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -106,7 +106,6 @@ func (client WarrantClient) ListTenants() ([]*Tenant, error) {
 	return tenants, nil
 }
 
-//
 func (client WarrantClient) GetTenant(tenantId string) (*Tenant, error) {
 	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/tenants/%s", tenantId), nil)
 	if err != nil {
@@ -257,7 +256,7 @@ func (client WarrantClient) UpdateUser(userId string, user User) (*User, error) 
 	return &updatedUser, nil
 }
 
-func (client WarrantClient) ListUsers() ([]*User, error) {
+func (client WarrantClient) ListUsers() ([]User, error) {
 	resp, err := client.makeRequest("GET", "/v1/users", nil)
 	if err != nil {
 		return nil, err
@@ -273,7 +272,7 @@ func (client WarrantClient) ListUsers() ([]*User, error) {
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var users []*User
+	var users []User
 	err = json.Unmarshal([]byte(body), &users)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -496,7 +495,7 @@ func (client WarrantClient) CreateRole(roleId string) (*Role, error) {
 	return &newRole, nil
 }
 
-func (client WarrantClient) ListRoles() ([]*Role, error) {
+func (client WarrantClient) ListRoles() ([]Role, error) {
 	resp, err := client.makeRequest("GET", "/v1/roles", nil)
 	if err != nil {
 		return nil, err
@@ -512,7 +511,7 @@ func (client WarrantClient) ListRoles() ([]*Role, error) {
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var roles []*Role
+	var roles []Role
 	err = json.Unmarshal([]byte(body), &roles)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -648,7 +647,7 @@ func (client WarrantClient) CreatePermission(permissionId string) (*Permission, 
 	return &newPermission, nil
 }
 
-func (client WarrantClient) ListPermissions() ([]*Permission, error) {
+func (client WarrantClient) ListPermissions() ([]Permission, error) {
 	resp, err := client.makeRequest("GET", "/v1/permissions", nil)
 	if err != nil {
 		return nil, err
@@ -664,7 +663,7 @@ func (client WarrantClient) ListPermissions() ([]*Permission, error) {
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var permissions []*Permission
+	var permissions []Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -735,7 +734,7 @@ func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, er
 	return &newWarrant, nil
 }
 
-func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]*Warrant, error) {
+func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]Warrant, error) {
 	filterQuery, err := query.Values(warrantFilters)
 	if err != nil {
 		return nil, wrapError("Could not parse filters", err)
@@ -757,7 +756,7 @@ func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]*
 		return nil, wrapError("Error reading response", err)
 	}
 
-	var warrants []*Warrant
+	var warrants []Warrant
 	err = json.Unmarshal([]byte(body), &warrants)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
