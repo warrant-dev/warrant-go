@@ -91,7 +91,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign the new user to the new tenant
-	newWarrant, err := client.AssignUserToTenant(fakeTenant.TenantId, newUser.UserId)
+	newWarrant, err := client.AssignUserToTenant(newUser.UserId, fakeTenant.TenantId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -196,7 +196,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign assigned-permission to test-role
-	assignedPermission, err = client.AssignPermissionToRole(testRole.RoleId, assignedPermission.PermissionId)
+	assignedPermission, err = client.AssignPermissionToRole(assignedPermission.PermissionId, testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -205,7 +205,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign view-self-service-dashboard to test-role
-	_, err = client.AssignPermissionToRole(testRole.RoleId, "view-self-service-dashboard")
+	_, err = client.AssignPermissionToRole("view-self-service-dashboard", testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -214,7 +214,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign test-role to user
-	_, err = client.AssignRoleToUser(newUser.UserId, testRole.RoleId)
+	_, err = client.AssignRoleToUser(testRole.RoleId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -223,7 +223,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign user-specific-permission to user
-	assignedUserPermission, err := client.AssignPermissionToUser(newUser.UserId, userAssignedPermission.PermissionId)
+	assignedUserPermission, err := client.AssignPermissionToUser(userAssignedPermission.PermissionId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -411,7 +411,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove test-role from user
-	err = client.RemoveRoleFromUser(newUser.UserId, testRole.RoleId)
+	err = client.RemoveRoleFromUser(testRole.RoleId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -420,7 +420,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove view-self-service-dashboard from test-role
-	err = client.RemovePermissionFromRole(testRole.RoleId, "view-self-service-dashboard")
+	err = client.RemovePermissionFromRole("view-self-service-dashboard", testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -429,7 +429,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove assigned-permission from test-role
-	err = client.RemovePermissionFromRole(testRole.RoleId, assignedPermission.PermissionId)
+	err = client.RemovePermissionFromRole(assignedPermission.PermissionId, testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -438,7 +438,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove user-specific-permission from test-user
-	err = client.RemovePermissionFromUser(newUser.UserId, userAssignedPermission.PermissionId)
+	err = client.RemovePermissionFromUser(userAssignedPermission.PermissionId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -483,7 +483,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove user from tenant
-	err = client.RemoveUserFromTenant(newTenant.TenantId, newUser.UserId)
+	err = client.RemoveUserFromTenant(newUser.UserId, newTenant.TenantId)
 	if err != nil {
 		fmt.Println(err)
 		return
