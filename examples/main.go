@@ -134,7 +134,9 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create test-role
-	testRole, err := client.CreateRole("test-role")
+	testRole, err := client.CreateRole(warrant.Role{
+		RoleId: "test-role",
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -152,7 +154,9 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create granted-permission
-	assignedPermission, err := client.CreatePermission("assigned-permission")
+	assignedPermission, err := client.CreatePermission(warrant.Permission{
+		PermissionId: "assigned-permission",
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -161,7 +165,9 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create user-specific-permission
-	userAssignedPermission, err := client.CreatePermission("user-specific-permission")
+	userAssignedPermission, err := client.CreatePermission(warrant.Permission{
+		PermissionId: "user-specific-permission",
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -170,7 +176,9 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create unassigned-permission
-	unassignedPermission, err := client.CreatePermission("unassigned-permission")
+	unassignedPermission, err := client.CreatePermission(warrant.Permission{
+		PermissionId: "unassigned-permission",
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
