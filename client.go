@@ -130,7 +130,7 @@ func (client WarrantClient) GetTenant(tenantId string) (*Tenant, error) {
 	return &foundTenant, nil
 }
 
-func (client WarrantClient) GetUsersForTenant(tenantId string) ([]*User, error) {
+func (client WarrantClient) GetUsersForTenant(tenantId string) ([]User, error) {
 	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/tenants/%s/users", tenantId), nil)
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (client WarrantClient) GetUsersForTenant(tenantId string) ([]*User, error) 
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var tenantUsers []*User
+	var tenantUsers []User
 	err = json.Unmarshal([]byte(body), &tenantUsers)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -304,7 +304,7 @@ func (client WarrantClient) GetUser(userId string) (*User, error) {
 	return &foundUser, nil
 }
 
-func (client WarrantClient) GetTenantsForUser(userId string) ([]*Tenant, error) {
+func (client WarrantClient) GetTenantsForUser(userId string) ([]Tenant, error) {
 	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/tenants", userId), nil)
 	if err != nil {
 		return nil, err
@@ -320,7 +320,7 @@ func (client WarrantClient) GetTenantsForUser(userId string) ([]*Tenant, error) 
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var userTenants []*Tenant
+	var userTenants []Tenant
 	err = json.Unmarshal([]byte(body), &userTenants)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -328,7 +328,7 @@ func (client WarrantClient) GetTenantsForUser(userId string) ([]*Tenant, error) 
 	return userTenants, nil
 }
 
-func (client WarrantClient) GetRolesForUser(userId string) ([]*Role, error) {
+func (client WarrantClient) GetRolesForUser(userId string) ([]Role, error) {
 	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/roles", userId), nil)
 	if err != nil {
 		return nil, err
@@ -344,7 +344,7 @@ func (client WarrantClient) GetRolesForUser(userId string) ([]*Role, error) {
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var userRoles []*Role
+	var userRoles []Role
 	err = json.Unmarshal([]byte(body), &userRoles)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -430,7 +430,7 @@ func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId
 	return nil
 }
 
-func (client WarrantClient) GetPermissionsForUser(userId string) ([]*Permission, error) {
+func (client WarrantClient) GetPermissionsForUser(userId string) ([]Permission, error) {
 	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions", userId), nil)
 	if err != nil {
 		return nil, err
@@ -446,7 +446,7 @@ func (client WarrantClient) GetPermissionsForUser(userId string) ([]*Permission,
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var userPermissions []*Permission
+	var userPermissions []Permission
 	err = json.Unmarshal([]byte(body), &userPermissions)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
@@ -582,7 +582,7 @@ func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId
 	return nil
 }
 
-func (client WarrantClient) GetPermissionsForRole(roleId string) ([]*Permission, error) {
+func (client WarrantClient) GetPermissionsForRole(roleId string) ([]Permission, error) {
 	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions", roleId), nil)
 	if err != nil {
 		return nil, err
@@ -598,7 +598,7 @@ func (client WarrantClient) GetPermissionsForRole(roleId string) ([]*Permission,
 	if err != nil {
 		return nil, wrapError("Error reading response", err)
 	}
-	var rolePermissions []*Permission
+	var rolePermissions []Permission
 	err = json.Unmarshal([]byte(body), &rolePermissions)
 	if err != nil {
 		return nil, wrapError("Invalid response from server", err)
