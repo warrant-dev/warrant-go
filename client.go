@@ -154,7 +154,7 @@ func (client WarrantClient) GetUsersForTenant(tenantId string) ([]User, error) {
 	return tenantUsers, nil
 }
 
-func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (*Warrant, error) {
+func (client WarrantClient) AssignUserToTenant(userId string, tenantId string) (*Warrant, error) {
 	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
 	if err != nil {
 		return nil, err
@@ -178,7 +178,7 @@ func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (
 	return &newWarrant, nil
 }
 
-func (client WarrantClient) RemoveUserFromTenant(tenantId string, userId string) error {
+func (client WarrantClient) RemoveUserFromTenant(userId string, tenantId string) error {
 	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
 	if err != nil {
 		return err
@@ -352,7 +352,7 @@ func (client WarrantClient) GetRolesForUser(userId string) ([]Role, error) {
 	return userRoles, nil
 }
 
-func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Role, error) {
+func (client WarrantClient) AssignRoleToUser(roleId string, userId string) (*Role, error) {
 	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
 	if err != nil {
 		return nil, err
@@ -376,7 +376,7 @@ func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Rol
 	return &newRole, nil
 }
 
-func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) error {
+func (client WarrantClient) RemoveRoleFromUser(roleId string, userId string) error {
 	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
 	if err != nil {
 		return err
@@ -391,7 +391,7 @@ func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) err
 	return nil
 }
 
-func (client WarrantClient) AssignPermissionToUser(userId string, permissionId string) (*Permission, error) {
+func (client WarrantClient) AssignPermissionToUser(permissionId string, userId string) (*Permission, error) {
 	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
 	if err != nil {
 		return nil, err
@@ -415,7 +415,7 @@ func (client WarrantClient) AssignPermissionToUser(userId string, permissionId s
 	return &newPermission, nil
 }
 
-func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId string) error {
+func (client WarrantClient) RemovePermissionFromUser(permissionId string, userId string) error {
 	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
 	if err != nil {
 		return err
@@ -541,7 +541,7 @@ func (client WarrantClient) GetRole(roleId string) (*Role, error) {
 	return &foundRole, nil
 }
 
-func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId string) (*Permission, error) {
+func (client WarrantClient) AssignPermissionToRole(permissionId string, roleId string) (*Permission, error) {
 	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
 	if err != nil {
 		return nil, err
@@ -565,7 +565,7 @@ func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId s
 	return &newPermission, nil
 }
 
-func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId string) error {
+func (client WarrantClient) RemovePermissionFromRole(permissionId string, roleId string) error {
 	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
 	if err != nil {
 		return err
