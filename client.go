@@ -469,10 +469,8 @@ func (client WarrantClient) DeleteUser(userId string) error {
 	return nil
 }
 
-func (client WarrantClient) CreateRole(roleId string) (*Role, error) {
-	resp, err := client.makeRequest("POST", "/v1/roles", Role{
-		RoleId: roleId,
-	})
+func (client WarrantClient) CreateRole(role Role) (*Role, error) {
+	resp, err := client.makeRequest("POST", "/v1/roles", role)
 	if err != nil {
 		return nil, err
 	}
@@ -621,10 +619,8 @@ func (client WarrantClient) DeleteRole(roleId string) error {
 	return nil
 }
 
-func (client WarrantClient) CreatePermission(permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("POST", "/v1/permissions", Permission{
-		PermissionId: permissionId,
-	})
+func (client WarrantClient) CreatePermission(permission Permission) (*Permission, error) {
+	resp, err := client.makeRequest("POST", "/v1/permissions", permission)
 	if err != nil {
 		return nil, err
 	}
