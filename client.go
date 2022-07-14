@@ -781,9 +781,6 @@ func (client WarrantClient) CreateAuthorizationSession(session Session) (string,
 		"type":   "sess",
 		"userId": session.UserId,
 	}
-	if session.TenantId != "" {
-		requestBody["tenantId"] = session.TenantId
-	}
 
 	resp, err := client.makeRequest("POST", "/v1/sessions", requestBody)
 	if err != nil {

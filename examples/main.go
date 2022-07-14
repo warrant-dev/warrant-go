@@ -233,8 +233,7 @@ func example(client warrant.WarrantClient) {
 
 	// Create a session for user
 	token, err := client.CreateAuthorizationSession(warrant.Session{
-		UserId:   newUser.UserId,
-		TenantId: newTenant.TenantId,
+		UserId: newUser.UserId,
 	})
 	if err != nil {
 		fmt.Println(err)
