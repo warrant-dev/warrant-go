@@ -13,7 +13,8 @@ type Subject struct {
 	Relation   string `json:"relation,omitempty"`
 }
 
-type ListWarrantFilters struct {
+type ListWarrantParams struct {
+	ListParams
 	ObjectType string `json:"objectType" url:"objectType,omitempty"`
 	ObjectId   string `json:"objectId" url:"objectId,omitempty"`
 	Relation   string `json:"relation" url:"relation,omitempty"`

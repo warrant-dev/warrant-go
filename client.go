@@ -85,8 +85,13 @@ func (client WarrantClient) UpdateTenant(tenantId string, tenant Tenant) (*Tenan
 	return &updatedTenant, nil
 }
 
-func (client WarrantClient) ListTenants() ([]Tenant, error) {
-	requestUrl := client.buildRequestUrl("/v1/tenants")
+func (client WarrantClient) ListTenants(listParams ListTenantParams) ([]Tenant, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants?%s", queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -267,8 +272,13 @@ func (client WarrantClient) UpdateUser(userId string, user User) (*User, error) 
 	return &updatedUser, nil
 }
 
-func (client WarrantClient) ListUsers() ([]User, error) {
-	requestUrl := client.buildRequestUrl("/v1/users")
+func (client WarrantClient) ListUsers(listParams ListUserParams) ([]User, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users?%s", queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -515,8 +525,13 @@ func (client WarrantClient) CreateRole(role Role) (*Role, error) {
 	return &newRole, nil
 }
 
-func (client WarrantClient) ListRoles() ([]Role, error) {
-	requestUrl := client.buildRequestUrl("/v1/roles")
+func (client WarrantClient) ListRoles(listParams ListRoleParams) ([]Role, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles?%s", queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -672,8 +687,13 @@ func (client WarrantClient) CreatePermission(permission Permission) (*Permission
 	return &newPermission, nil
 }
 
-func (client WarrantClient) ListPermissions() ([]Permission, error) {
-	requestUrl := client.buildRequestUrl("/v1/permissions")
+func (client WarrantClient) ListPermissions(listParams ListPermissionParams) ([]Permission, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -763,13 +783,13 @@ func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, er
 	return &newWarrant, nil
 }
 
-func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]Warrant, error) {
-	filterQuery, err := query.Values(warrantFilters)
+func (client WarrantClient) ListWarrants(listParams ListWarrantParams) ([]Warrant, error) {
+	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, wrapError("Could not parse filters", err)
+		return nil, wrapError("Could not parse listParams", err)
 	}
 
-	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/warrants?%s", filterQuery.Encode()))
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/warrants?%s", queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err

@@ -254,7 +254,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all warrants for organization
-	warrants, err := client.ListWarrants(warrant.ListWarrantFilters{})
+	warrants, err := client.ListWarrants(warrant.ListWarrantParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -266,7 +266,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all tenants
-	tenants, err := client.ListTenants()
+	tenants, err := client.ListTenants(warrant.ListTenantParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -290,7 +290,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all users
-	users, err := client.ListUsers()
+	users, err := client.ListUsers(warrant.ListUserParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -338,7 +338,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all roles
-	roles, err := client.ListRoles()
+	roles, err := client.ListRoles(warrant.ListRoleParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -362,7 +362,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all permissions
-	permissions, err := client.ListPermissions()
+	permissions, err := client.ListPermissions(warrant.ListPermissionParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
