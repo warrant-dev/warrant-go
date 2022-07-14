@@ -114,7 +114,10 @@ func (ehp *EnsureHasPermission) ServeHTTP(w http.ResponseWriter, r *http.Request
 		userId = ehp.mw.config.GetUserId(r)
 	}
 
-	isAuthorized, err := ehp.mw.client.HasPermission(ehp.options.PermissionId, userId)
+	isAuthorized, err := ehp.mw.client.HasPermission(PermissionCheckParams{
+		PermissionId: ehp.options.PermissionId,
+		UserId:       userId,
+	})
 	if err != nil {
 		log.Println(err)
 		ehp.mw.config.OnAccessDenied(w, r)

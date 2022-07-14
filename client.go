@@ -15,7 +15,8 @@ const API_VERSION = "/v1"
 const SELF_SERVICE_DASH_URL_BASE = "https://self-serve.warrant.dev"
 
 type ClientConfig struct {
-	ApiKey string
+	ApiKey            string
+	AuthorizeEndpoint string
 }
 
 type WarrantClient struct {
@@ -35,7 +36,8 @@ func NewClient(config ClientConfig) WarrantClient {
 }
 
 func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
-	resp, err := client.makeRequest("POST", "/v1/tenants", tenant)
+	requestUrl := client.buildRequestUrl("/v1/tenants")
+	resp, err := client.makeRequest("POST", requestUrl, tenant)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +61,8 @@ func (client WarrantClient) CreateTenant(tenant Tenant) (*Tenant, error) {
 }
 
 func (client WarrantClient) UpdateTenant(tenantId string, tenant Tenant) (*Tenant, error) {
-	resp, err := client.makeRequest("PUT", fmt.Sprintf("/v1/tenants/%s", tenantId), tenant)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s", tenantId))
+	resp, err := client.makeRequest("PUT", requestUrl, tenant)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +86,8 @@ func (client WarrantClient) UpdateTenant(tenantId string, tenant Tenant) (*Tenan
 }
 
 func (client WarrantClient) ListTenants() ([]Tenant, error) {
-	resp, err := client.makeRequest("GET", "/v1/tenants", nil)
+	requestUrl := client.buildRequestUrl("/v1/tenants")
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +111,8 @@ func (client WarrantClient) ListTenants() ([]Tenant, error) {
 }
 
 func (client WarrantClient) GetTenant(tenantId string) (*Tenant, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/tenants/%s", tenantId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s", tenantId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +136,8 @@ func (client WarrantClient) GetTenant(tenantId string) (*Tenant, error) {
 }
 
 func (client WarrantClient) GetUsersForTenant(tenantId string) ([]User, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/tenants/%s/users", tenantId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s/users", tenantId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +161,8 @@ func (client WarrantClient) GetUsersForTenant(tenantId string) ([]User, error) {
 }
 
 func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (*Warrant, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId))
+	resp, err := client.makeRequest("POST", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +186,8 @@ func (client WarrantClient) AssignUserToTenant(tenantId string, userId string) (
 }
 
 func (client WarrantClient) RemoveUserFromTenant(tenantId string, userId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -194,7 +202,8 @@ func (client WarrantClient) RemoveUserFromTenant(tenantId string, userId string)
 }
 
 func (client WarrantClient) DeleteTenant(tenantId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s", tenantId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s", tenantId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -209,7 +218,8 @@ func (client WarrantClient) DeleteTenant(tenantId string) error {
 }
 
 func (client WarrantClient) CreateUser(user User) (*User, error) {
-	resp, err := client.makeRequest("POST", "/v1/users", user)
+	requestUrl := client.buildRequestUrl("/v1/users")
+	resp, err := client.makeRequest("POST", requestUrl, user)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +243,8 @@ func (client WarrantClient) CreateUser(user User) (*User, error) {
 }
 
 func (client WarrantClient) UpdateUser(userId string, user User) (*User, error) {
-	resp, err := client.makeRequest("PUT", fmt.Sprintf("/v1/users/%s", userId), user)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s", userId))
+	resp, err := client.makeRequest("PUT", requestUrl, user)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +268,8 @@ func (client WarrantClient) UpdateUser(userId string, user User) (*User, error) 
 }
 
 func (client WarrantClient) ListUsers() ([]User, error) {
-	resp, err := client.makeRequest("GET", "/v1/users", nil)
+	requestUrl := client.buildRequestUrl("/v1/users")
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +293,8 @@ func (client WarrantClient) ListUsers() ([]User, error) {
 }
 
 func (client WarrantClient) GetUser(userId string) (*User, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s", userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s", userId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -305,7 +318,8 @@ func (client WarrantClient) GetUser(userId string) (*User, error) {
 }
 
 func (client WarrantClient) GetTenantsForUser(userId string) ([]Tenant, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/tenants", userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/tenants", userId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -329,7 +343,8 @@ func (client WarrantClient) GetTenantsForUser(userId string) ([]Tenant, error) {
 }
 
 func (client WarrantClient) GetRolesForUser(userId string) ([]Role, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/roles", userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/roles", userId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -353,7 +368,8 @@ func (client WarrantClient) GetRolesForUser(userId string) ([]Role, error) {
 }
 
 func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Role, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId))
+	resp, err := client.makeRequest("POST", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +393,8 @@ func (client WarrantClient) AssignRoleToUser(userId string, roleId string) (*Rol
 }
 
 func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -392,7 +409,8 @@ func (client WarrantClient) RemoveRoleFromUser(userId string, roleId string) err
 }
 
 func (client WarrantClient) AssignPermissionToUser(userId string, permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId))
+	resp, err := client.makeRequest("POST", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -416,7 +434,8 @@ func (client WarrantClient) AssignPermissionToUser(userId string, permissionId s
 }
 
 func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -431,7 +450,8 @@ func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId
 }
 
 func (client WarrantClient) GetPermissionsForUser(userId string) ([]Permission, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions", userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/permissions", userId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -455,7 +475,8 @@ func (client WarrantClient) GetPermissionsForUser(userId string) ([]Permission, 
 }
 
 func (client WarrantClient) DeleteUser(userId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/users/%s", userId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s", userId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -470,7 +491,8 @@ func (client WarrantClient) DeleteUser(userId string) error {
 }
 
 func (client WarrantClient) CreateRole(role Role) (*Role, error) {
-	resp, err := client.makeRequest("POST", "/v1/roles", role)
+	requestUrl := client.buildRequestUrl("/v1/roles")
+	resp, err := client.makeRequest("POST", requestUrl, role)
 	if err != nil {
 		return nil, err
 	}
@@ -494,7 +516,8 @@ func (client WarrantClient) CreateRole(role Role) (*Role, error) {
 }
 
 func (client WarrantClient) ListRoles() ([]Role, error) {
-	resp, err := client.makeRequest("GET", "/v1/roles", nil)
+	requestUrl := client.buildRequestUrl("/v1/roles")
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -518,7 +541,8 @@ func (client WarrantClient) ListRoles() ([]Role, error) {
 }
 
 func (client WarrantClient) GetRole(roleId string) (*Role, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s", roleId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -542,7 +566,8 @@ func (client WarrantClient) GetRole(roleId string) (*Role, error) {
 }
 
 func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("POST", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId))
+	resp, err := client.makeRequest("POST", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -566,7 +591,8 @@ func (client WarrantClient) AssignPermissionToRole(roleId string, permissionId s
 }
 
 func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -581,7 +607,8 @@ func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId
 }
 
 func (client WarrantClient) GetPermissionsForRole(roleId string) ([]Permission, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions", roleId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s/permissions", roleId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -605,7 +632,8 @@ func (client WarrantClient) GetPermissionsForRole(roleId string) ([]Permission, 
 }
 
 func (client WarrantClient) DeleteRole(roleId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s", roleId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -620,7 +648,8 @@ func (client WarrantClient) DeleteRole(roleId string) error {
 }
 
 func (client WarrantClient) CreatePermission(permission Permission) (*Permission, error) {
-	resp, err := client.makeRequest("POST", "/v1/permissions", permission)
+	requestUrl := client.buildRequestUrl("/v1/permissions")
+	resp, err := client.makeRequest("POST", requestUrl, permission)
 	if err != nil {
 		return nil, err
 	}
@@ -644,7 +673,8 @@ func (client WarrantClient) CreatePermission(permission Permission) (*Permission
 }
 
 func (client WarrantClient) ListPermissions() ([]Permission, error) {
-	resp, err := client.makeRequest("GET", "/v1/permissions", nil)
+	requestUrl := client.buildRequestUrl("/v1/permissions")
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -668,7 +698,8 @@ func (client WarrantClient) ListPermissions() ([]Permission, error) {
 }
 
 func (client WarrantClient) GetPermission(permissionId string) (*Permission, error) {
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/permissions/%s", permissionId))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -692,7 +723,8 @@ func (client WarrantClient) GetPermission(permissionId string) (*Permission, err
 }
 
 func (client WarrantClient) DeletePermission(permissionId string) error {
-	resp, err := client.makeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/permissions/%s", permissionId))
+	resp, err := client.makeRequest("DELETE", requestUrl, nil)
 	if err != nil {
 		return err
 	}
@@ -707,7 +739,8 @@ func (client WarrantClient) DeletePermission(permissionId string) error {
 }
 
 func (client WarrantClient) CreateWarrant(warrantToCreate Warrant) (*Warrant, error) {
-	resp, err := client.makeRequest("POST", "/v1/warrants", warrantToCreate)
+	requestUrl := client.buildRequestUrl("/v1/warrants")
+	resp, err := client.makeRequest("POST", requestUrl, warrantToCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -736,7 +769,8 @@ func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]W
 		return nil, wrapError("Could not parse filters", err)
 	}
 
-	resp, err := client.makeRequest("GET", fmt.Sprintf("/v1/warrants?%s", filterQuery.Encode()), nil)
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/warrants?%s", filterQuery.Encode()))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -762,7 +796,8 @@ func (client WarrantClient) ListWarrants(warrantFilters ListWarrantFilters) ([]W
 }
 
 func (client WarrantClient) DeleteWarrant(warrantToDelete Warrant) error {
-	resp, err := client.makeRequest("DELETE", "/v1/warrants", warrantToDelete)
+	requestUrl := client.buildRequestUrl("/v1/warrants")
+	resp, err := client.makeRequest("DELETE", requestUrl, warrantToDelete)
 	if err != nil {
 		return err
 	}
@@ -785,7 +820,8 @@ func (client WarrantClient) CreateAuthorizationSession(session Session) (string,
 		requestBody["tenantId"] = session.TenantId
 	}
 
-	resp, err := client.makeRequest("POST", "/v1/sessions", requestBody)
+	requestUrl := client.buildRequestUrl("/v1/sessions")
+	resp, err := client.makeRequest("POST", requestUrl, requestBody)
 	if err != nil {
 		return "", err
 	}
@@ -817,7 +853,8 @@ func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUr
 		requestBody["tenantId"] = session.TenantId
 	}
 
-	resp, err := client.makeRequest("POST", "/v1/sessions", requestBody)
+	requestUrl := client.buildRequestUrl("/v1/sessions")
+	resp, err := client.makeRequest("POST", requestUrl, requestBody)
 	if err != nil {
 		return "", err
 	}
@@ -841,7 +878,34 @@ func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUr
 }
 
 func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, error) {
-	resp, err := client.makeRequest("POST", "/v2/authorize", toCheck)
+	if client.config.AuthorizeEndpoint != "" {
+		return client.edgeAuthorize(toCheck)
+	}
+
+	return client.authorize(toCheck)
+}
+
+func (client WarrantClient) HasPermission(toCheck PermissionCheckParams) (bool, error) {
+	return client.IsAuthorized(WarrantCheckParams{
+		Warrants: []Warrant{
+			{
+				ObjectType: "permission",
+				ObjectId:   toCheck.PermissionId,
+				Relation:   "member",
+				Subject: Subject{
+					ObjectType: "user",
+					ObjectId:   toCheck.UserId,
+				},
+			},
+		},
+		ConsistentRead: toCheck.ConsistentRead,
+		Debug:          toCheck.Debug,
+	})
+}
+
+func (client WarrantClient) authorize(toCheck WarrantCheckParams) (bool, error) {
+	requestUrl := client.buildRequestUrl("/v2/authorize")
+	resp, err := client.makeRequest("POST", requestUrl, toCheck)
 	if err != nil {
 		return false, err
 	}
@@ -870,29 +934,43 @@ func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, erro
 	}
 }
 
-func (client WarrantClient) HasPermission(permissionId string, userId string) (bool, error) {
-	return client.IsAuthorized(WarrantCheckParams{
-		Warrants: []Warrant{
-			{
-				ObjectType: "permission",
-				ObjectId:   permissionId,
-				Relation:   "member",
-				Subject: Subject{
-					ObjectType: "user",
-					ObjectId:   userId,
-				},
-			},
-		},
-	})
+func (client WarrantClient) edgeAuthorize(toCheck WarrantCheckParams) (bool, error) {
+	resp, err := client.makeRequest("POST", fmt.Sprintf("%s%s", client.config.AuthorizeEndpoint, "/v2/authorize"), toCheck)
+	if err != nil {
+		return false, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return false, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, wrapError("Error reading response", err)
+	}
+
+	var result WarrantCheckResult
+	err = json.Unmarshal([]byte(body), &result)
+	if err != nil {
+		return false, wrapError("Invalid response from server", err)
+	}
+
+	if result.Result == "Authorized" {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
-func (client WarrantClient) makeRequest(method string, requestUri string, payload interface{}) (*http.Response, error) {
+func (client WarrantClient) makeRequest(method string, url string, payload interface{}) (*http.Response, error) {
 	postBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, wrapError("Invalid request payload", err)
 	}
 	requestBody := bytes.NewBuffer(postBody)
-	req, err := http.NewRequest(method, API_URL_BASE+requestUri, requestBody)
+	req, err := http.NewRequest(method, url, requestBody)
 	if err != nil {
 		return nil, wrapError("Unable to create request", err)
 	}
@@ -902,4 +980,8 @@ func (client WarrantClient) makeRequest(method string, requestUri string, payloa
 		return nil, wrapError("Error making request", err)
 	}
 	return resp, nil
+}
+
+func (client WarrantClient) buildRequestUrl(requestUri string) string {
+	return fmt.Sprintf("%s%s", API_URL_BASE, requestUri)
 }
