@@ -327,8 +327,13 @@ func (client WarrantClient) GetUser(userId string) (*User, error) {
 	return &foundUser, nil
 }
 
-func (client WarrantClient) GetTenantsForUser(userId string) ([]Tenant, error) {
-	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/tenants", userId))
+func (client WarrantClient) ListTenantsForUser(userId string, listParams ListTenantParams) ([]Tenant, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/tenants?%s", userId, queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -352,8 +357,13 @@ func (client WarrantClient) GetTenantsForUser(userId string) ([]Tenant, error) {
 	return userTenants, nil
 }
 
-func (client WarrantClient) GetRolesForUser(userId string) ([]Role, error) {
-	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/roles", userId))
+func (client WarrantClient) ListRolesForUser(userId string, listParams ListRoleParams) ([]Role, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -459,8 +469,13 @@ func (client WarrantClient) RemovePermissionFromUser(userId string, permissionId
 	return nil
 }
 
-func (client WarrantClient) GetPermissionsForUser(userId string) ([]Permission, error) {
-	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/permissions", userId))
+func (client WarrantClient) ListPermissionsForUser(userId string, listParams ListPermissionParams) ([]Permission, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
@@ -621,8 +636,13 @@ func (client WarrantClient) RemovePermissionFromRole(roleId string, permissionId
 	return nil
 }
 
-func (client WarrantClient) GetPermissionsForRole(roleId string) ([]Permission, error) {
-	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s/permissions", roleId))
+func (client WarrantClient) ListPermissionsForRole(roleId string, listParams ListPermissionParams) ([]Permission, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, wrapError("Could not parse listParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
 		return nil, err
