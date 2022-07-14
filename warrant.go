@@ -21,11 +21,20 @@ type ListWarrantFilters struct {
 }
 
 type WarrantCheckParams struct {
-	Op       string    `json:"op"`
-	Warrants []Warrant `json:"warrants"`
+	Op             string    `json:"op"`
+	Warrants       []Warrant `json:"warrants"`
+	ConsistentRead bool      `json:"consistentRead"`
+	Debug          bool      `json:"debug"`
 }
 
 type WarrantCheckResult struct {
 	Code   int64  `json:"code"`
 	Result string `json:"result"`
+}
+
+type PermissionCheckParams struct {
+	PermissionId   string `json:"permissionId"`
+	UserId         string `json:"userId"`
+	ConsistentRead bool   `json:"consistentRead"`
+	Debug          bool   `json:"debug"`
 }

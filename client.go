@@ -15,7 +15,8 @@ const API_VERSION = "/v1"
 const SELF_SERVICE_DASH_URL_BASE = "https://self-serve.warrant.dev"
 
 type ClientConfig struct {
-	ApiKey string
+	ApiKey            string
+	AuthorizeEndpoint string
 }
 
 type WarrantClient struct {
@@ -877,6 +878,32 @@ func (client WarrantClient) CreateSelfServiceSession(session Session, redirectUr
 }
 
 func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, error) {
+	if client.config.AuthorizeEndpoint != "" {
+		return client.edgeAuthorize(toCheck)
+	}
+
+	return client.authorize(toCheck)
+}
+
+func (client WarrantClient) HasPermission(toCheck PermissionCheckParams) (bool, error) {
+	return client.IsAuthorized(WarrantCheckParams{
+		Warrants: []Warrant{
+			{
+				ObjectType: "permission",
+				ObjectId:   toCheck.PermissionId,
+				Relation:   "member",
+				Subject: Subject{
+					ObjectType: "user",
+					ObjectId:   toCheck.UserId,
+				},
+			},
+		},
+		ConsistentRead: toCheck.ConsistentRead,
+		Debug:          toCheck.Debug,
+	})
+}
+
+func (client WarrantClient) authorize(toCheck WarrantCheckParams) (bool, error) {
 	requestUrl := client.buildRequestUrl("/v2/authorize")
 	resp, err := client.makeRequest("POST", requestUrl, toCheck)
 	if err != nil {
@@ -907,20 +934,34 @@ func (client WarrantClient) IsAuthorized(toCheck WarrantCheckParams) (bool, erro
 	}
 }
 
-func (client WarrantClient) HasPermission(permissionId string, userId string) (bool, error) {
-	return client.IsAuthorized(WarrantCheckParams{
-		Warrants: []Warrant{
-			{
-				ObjectType: "permission",
-				ObjectId:   permissionId,
-				Relation:   "member",
-				Subject: Subject{
-					ObjectType: "user",
-					ObjectId:   userId,
-				},
-			},
-		},
-	})
+func (client WarrantClient) edgeAuthorize(toCheck WarrantCheckParams) (bool, error) {
+	resp, err := client.makeRequest("POST", fmt.Sprintf("%s%s", client.config.AuthorizeEndpoint, "/v2/authorize"), toCheck)
+	if err != nil {
+		return false, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return false, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, wrapError("Error reading response", err)
+	}
+
+	var result WarrantCheckResult
+	err = json.Unmarshal([]byte(body), &result)
+	if err != nil {
+		return false, wrapError("Invalid response from server", err)
+	}
+
+	if result.Result == "Authorized" {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
 func (client WarrantClient) makeRequest(method string, url string, payload interface{}) (*http.Response, error) {
