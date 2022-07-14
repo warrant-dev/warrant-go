@@ -302,7 +302,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get tenants for user
-	userTenants, err := client.GetTenantsForUser(newUser.UserId)
+	userTenants, err := client.ListTenantsForUser(newUser.UserId, warrant.ListTenantParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -314,7 +314,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get roles for user
-	userRoles, err := client.GetRolesForUser(newUser.UserId)
+	userRoles, err := client.ListRolesForUser(newUser.UserId, warrant.ListRoleParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -326,7 +326,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get permissions for user
-	userPermissions, err := client.GetPermissionsForUser(newUser.UserId)
+	userPermissions, err := client.ListPermissionsForUser(newUser.UserId, warrant.ListPermissionParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -350,7 +350,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get permissions for role
-	rolePermissions, err := client.GetPermissionsForRole(testRole.RoleId)
+	rolePermissions, err := client.ListPermissionsForRole(testRole.RoleId, warrant.ListPermissionParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
