@@ -135,7 +135,7 @@ func (client WarrantClient) GetTenant(tenantId string) (*Tenant, error) {
 	return &foundTenant, nil
 }
 
-func (client WarrantClient) GetUsersForTenant(tenantId string) ([]User, error) {
+func (client WarrantClient) ListUsersForTenant(tenantId string) ([]User, error) {
 	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/tenants/%s/users", tenantId))
 	resp, err := client.makeRequest("GET", requestUrl, nil)
 	if err != nil {
