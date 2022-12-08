@@ -1002,21 +1002,34 @@ func (client WarrantClient) edgeAuthorize(toCheck WarrantCheckParams) (bool, err
 }
 
 func (client WarrantClient) makeRequest(method string, url string, payload interface{}) (*http.Response, error) {
-	postBody, err := json.Marshal(payload)
-	if err != nil {
-		return nil, wrapError("Invalid request payload", err)
+	if payload == nil {
+		req, err := http.NewRequest(method, url, nil)
+		if err != nil {
+			return nil, wrapError("Unable to create request", err)
+		}
+		req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.config.ApiKey))
+		resp, err := client.httpClient.Do(req)
+		if err != nil {
+			return nil, wrapError("Error making request", err)
+		}
+		return resp, nil
+	} else {
+		postBody, err := json.Marshal(payload)
+		if err != nil {
+			return nil, wrapError("Invalid request payload", err)
+		}
+		requestBody := bytes.NewBuffer(postBody)
+		req, err := http.NewRequest(method, url, requestBody)
+		if err != nil {
+			return nil, wrapError("Unable to create request", err)
+		}
+		req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.config.ApiKey))
+		resp, err := client.httpClient.Do(req)
+		if err != nil {
+			return nil, wrapError("Error making request", err)
+		}
+		return resp, nil
 	}
-	requestBody := bytes.NewBuffer(postBody)
-	req, err := http.NewRequest(method, url, requestBody)
-	if err != nil {
-		return nil, wrapError("Unable to create request", err)
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.config.ApiKey))
-	resp, err := client.httpClient.Do(req)
-	if err != nil {
-		return nil, wrapError("Error making request", err)
-	}
-	return resp, nil
 }
 
 func (client WarrantClient) buildRequestUrl(requestUri string) string {
