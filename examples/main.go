@@ -278,7 +278,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List users for tenant
-	tenantUsers, err := client.GetUsersForTenant(newTenant.TenantId)
+	tenantUsers, err := client.ListUsersForTenant(newTenant.TenantId)
 	if err != nil {
 		fmt.Println(err)
 		return
