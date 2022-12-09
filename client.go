@@ -1013,23 +1013,23 @@ func (client WarrantClient) makeRequest(method string, url string, payload inter
 			return nil, wrapError("Error making request", err)
 		}
 		return resp, nil
-	} else {
-		postBody, err := json.Marshal(payload)
-		if err != nil {
-			return nil, wrapError("Invalid request payload", err)
-		}
-		requestBody := bytes.NewBuffer(postBody)
-		req, err := http.NewRequest(method, url, requestBody)
-		if err != nil {
-			return nil, wrapError("Unable to create request", err)
-		}
-		req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.config.ApiKey))
-		resp, err := client.httpClient.Do(req)
-		if err != nil {
-			return nil, wrapError("Error making request", err)
-		}
-		return resp, nil
 	}
+
+	postBody, err := json.Marshal(payload)
+	if err != nil {
+		return nil, wrapError("Invalid request payload", err)
+	}
+	requestBody := bytes.NewBuffer(postBody)
+	req, err := http.NewRequest(method, url, requestBody)
+	if err != nil {
+		return nil, wrapError("Unable to create request", err)
+	}
+	req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.config.ApiKey))
+	resp, err := client.httpClient.Do(req)
+	if err != nil {
+		return nil, wrapError("Error making request", err)
+	}
+	return resp, nil
 }
 
 func (client WarrantClient) buildRequestUrl(requestUri string) string {
