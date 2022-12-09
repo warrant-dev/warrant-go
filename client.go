@@ -835,6 +835,38 @@ func (client WarrantClient) ListWarrants(listParams ListWarrantParams) ([]Warran
 	return warrants, nil
 }
 
+func (client WarrantClient) QueryWarrants(queryWarrantParams QueryWarrantParams) ([]Warrant, error) {
+	queryParams, err := query.Values(queryWarrantParams)
+	if err != nil {
+		return nil, wrapError("Could not parse queryWarrantParams", err)
+	}
+
+	requestUrl := client.buildRequestUrl(fmt.Sprintf("/v1/query?%s", queryParams.Encode()))
+	resp, err := client.makeRequest("GET", requestUrl, nil)
+	if err != nil {
+		return nil, err
+	}
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, wrapError("Error reading response", err)
+	}
+
+	var warrants []Warrant
+	err = json.Unmarshal([]byte(body), &warrants)
+	if err != nil {
+		return nil, wrapError("Invalid response from server", err)
+	}
+
+	return warrants, nil
+}
+
 func (client WarrantClient) DeleteWarrant(warrantToDelete Warrant) error {
 	requestUrl := client.buildRequestUrl("/v1/warrants")
 	resp, err := client.makeRequest("DELETE", requestUrl, warrantToDelete)
