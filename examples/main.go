@@ -513,4 +513,12 @@ func example(client warrant.WarrantClient) {
 	} else {
 		fmt.Printf("Deleted tenant %s\n", newTenant.TenantId)
 	}
+
+	err = client.DeleteTenant(fakeTenant.TenantId)
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Printf("Deleted tenant %s\n", newTenant.TenantId)
+	}
 }
