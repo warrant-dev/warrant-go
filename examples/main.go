@@ -265,6 +265,20 @@ func example(client warrant.WarrantClient) {
 		}
 	}
 
+	// Query warrants for role test-role
+	roleWarrants, err := client.QueryWarrants(warrant.QueryWarrantParams{
+		Subject: "role:test-role",
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		fmt.Println("\nRole test-role's warrants: ")
+		for _, w := range roleWarrants {
+			fmt.Printf("%+v\n", w)
+		}
+	}
+
 	// List all tenants
 	tenants, err := client.ListTenants(warrant.ListTenantParams{})
 	if err != nil {
