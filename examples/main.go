@@ -267,7 +267,10 @@ func example(client warrant.WarrantClient) {
 
 	// Query warrants for role test-role
 	roleWarrants, err := client.QueryWarrants(warrant.QueryWarrantParams{
-		Subject: "role:test-role",
+		Subject: warrant.Subject{
+			ObjectType: "role",
+			ObjectId:   "test-role",
+		},
 	})
 	if err != nil {
 		fmt.Println(err)

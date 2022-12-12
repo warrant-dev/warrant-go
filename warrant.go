@@ -1,5 +1,10 @@
 package warrant
 
+import (
+	"fmt"
+	"net/url"
+)
+
 type Warrant struct {
 	ObjectType    string  `json:"objectType"`
 	ObjectId      string  `json:"objectId"`
@@ -23,9 +28,9 @@ type ListWarrantParams struct {
 }
 
 type QueryWarrantParams struct {
-	ObjectType string `json:"objectType" url:"objectType,omitempty"`
-	Relation   string `json:"relation" url:"relation,omitempty"`
-	Subject    string `json:"subject" url:"subject,omitempty"`
+	ObjectType string  `json:"objectType" url:"objectType,omitempty"`
+	Relation   string  `json:"relation" url:"relation,omitempty"`
+	Subject    Subject `json:"subject" url:"subject,omitempty"`
 }
 
 type WarrantCheckParams struct {
@@ -45,4 +50,10 @@ type PermissionCheckParams struct {
 	UserId         string `json:"userId"`
 	ConsistentRead bool   `json:"consistentRead"`
 	Debug          bool   `json:"debug"`
+}
+
+func (subject Subject) EncodeValues(key string, v *url.Values) error {
+	v.Set(key, fmt.Sprintf("%s:%s", subject.ObjectType, subject.ObjectId))
+
+	return nil
 }
