@@ -16,7 +16,7 @@ Instantiate the Warrant client with your API key to get started:
 ```go
 import "github.com/warrant-dev/warrant-go"
 
-client := warrant.NewClient(warrant.ClientConfig{
+client := warrant.NewClient(client.ClientConfig{
     ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
 })
 ```

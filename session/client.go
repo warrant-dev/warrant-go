@@ -7,10 +7,11 @@ import (
 	"net/http"
 
 	"github.com/warrant-dev/warrant-go"
+	"github.com/warrant-dev/warrant-go/client"
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	warrantClient *client.WarrantClient
 }
 
 func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (string, error) {
@@ -20,12 +21,12 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", warrant.WrapError("Error reading response", err)
+		return "", client.WrapError("Error reading response", err)
 	}
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
-		return "", warrant.WrapError("Invalid response from server", err)
+		return "", client.WrapError("Invalid response from server", err)
 	}
 	return response["token"], nil
 }
@@ -41,12 +42,12 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", warrant.WrapError("Error reading response", err)
+		return "", client.WrapError("Error reading response", err)
 	}
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
-		return "", warrant.WrapError("Invalid response from server", err)
+		return "", client.WrapError("Invalid response from server", err)
 	}
 	return fmt.Sprintf("%s/%s?redirectUrl=%s", warrant.SelfServiceDashEndpoint, response["token"], params.RedirectUrl), nil
 }
@@ -60,13 +61,13 @@ func getClient() Client {
 		panic("You must provide an ApiKey to initialize the Warrant Client")
 	}
 
-	config := warrant.ClientConfig{
+	config := client.ClientConfig{
 		ApiKey:            warrant.ApiKey,
 		AuthorizeEndpoint: warrant.AuthorizeEndpoint,
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&client.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

@@ -8,10 +8,11 @@ import (
 
 	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go"
+	"github.com/warrant-dev/warrant-go/client"
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	warrantClient *client.WarrantClient
 }
 
 func (c Client) Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
@@ -21,12 +22,12 @@ func (c Client) Create(params *warrant.FeatureParams) (*warrant.Feature, error) 
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var newFeature warrant.Feature
 	err = json.Unmarshal([]byte(body), &newFeature)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &newFeature, nil
 }
@@ -42,12 +43,12 @@ func (c Client) Get(featureId string) (*warrant.Feature, error) {
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var foundFeature warrant.Feature
 	err = json.Unmarshal([]byte(body), &foundFeature)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &foundFeature, nil
 }
@@ -64,7 +65,7 @@ func (c Client) Delete(featureId string) error {
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
 		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
+		return client.Error{
 			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
@@ -78,7 +79,7 @@ func Delete(featureId string) error {
 func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features?%s", queryParams.Encode()), nil)
@@ -87,12 +88,12 @@ func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.F
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Feature
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -104,7 +105,7 @@ func ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.Feature, err
 func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s/features?%s", pricingTierId, queryParams.Encode()), nil)
@@ -113,12 +114,12 @@ func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *war
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var features []warrant.Feature
 	err = json.Unmarshal([]byte(body), &features)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return features, nil
 }
@@ -134,12 +135,12 @@ func (c Client) AssignFeatureToPricingTier(featureId string, pricingTierId strin
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var assignedFeature warrant.Feature
 	err = json.Unmarshal([]byte(body), &assignedFeature)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &assignedFeature, nil
 }
@@ -156,7 +157,7 @@ func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId str
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
 		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
+		return client.Error{
 			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
 	}
@@ -170,7 +171,7 @@ func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error 
 func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/features?%s", tenantId, queryParams.Encode()), nil)
@@ -179,12 +180,12 @@ func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListF
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var features []warrant.Feature
 	err = json.Unmarshal([]byte(body), &features)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return features, nil
 }
@@ -201,12 +202,12 @@ func (c Client) AssignFeatureToTenant(featureId string, tenantId string) (*warra
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var assignedFeature warrant.Feature
 	err = json.Unmarshal([]byte(body), &assignedFeature)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &assignedFeature, nil
 }
@@ -230,7 +231,7 @@ func RemoveFeatureFromTenant(featureId string, tenantId string) error {
 func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/features?%s", userId, queryParams.Encode()), nil)
@@ -239,12 +240,12 @@ func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatu
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var features []warrant.Feature
 	err = json.Unmarshal([]byte(body), &features)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return features, nil
 }
@@ -260,12 +261,12 @@ func (c Client) AssignFeatureToUser(featureId string, userId string) (*warrant.F
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var assignedFeature warrant.Feature
 	err = json.Unmarshal([]byte(body), &assignedFeature)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &assignedFeature, nil
 }
@@ -291,13 +292,13 @@ func getClient() Client {
 		panic("You must provide an ApiKey to initialize the Warrant Client")
 	}
 
-	config := warrant.ClientConfig{
+	config := client.ClientConfig{
 		ApiKey:            warrant.ApiKey,
 		AuthorizeEndpoint: warrant.AuthorizeEndpoint,
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&client.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

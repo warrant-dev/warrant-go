@@ -8,10 +8,11 @@ import (
 
 	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go"
+	"github.com/warrant-dev/warrant-go/client"
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	warrantClient *client.WarrantClient
 }
 
 func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
@@ -21,12 +22,12 @@ func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, e
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var newPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &newPermission)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &newPermission, nil
 }
@@ -42,12 +43,12 @@ func (c Client) Get(permissionId string) (*warrant.Permission, error) {
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var foundPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &foundPermission)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &foundPermission, nil
 }
@@ -63,12 +64,12 @@ func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var updatedPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &updatedPermission)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &updatedPermission, nil
 }
@@ -92,7 +93,7 @@ func Delete(permissionId string) error {
 func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil)
@@ -101,12 +102,12 @@ func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]war
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -118,7 +119,7 @@ func ListPermissions(listParams *warrant.ListPermissionParams) ([]warrant.Permis
 func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil)
@@ -127,12 +128,12 @@ func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPe
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -148,12 +149,12 @@ func (c Client) AssignPermissionToRole(permissionId string, roleId string) (*war
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var assignedPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &assignedPermission)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &assignedPermission, nil
 }
@@ -177,7 +178,7 @@ func RemovePermissionFromRole(permissionId string, roleId string) error {
 func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return nil, client.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil)
@@ -186,12 +187,12 @@ func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPe
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -207,12 +208,12 @@ func (c Client) AssignPermissionToUser(permissionId string, userId string) (*war
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return nil, client.WrapError("Error reading response", err)
 	}
 	var assignedPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &assignedPermission)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return nil, client.WrapError("Invalid response from server", err)
 	}
 	return &assignedPermission, nil
 }
@@ -238,13 +239,13 @@ func getClient() Client {
 		panic("You must provide an ApiKey to initialize the Warrant Client")
 	}
 
-	config := warrant.ClientConfig{
+	config := client.ClientConfig{
 		ApiKey:            warrant.ApiKey,
 		AuthorizeEndpoint: warrant.AuthorizeEndpoint,
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&client.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

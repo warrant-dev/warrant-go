@@ -1,4 +1,4 @@
-package warrant
+package client
 
 import "fmt"
 
