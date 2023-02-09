@@ -15,7 +15,12 @@ type Client struct {
 }
 
 func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (string, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", params)
+	sessionParams := map[string]interface{}{
+		"type":   "sess",
+		"userId": params.UserId,
+		"ttl":    params.TTL,
+	}
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +41,13 @@ func CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (str
 }
 
 func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParams) (string, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", params)
+	sessionParams := map[string]interface{}{
+		"type":     "ssdash",
+		"userId":   params.UserId,
+		"tenantId": params.TenantId,
+		"ttl":      params.TTL,
+	}
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
 	if err != nil {
 		return "", err
 	}
