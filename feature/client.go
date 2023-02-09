@@ -293,8 +293,10 @@ func getClient() Client {
 	}
 
 	config := client.ClientConfig{
-		ApiKey:            warrant.ApiKey,
-		AuthorizeEndpoint: warrant.AuthorizeEndpoint,
+		ApiKey:                  warrant.ApiKey,
+		ApiEndpoint:             warrant.ApiEndpoint,
+		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
+		SelfServiceDashEndpoint: warrant.SelfServiceDashEndpoint,
 	}
 
 	return Client{

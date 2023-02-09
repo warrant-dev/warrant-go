@@ -14,9 +14,10 @@ type WarrantClient struct {
 }
 
 type ClientConfig struct {
-	ApiKey            string
-	ApiEndpoint       string
-	AuthorizeEndpoint string
+	ApiKey                  string
+	ApiEndpoint             string
+	AuthorizeEndpoint       string
+	SelfServiceDashEndpoint string
 }
 
 func (client WarrantClient) MakeRequest(method string, path string, payload interface{}) (*http.Response, error) {
