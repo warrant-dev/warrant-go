@@ -45,19 +45,22 @@ func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
 }
 
-func (c Client) Check(object WarrantObject, relation string, subject Subject) (bool, error) {
-	warrantCheckParams := WarrantCheckParams{
+func (c Client) Check(params *WarrantCheckParams) (bool, error) {
+	accessCheckRequest := AccessCheckRequest{
 		Warrants: []Warrant{
 			{
-				ObjectType: object.ObjectType,
-				ObjectId:   object.ObjectId,
-				Relation:   relation,
-				Subject:    subject,
+				ObjectType: params.WarrantCheck.Object.ObjectType,
+				ObjectId:   params.WarrantCheck.Object.ObjectId,
+				Relation:   params.WarrantCheck.Relation,
+				Subject:    *params.WarrantCheck.Subject,
+				Context:    params.WarrantCheck.Context,
 			},
 		},
+		ConsistentRead: params.ConsistentRead,
+		Debug:          params.Debug,
 	}
 
-	checkResult, err := c.makeAuthorizeRequest(&warrantCheckParams)
+	checkResult, err := c.makeAuthorizeRequest(&accessCheckRequest)
 	if err != nil {
 		return false, err
 	}
@@ -69,17 +72,24 @@ func (c Client) Check(object WarrantObject, relation string, subject Subject) (b
 	}
 }
 
-func Check(object WarrantObject, relation string, subject Subject) (bool, error) {
-	return getClient().Check(object, relation, subject)
+func Check(params *WarrantCheckParams) (bool, error) {
+	return getClient().Check(params)
 }
 
-func (c Client) CheckMany(op string, warrants []Warrant) (bool, error) {
-	warrantCheckParams := WarrantCheckParams{
-		Op:       op,
-		Warrants: warrants,
+func (c Client) CheckMany(params *WarrantCheckManyParams) (bool, error) {
+	warrants := make([]Warrant, 0)
+	for _, warrantCheck := range params.Warrants {
+		warrants = append(warrants, warrantCheck.ToWarrant())
 	}
 
-	checkResult, err := c.makeAuthorizeRequest(&warrantCheckParams)
+	accessCheckRequest := AccessCheckRequest{
+		Op:             params.Op,
+		Warrants:       warrants,
+		ConsistentRead: params.ConsistentRead,
+		Debug:          params.Debug,
+	}
+
+	checkResult, err := c.makeAuthorizeRequest(&accessCheckRequest)
 	if err != nil {
 		return false, err
 	}
@@ -91,62 +101,77 @@ func (c Client) CheckMany(op string, warrants []Warrant) (bool, error) {
 	}
 }
 
-func CheckMany(op string, warrants []Warrant) (bool, error) {
-	return getClient().CheckMany(op, warrants)
+func CheckMany(params *WarrantCheckManyParams) (bool, error) {
+	return getClient().CheckMany(params)
 }
 
-func (c Client) CheckUserHasPermission(user *User, permissionId string) (bool, error) {
-	return c.Check(
-		WarrantObject{
-			ObjectType: "permission",
-			ObjectId:   permissionId,
+func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
+	return c.Check(&WarrantCheckParams{
+		WarrantCheck: WarrantCheck{
+			Object: &WarrantObject{
+				ObjectType: "permission",
+				ObjectId:   params.PermissionId,
+			},
+			Relation: "member",
+			Subject: &Subject{
+				ObjectType: "user",
+				ObjectId:   params.UserId,
+			},
+			Context: params.Context,
 		},
-		"member",
-		Subject{
-			ObjectType: "user",
-			ObjectId:   user.UserId,
+		ConsistentRead: params.ConsistentRead,
+		Debug:          params.Debug,
+	})
+}
+
+func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
+	return getClient().CheckUserHasPermission(params)
+}
+
+func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
+	return c.Check(&WarrantCheckParams{
+		WarrantCheck: WarrantCheck{
+			Object: &WarrantObject{
+				ObjectType: "role",
+				ObjectId:   params.RoleId,
+			},
+			Relation: "member",
+			Subject: &Subject{
+				ObjectType: "user",
+				ObjectId:   params.UserId,
+			},
+			Context: params.Context,
 		},
-	)
+		ConsistentRead: params.ConsistentRead,
+		Debug:          params.Debug,
+	})
 }
 
-func CheckUserHasPermission(user *User, permissionId string) (bool, error) {
-	return getClient().CheckUserHasPermission(user, permissionId)
+func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
+	return getClient().CheckUserHasRole(params)
 }
 
-func (c Client) CheckUserHasRole(user *User, roleId string) (bool, error) {
-	return c.Check(
-		WarrantObject{
-			ObjectType: "role",
-			ObjectId:   roleId,
+func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
+	return c.Check(&WarrantCheckParams{
+		WarrantCheck: WarrantCheck{
+			Object: &WarrantObject{
+				ObjectType: "feature",
+				ObjectId:   params.FeatureId,
+			},
+			Relation: "member",
+			Subject:  params.Subject,
+			Context:  params.Context,
 		},
-		"member",
-		Subject{
-			ObjectType: "user",
-			ObjectId:   user.UserId,
-		},
-	)
+		ConsistentRead: params.ConsistentRead,
+		Debug:          params.Debug,
+	})
 }
 
-func CheckUserHasRole(user *User, roleId string) (bool, error) {
-	return getClient().CheckUserHasRole(user, roleId)
+func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
+	return getClient().CheckHasFeature(params)
 }
 
-func (c Client) CheckHasFeature(subject *Subject, featureId string) (bool, error) {
-	return c.Check(
-		WarrantObject{
-			ObjectType: "feature",
-			ObjectId:   featureId,
-		},
-		"member",
-		*subject,
-	)
-}
-
-func CheckHasFeature(subject *Subject, featureId string) (bool, error) {
-	return getClient().CheckHasFeature(subject, featureId)
-}
-
-func (c Client) makeAuthorizeRequest(params *WarrantCheckParams) (*WarrantCheckResult, error) {
+func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
 	resp, err := c.warrantClient.MakeRequest("POST", "/v2/authorize", params)
 	if err != nil {
 		return nil, err
