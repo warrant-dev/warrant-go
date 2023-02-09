@@ -8,3 +8,8 @@ type User struct {
 type ListUserParams struct {
 	ListParams
 }
+
+type UserParams struct {
+	UserId string `json:"userId"`
+	Email  string `json:"email"`
+}

@@ -1,15 +1,11 @@
 package warrant
 
-import (
-	"fmt"
-	"net/url"
-)
-
 type Warrant struct {
 	ObjectType    string  `json:"objectType"`
 	ObjectId      string  `json:"objectId"`
 	Relation      string  `json:"relation"`
 	Subject       Subject `json:"subject"`
+	Context       Context `json:"context"`
 	IsDirectMatch bool    `json:"isDirectMatch,omitempty"`
 }
 
@@ -19,25 +15,31 @@ type Subject struct {
 	Relation   string `json:"relation,omitempty"`
 }
 
-type ListWarrantParams struct {
-	ListParams
-	ObjectType string `json:"objectType" url:"objectType,omitempty"`
-	ObjectId   string `json:"objectId" url:"objectId,omitempty"`
-	Relation   string `json:"relation" url:"relation,omitempty"`
-	UserId     string `json:"userId" url:"userId,omitempty"`
+type Context map[string]string
+
+type WarrantParams struct {
+	ObjectType string  `json:"objectType"`
+	ObjectId   string  `json:"objectId"`
+	Relation   string  `json:"relation"`
+	Subject    Subject `json:"subject"`
 }
 
-type QueryWarrantParams struct {
-	ObjectType string  `json:"objectType" url:"objectType,omitempty"`
-	Relation   string  `json:"relation" url:"relation,omitempty"`
-	Subject    Subject `json:"subject" url:"subject,omitempty"`
+type WarrantObject struct {
+	ObjectType string `json:"objectType"`
+	ObjectId   string `json:"objectId"`
 }
+
+// type QueryWarrantParams struct {
+// 	ObjectType string  `json:"objectType" url:"objectType,omitempty"`
+// 	Relation   string  `json:"relation" url:"relation,omitempty"`
+// 	Subject    Subject `json:"subject" url:"subject,omitempty"`
+// }
 
 type WarrantCheckParams struct {
-	Op             string    `json:"op"`
+	Op             string    `json:"op,omitempty"`
 	Warrants       []Warrant `json:"warrants"`
-	ConsistentRead bool      `json:"consistentRead"`
-	Debug          bool      `json:"debug"`
+	ConsistentRead bool      `json:"consistentRead,omitempty"`
+	Debug          bool      `json:"debug,omitempty"`
 }
 
 type WarrantCheckResult struct {
@@ -52,8 +54,8 @@ type PermissionCheckParams struct {
 	Debug          bool   `json:"debug"`
 }
 
-func (subject Subject) EncodeValues(key string, v *url.Values) error {
-	v.Set(key, fmt.Sprintf("%s:%s", subject.ObjectType, subject.ObjectId))
+// func (subject Subject) EncodeValues(key string, v *url.Values) error {
+// 	v.Set(key, fmt.Sprintf("%s:%s", subject.ObjectType, subject.ObjectId))
 
-	return nil
-}
+// 	return nil
+// }
