@@ -49,11 +49,11 @@ func (c Client) Check(params *WarrantCheckParams) (bool, error) {
 	accessCheckRequest := AccessCheckRequest{
 		Warrants: []Warrant{
 			{
-				ObjectType: params.WarrantCheck.Object.ObjectType,
-				ObjectId:   params.WarrantCheck.Object.ObjectId,
-				Relation:   params.WarrantCheck.Relation,
-				Subject:    *params.WarrantCheck.Subject,
-				Context:    params.WarrantCheck.Context,
+				ObjectType: params.Object.ObjectType,
+				ObjectId:   params.Object.ObjectId,
+				Relation:   params.Relation,
+				Subject:    *params.Subject,
+				Context:    params.Context,
 			},
 		},
 		ConsistentRead: params.ConsistentRead,
@@ -107,18 +107,16 @@ func CheckMany(params *WarrantCheckManyParams) (bool, error) {
 
 func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
-		WarrantCheck: WarrantCheck{
-			Object: &WarrantObject{
-				ObjectType: "permission",
-				ObjectId:   params.PermissionId,
-			},
-			Relation: "member",
-			Subject: &Subject{
-				ObjectType: "user",
-				ObjectId:   params.UserId,
-			},
-			Context: params.Context,
+		Object: &WarrantObject{
+			ObjectType: "permission",
+			ObjectId:   params.PermissionId,
 		},
+		Relation: "member",
+		Subject: &Subject{
+			ObjectType: "user",
+			ObjectId:   params.UserId,
+		},
+		Context:        params.Context,
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	})
@@ -130,18 +128,16 @@ func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 
 func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
-		WarrantCheck: WarrantCheck{
-			Object: &WarrantObject{
-				ObjectType: "role",
-				ObjectId:   params.RoleId,
-			},
-			Relation: "member",
-			Subject: &Subject{
-				ObjectType: "user",
-				ObjectId:   params.UserId,
-			},
-			Context: params.Context,
+		Object: &WarrantObject{
+			ObjectType: "role",
+			ObjectId:   params.RoleId,
 		},
+		Relation: "member",
+		Subject: &Subject{
+			ObjectType: "user",
+			ObjectId:   params.UserId,
+		},
+		Context:        params.Context,
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	})
@@ -153,15 +149,13 @@ func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 
 func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
-		WarrantCheck: WarrantCheck{
-			Object: &WarrantObject{
-				ObjectType: "feature",
-				ObjectId:   params.FeatureId,
-			},
-			Relation: "member",
-			Subject:  params.Subject,
-			Context:  params.Context,
+		Object: &WarrantObject{
+			ObjectType: "feature",
+			ObjectId:   params.FeatureId,
 		},
+		Relation:       "member",
+		Subject:        params.Subject,
+		Context:        params.Context,
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	})

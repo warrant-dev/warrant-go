@@ -53,9 +53,12 @@ func (warrantCheck WarrantCheck) ToWarrant() Warrant {
 }
 
 type WarrantCheckParams struct {
-	WarrantCheck   WarrantCheck `json:"warrantCheck"`
-	ConsistentRead bool         `json:"consistentRead,omitempty"`
-	Debug          bool         `json:"debug,omitempty"`
+	Object         *WarrantObject `json:"object"`
+	Relation       string         `json:"relation"`
+	Subject        *Subject       `json:"subject"`
+	Context        Context        `json:"context,omitempty"`
+	ConsistentRead bool           `json:"consistentRead,omitempty"`
+	Debug          bool           `json:"debug,omitempty"`
 }
 
 type WarrantCheckManyParams struct {
