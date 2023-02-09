@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -41,5 +42,14 @@ func (client WarrantClient) MakeRequest(method string, path string, payload inte
 	if err != nil {
 		return nil, WrapError("Error making request", err)
 	}
+
+	respStatus := resp.StatusCode
+	if respStatus < 200 || respStatus >= 400 {
+		msg, _ := ioutil.ReadAll(resp.Body)
+		return nil, Error{
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+		}
+	}
+
 	return resp, nil
 }

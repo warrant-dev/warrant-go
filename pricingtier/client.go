@@ -19,13 +19,6 @@ func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier,
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -47,13 +40,6 @@ func (c Client) Get(pricingTierId string) (*warrant.PricingTier, error) {
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -71,16 +57,9 @@ func Get(pricingTierId string) (*warrant.PricingTier, error) {
 }
 
 func (c Client) Delete(pricingTierId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }
@@ -98,13 +77,6 @@ func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]w
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -132,13 +104,6 @@ func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.L
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -160,13 +125,6 @@ func (c Client) AssignPricingTierToTenant(pricingTierId string, tenantId string)
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -184,16 +142,9 @@ func AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.
 }
 
 func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/pricing-tiers/%s", tenantId, pricingTierId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/pricing-tiers/%s", tenantId, pricingTierId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }
@@ -211,13 +162,6 @@ func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListP
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -240,13 +184,6 @@ func (c Client) AssignPricingTierToUser(pricingTierId string, userId string) (*w
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -264,16 +201,9 @@ func AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Pric
 }
 
 func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/pricing-tiers/%s", userId, pricingTierId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/pricing-tiers/%s", userId, pricingTierId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }

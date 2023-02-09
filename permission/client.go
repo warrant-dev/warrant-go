@@ -19,13 +19,6 @@ func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, e
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -46,13 +39,6 @@ func (c Client) Get(permissionId string) (*warrant.Permission, error) {
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -75,13 +61,6 @@ func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -99,16 +78,9 @@ func Update(permissionId string, params *warrant.PermissionParams) (*warrant.Per
 }
 
 func (c Client) Delete(permissionId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }
@@ -126,13 +98,6 @@ func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]war
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -160,13 +125,6 @@ func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPe
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -188,13 +146,6 @@ func (c Client) AssignPermissionToRole(permissionId string, roleId string) (*war
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -212,16 +163,9 @@ func AssignPermissionToRole(permissionId string, roleId string) (*warrant.Permis
 }
 
 func (c Client) RemovePermissionFromRole(permissionId string, roleId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }
@@ -239,13 +183,6 @@ func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPe
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -268,13 +205,6 @@ func (c Client) AssignPermissionToUser(permissionId string, userId string) (*war
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -292,16 +222,9 @@ func AssignPermissionToUser(permissionId string, userId string) (*warrant.Permis
 }
 
 func (c Client) RemovePermissionFromUser(permissionId string, userId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }

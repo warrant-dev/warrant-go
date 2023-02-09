@@ -19,13 +19,6 @@ func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -46,13 +39,6 @@ func (c Client) Get(roleId string) (*warrant.Role, error) {
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -75,13 +61,6 @@ func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -99,16 +78,9 @@ func Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Delete(roleId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }
@@ -126,13 +98,6 @@ func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, e
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -160,13 +125,6 @@ func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRolePara
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -188,13 +146,6 @@ func (c Client) AssignRoleForUser(roleId string, userId string) (*warrant.Role, 
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -212,16 +163,9 @@ func AssignRoleForUser(roleId string, userId string) (*warrant.Role, error) {
 }
 
 func (c Client) RemoveRoleForUser(roleId string, userId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }

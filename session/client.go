@@ -18,13 +18,6 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 	if err != nil {
 		return "", err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return "", warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", warrant.WrapError("Error reading response", err)
@@ -45,13 +38,6 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", params)
 	if err != nil {
 		return "", err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return "", warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

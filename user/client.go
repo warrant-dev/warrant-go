@@ -19,13 +19,6 @@ func (c Client) Create(params *warrant.UserParams) (*warrant.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -46,13 +39,6 @@ func (c Client) BatchCreate(params []warrant.UserParams) ([]warrant.User, error)
 	resp, err := c.warrantClient.MakeRequest("POST", "/v1/users", params)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -75,13 +61,6 @@ func (c Client) Get(userId string) (*warrant.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -103,13 +82,6 @@ func (c Client) Update(userId string, params *warrant.UserParams) (*warrant.User
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -127,16 +99,9 @@ func Update(userId string, params *warrant.UserParams) (*warrant.User, error) {
 }
 
 func (c Client) Delete(userId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s", userId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s", userId), nil)
 	if err != nil {
 		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	return nil
 }
@@ -154,13 +119,6 @@ func (c Client) ListUsers(listParams *warrant.ListUserParams) ([]warrant.User, e
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users?%s", queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -188,13 +146,6 @@ func (c Client) ListUsersForTenant(tenantId string, listParams *warrant.ListUser
 	if err != nil {
 		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
@@ -215,13 +166,6 @@ func (c Client) AssignUserToTenant(userId string, tenantId string) (*warrant.War
 	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
 	if err != nil {
 		return nil, err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return nil, warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
