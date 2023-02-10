@@ -2,8 +2,8 @@ package warrant
 
 type Permission struct {
 	PermissionId string `json:"permissionId"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
+	Name         string `json:"name,omitempty"`
+	Description  string `json:"description,omitempty"`
 }
 
 type ListPermissionParams struct {
@@ -12,6 +12,6 @@ type ListPermissionParams struct {
 
 type PermissionParams struct {
 	PermissionId string `json:"permissionId"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
+	Name         string `json:"name,omitempty"`
+	Description  string `json:"description,omitempty"`
 }

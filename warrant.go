@@ -22,6 +22,7 @@ type WarrantParams struct {
 	ObjectId   string  `json:"objectId"`
 	Relation   string  `json:"relation"`
 	Subject    Subject `json:"subject"`
+	Context    Context `json:"context,omitempty"`
 }
 
 type WarrantObject struct {
