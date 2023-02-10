@@ -8,10 +8,20 @@ import (
 
 	"github.com/warrant-dev/warrant-go"
 	"github.com/warrant-dev/warrant-go/client"
+	"github.com/warrant-dev/warrant-go/config"
 )
 
 type Client struct {
 	warrantClient *client.WarrantClient
+}
+
+func NewClient(config config.ClientConfig) Client {
+	return Client{
+		warrantClient: &client.WarrantClient{
+			HttpClient: http.DefaultClient,
+			Config:     config,
+		},
+	}
 }
 
 func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (string, error) {
@@ -72,7 +82,7 @@ func getClient() Client {
 		panic("You must provide an ApiKey to initialize the Warrant Client")
 	}
 
-	config := client.ClientConfig{
+	config := config.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,

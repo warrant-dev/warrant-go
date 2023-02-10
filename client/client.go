@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/warrant-dev/warrant-go/config"
 )
 
 const (
@@ -14,15 +16,15 @@ const (
 
 type WarrantClient struct {
 	HttpClient *http.Client
-	Config     ClientConfig
+	Config     config.ClientConfig
 }
 
-type ClientConfig struct {
-	ApiKey                  string
-	ApiEndpoint             string
-	AuthorizeEndpoint       string
-	SelfServiceDashEndpoint string
-}
+// type ClientConfig struct {
+// 	ApiKey                  string
+// 	ApiEndpoint             string
+// 	AuthorizeEndpoint       string
+// 	SelfServiceDashEndpoint string
+// }
 
 func (client WarrantClient) MakeRequest(method string, path string, payload interface{}) (*http.Response, error) {
 	url := client.Config.ApiEndpoint + path
