@@ -29,12 +29,6 @@ type WarrantObject struct {
 	ObjectId   string `json:"objectId"`
 }
 
-// type QueryWarrantParams struct {
-// 	ObjectType string  `json:"objectType" url:"objectType,omitempty"`
-// 	Relation   string  `json:"relation" url:"relation,omitempty"`
-// 	Subject    Subject `json:"subject" url:"subject,omitempty"`
-// }
-
 type QueryWarrantResult struct {
 	Result interface{}            `json:"result"`
 	Meta   map[string]interface{} `json:"meta"`
