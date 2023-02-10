@@ -4,21 +4,22 @@ import (
 	"fmt"
 
 	"github.com/warrant-dev/warrant-go"
+	"github.com/warrant-dev/warrant-go/permission"
+	"github.com/warrant-dev/warrant-go/role"
+	"github.com/warrant-dev/warrant-go/session"
+	"github.com/warrant-dev/warrant-go/tenant"
+	"github.com/warrant-dev/warrant-go/user"
 )
 
-const API_KEY = "YOUR_API_KEY"
-
 func main() {
-	client := warrant.NewClient(warrant.ClientConfig{
-		ApiKey: API_KEY,
-	})
+	warrant.ApiKey = "YOUR_KEY"
 
-	example(client)
+	example()
 }
 
-func example(client warrant.WarrantClient) {
+func example() {
 	// Create a new tenant with a Warrant generated id
-	newTenant, err := client.CreateTenant(warrant.Tenant{
+	newTenant, err := tenant.Create(&warrant.TenantParams{
 		TenantId: "test-tenant",
 	})
 	if err != nil {
@@ -29,7 +30,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create a new tenant with a Warrant generated id
-	fakeTenant, err := client.CreateTenant(warrant.Tenant{
+	fakeTenant, err := tenant.Create(&warrant.TenantParams{
 		TenantId: "fake-tenant",
 	})
 	if err != nil {
@@ -40,7 +41,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Update tenant
-	updatedTenant, err := client.UpdateTenant("test-tenant", warrant.Tenant{
+	updatedTenant, err := tenant.Update("test-tenant", &warrant.TenantParams{
 		Name: "my tenant",
 	})
 	if err != nil {
@@ -51,7 +52,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get created tenant
-	foundTenant, err := client.GetTenant("test-tenant")
+	foundTenant, err := tenant.Get("test-tenant")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -60,7 +61,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create a new user with a Warrant generated id
-	newUser, err := client.CreateUser(warrant.User{
+	newUser, err := user.Create(&warrant.UserParams{
 		UserId: "test-user",
 	})
 	if err != nil {
@@ -71,7 +72,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Update user
-	updatedUser, err := client.UpdateUser("test-user", warrant.User{
+	updatedUser, err := user.Update("test-user", &warrant.UserParams{
 		Email: "my-user@example.com",
 	})
 	if err != nil {
@@ -82,7 +83,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get created user
-	foundUser, err := client.GetUser("test-user")
+	foundUser, err := user.Get("test-user")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -91,7 +92,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign the new user to the new tenant
-	newWarrant, err := client.AssignUserToTenant(fakeTenant.TenantId, newUser.UserId)
+	newWarrant, err := user.AssignUserToTenant(fakeTenant.TenantId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -100,7 +101,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete warrant
-	err = client.DeleteWarrant(warrant.Warrant{
+	err = warrant.Delete(&warrant.WarrantParams{
 		ObjectType: "tenant",
 		ObjectId:   fakeTenant.TenantId,
 		Relation:   "member",
@@ -117,7 +118,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create warrant
-	createdWarrant, err := client.CreateWarrant(warrant.Warrant{
+	createdWarrant, err := warrant.Create(&warrant.WarrantParams{
 		ObjectType: "tenant",
 		ObjectId:   newTenant.TenantId,
 		Relation:   "member",
@@ -134,7 +135,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create test-role
-	testRole, err := client.CreateRole(warrant.Role{
+	testRole, err := role.Create(&warrant.RoleParams{
 		RoleId: "test-role",
 	})
 	if err != nil {
@@ -145,7 +146,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get created role
-	foundRole, err := client.GetRole("test-role")
+	foundRole, err := role.Get("test-role")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -154,7 +155,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create granted-permission
-	assignedPermission, err := client.CreatePermission(warrant.Permission{
+	assignedPermission, err := permission.Create(&warrant.PermissionParams{
 		PermissionId: "assigned-permission",
 	})
 	if err != nil {
@@ -165,7 +166,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create user-specific-permission
-	userAssignedPermission, err := client.CreatePermission(warrant.Permission{
+	userAssignedPermission, err := permission.Create(&warrant.PermissionParams{
 		PermissionId: "user-specific-permission",
 	})
 	if err != nil {
@@ -176,7 +177,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create unassigned-permission
-	unassignedPermission, err := client.CreatePermission(warrant.Permission{
+	unassignedPermission, err := permission.Create(&warrant.PermissionParams{
 		PermissionId: "unassigned-permission",
 	})
 	if err != nil {
@@ -187,7 +188,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get permission
-	foundPermission, err := client.GetPermission("assigned-permission")
+	foundPermission, err := permission.Get("assigned-permission")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -196,7 +197,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign assigned-permission to test-role
-	assignedPermission, err = client.AssignPermissionToRole(testRole.RoleId, assignedPermission.PermissionId)
+	assignedPermission, err = permission.AssignPermissionToRole(assignedPermission.PermissionId, testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -205,7 +206,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign view-self-service-dashboard to test-role
-	_, err = client.AssignPermissionToRole(testRole.RoleId, "view-self-service-dashboard")
+	_, err = permission.AssignPermissionToRole("view-self-service-dashboard", testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -214,7 +215,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign test-role to user
-	_, err = client.AssignRoleToUser(newUser.UserId, testRole.RoleId)
+	_, err = role.AssignRoleToUser(newUser.UserId, testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -223,7 +224,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Assign user-specific-permission to user
-	assignedUserPermission, err := client.AssignPermissionToUser(newUser.UserId, userAssignedPermission.PermissionId)
+	assignedUserPermission, err := permission.AssignPermissionToUser(userAssignedPermission.PermissionId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -232,7 +233,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Create a session for user
-	token, err := client.CreateAuthorizationSession(warrant.Session{
+	token, err := session.CreateAuthorizationSession(&warrant.AuthorizationSessionParams{
 		UserId: newUser.UserId,
 	})
 	if err != nil {
@@ -242,10 +243,11 @@ func example(client warrant.WarrantClient) {
 		fmt.Printf("Created session token %s for user %s\n", token, newUser.UserId)
 	}
 
-	selfServiceDashUrl, err := client.CreateSelfServiceSession(warrant.Session{
-		UserId:   newUser.UserId,
-		TenantId: newTenant.TenantId,
-	}, "https://warrant.dev")
+	selfServiceDashUrl, err := session.CreateSelfServiceSession(&warrant.SelfServiceSessionParams{
+		UserId:      newUser.UserId,
+		TenantId:    newTenant.TenantId,
+		RedirectUrl: "https://warrant.dev",
+	})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -253,37 +255,17 @@ func example(client warrant.WarrantClient) {
 		fmt.Printf("Created self service session %s for user %s\n", selfServiceDashUrl, newUser.UserId)
 	}
 
-	// List all warrants for organization
-	warrants, err := client.ListWarrants(warrant.ListWarrantParams{})
-	if err != nil {
-		fmt.Println(err)
-		return
-	} else {
-		fmt.Println("\nWarrants: ")
-		for _, w := range warrants {
-			fmt.Printf("%+v\n", w)
-		}
-	}
-
 	// Query warrants for role test-role
-	roleWarrants, err := client.QueryWarrants(warrant.QueryWarrantParams{
-		Subject: warrant.Subject{
-			ObjectType: "role",
-			ObjectId:   "test-role",
-		},
-	})
+	testRoleQuery, err := warrant.Query("SELECT warrant FOR object=role:test-role")
 	if err != nil {
 		fmt.Println(err)
 		return
 	} else {
-		fmt.Println("\nRole test-role's warrants: ")
-		for _, w := range roleWarrants {
-			fmt.Printf("%+v\n", w)
-		}
+		fmt.Printf("\nRole test-role's warrants: %+v", testRoleQuery.Result)
 	}
 
 	// List all tenants
-	tenants, err := client.ListTenants(warrant.ListTenantParams{})
+	tenants, err := tenant.ListTenants(&warrant.ListTenantParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -295,7 +277,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List users for tenant
-	tenantUsers, err := client.ListUsersForTenant(newTenant.TenantId)
+	tenantUsers, err := user.ListUsersForTenant(newTenant.TenantId, &warrant.ListUserParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -307,7 +289,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all users
-	users, err := client.ListUsers(warrant.ListUserParams{})
+	users, err := user.ListUsers(&warrant.ListUserParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -319,7 +301,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get tenants for user
-	userTenants, err := client.ListTenantsForUser(newUser.UserId, warrant.ListTenantParams{})
+	userTenants, err := tenant.ListTenantsForUser(newUser.UserId, &warrant.ListTenantParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -331,7 +313,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get roles for user
-	userRoles, err := client.ListRolesForUser(newUser.UserId, warrant.ListRoleParams{})
+	userRoles, err := role.ListRolesForUser(newUser.UserId, &warrant.ListRoleParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -343,7 +325,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get permissions for user
-	userPermissions, err := client.ListPermissionsForUser(newUser.UserId, warrant.ListPermissionParams{})
+	userPermissions, err := permission.ListPermissionsForUser(newUser.UserId, &warrant.ListPermissionParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -355,7 +337,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all roles
-	roles, err := client.ListRoles(warrant.ListRoleParams{})
+	roles, err := role.ListRoles(&warrant.ListRoleParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -367,7 +349,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Get permissions for role
-	rolePermissions, err := client.ListPermissionsForRole(testRole.RoleId, warrant.ListPermissionParams{})
+	rolePermissions, err := permission.ListPermissionsForRole(testRole.RoleId, &warrant.ListPermissionParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -379,7 +361,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// List all permissions
-	permissions, err := client.ListPermissions(warrant.ListPermissionParams{})
+	permissions, err := permission.ListPermissions(&warrant.ListPermissionParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -391,17 +373,15 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Check authorization (tenant membership) for a user
-	isAuthorized, err := client.IsAuthorized(warrant.WarrantCheckParams{
-		Warrants: []warrant.Warrant{
-			{
-				ObjectType: "tenant",
-				ObjectId:   newTenant.TenantId,
-				Relation:   "member",
-				Subject: warrant.Subject{
-					ObjectType: "user",
-					ObjectId:   newUser.UserId,
-				},
-			},
+	isAuthorized, err := warrant.Check(&warrant.WarrantCheckParams{
+		Object: &warrant.WarrantObject{
+			ObjectType: "tenant",
+			ObjectId:   newTenant.TenantId,
+		},
+		Relation: "member",
+		Subject: &warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   newUser.UserId,
 		},
 	})
 	if err != nil {
@@ -411,7 +391,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Check if user has assigned-permission
-	hasPermission, err := client.HasPermission(warrant.PermissionCheckParams{
+	hasPermission, err := warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
 		PermissionId: assignedPermission.PermissionId,
 		UserId:       newUser.UserId,
 	})
@@ -422,7 +402,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Check if user has unassigned-permission
-	hasPermission, err = client.HasPermission(warrant.PermissionCheckParams{
+	hasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
 		PermissionId: unassignedPermission.PermissionId,
 		UserId:       newUser.UserId,
 	})
@@ -433,7 +413,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove test-role from user
-	err = client.RemoveRoleFromUser(newUser.UserId, testRole.RoleId)
+	err = role.RemoveRoleFromUser(testRole.RoleId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -442,7 +422,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove view-self-service-dashboard from test-role
-	err = client.RemovePermissionFromRole(testRole.RoleId, "view-self-service-dashboard")
+	err = permission.RemovePermissionFromRole("view-self-service-dashboard", testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -451,7 +431,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove assigned-permission from test-role
-	err = client.RemovePermissionFromRole(testRole.RoleId, assignedPermission.PermissionId)
+	err = permission.RemovePermissionFromRole(assignedPermission.PermissionId, testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -460,7 +440,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove user-specific-permission from test-user
-	err = client.RemovePermissionFromUser(newUser.UserId, userAssignedPermission.PermissionId)
+	err = permission.RemovePermissionFromUser(userAssignedPermission.PermissionId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -469,7 +449,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete assigned-permission
-	err = client.DeletePermission(assignedPermission.PermissionId)
+	err = permission.Delete(assignedPermission.PermissionId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -478,7 +458,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete user-specific-permission
-	err = client.DeletePermission(userAssignedPermission.PermissionId)
+	err = permission.Delete(userAssignedPermission.PermissionId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -487,7 +467,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete unassigned-permission
-	err = client.DeletePermission(unassignedPermission.PermissionId)
+	err = permission.Delete(unassignedPermission.PermissionId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -496,7 +476,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete test-role
-	err = client.DeleteRole(testRole.RoleId)
+	err = role.Delete(testRole.RoleId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -505,7 +485,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Remove user from tenant
-	err = client.RemoveUserFromTenant(newTenant.TenantId, newUser.UserId)
+	err = user.RemoveUserFromTenant(newTenant.TenantId, newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -514,7 +494,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete user
-	err = client.DeleteUser(newUser.UserId)
+	err = user.Delete(newUser.UserId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -523,7 +503,7 @@ func example(client warrant.WarrantClient) {
 	}
 
 	// Delete tenant
-	err = client.DeleteTenant(newTenant.TenantId)
+	err = tenant.Delete(newTenant.TenantId)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -531,7 +511,7 @@ func example(client warrant.WarrantClient) {
 		fmt.Printf("Deleted tenant %s\n", newTenant.TenantId)
 	}
 
-	err = client.DeleteTenant(fakeTenant.TenantId)
+	err = tenant.Delete(fakeTenant.TenantId)
 	if err != nil {
 		fmt.Println(err)
 		return
