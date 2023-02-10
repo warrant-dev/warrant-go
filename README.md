@@ -12,75 +12,95 @@ go get github.com/warrant-dev/warrant-go
 
 ## Usage
 
+You can use the Warrant SDK with or without a client. Instantiating a client allows you to create different client instances each with their own config (API key, API endpoint, etc).
+
+### Without a Client
+
+```go
+import "github.com/warrant-dev/warrant-go"
+
+// Setup
+warrant.ApiKey = "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E="
+
+// Create warrant
+warrant, err := warrant.Create(&warrant.WarrantParams{})
+
+// Create tenant
+tenant, err := tenant.Create(&tenant.TenantParams{})
+```
+
+### With a Client
+
 Instantiate the Warrant client with your API key to get started:
 ```go
 import "github.com/warrant-dev/warrant-go"
 
-client := warrant.NewClient(client.ClientConfig{
+client := warrant.NewClient(config.ClientConfig{
     ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
+	ApiEndpoint: "https://api.warrant.dev",
+	AuthorizeEndpoint: "https://api.warrant.dev",
+	SelfServiceDashEndpoint: "https://self-serve.warrant.dev"
 })
 ```
 
-### `CreateUserWithGeneratedId()`
+## Examples
 
-This method creates a user entity in Warrant with a Warrant-generated id.
+### Users
+
 ```go
-user, err := client.CreateUserWithGeneratedId()
-```
-
-### `CreateUser(user User)`
-
-This method creates a user entity in Warrant with the specified userId.
-```go
-user, err := client.CreateUser(warrant.User{
+// Create
+createdUser, err := user.Create(&warrant.UserParams{
     UserId: "userId",
 })
+
+// Get
+user, err := user.Get("userId")
+
+
+// Delete
+err = user.Delete("userId")
 ```
 
-### `CreateWarrant(warrantToCreate Warrant)`
-
-This method creates a warrant which specifies that the provided `user` (or `userset`) has `relation` on the object of type `objectType` with id `objectId`.
-```go
-// Create a warrant allowing user1 to "view" the store with id store1
-warrant, err := client.createWarrant(warrant.Warrant{
-		ObjectType: "store",
-		ObjectId:   "store1",
-		Relation:   "viewer",
-		User: warrant.WarrantUser{
-			UserId: "user1",
-		},
-	})
-```
-
-### `CreateSession(userId string)`
-
-This method creates a session in Warrant for the user with the specified `userId` and returns a session token which can be used to make authorized requests to the Warrant API only for the specified user. This session token can safely be used to make requests to the Warrant API's authorization endpoint to determine user access in web and mobile client applications.
+### Warrants
 
 ```go
-// Creates a session token scoped to the specified userId
-// Return this token to your client application to allow
-// it to make requests for the given user.
-token, err := client.CreateSession(userId)
+
+// Create
+createdWarrant, err := warrant.Create(&warrant.WarrantParams{
+	ObjectType: "tenant",
+	ObjectId:   "1",
+	Relation:   "member",
+	Subject: warrant.Subject{
+		ObjectType: "user",
+		ObjectId:   "1",
+	},
+})
+
+// Delete
+err = warrant.Delete(&warrant.WarrantParams{
+	ObjectType: "tenant",
+	ObjectId:   "1",
+	Relation:   "member",
+	Subject: warrant.Subject{
+		ObjectType: "user",
+		ObjectId:   "1",
+	},
+})
+
+// Check access
+isAuthorized, err := warrant.Check(&warrant.WarrantCheckParams{
+	Object: &warrant.WarrantObject{
+		ObjectType: "tenant",
+		ObjectId:   "1",
+	},
+	Relation: "member",
+	Subject: &warrant.Subject{
+		ObjectType: "user",
+		ObjectId:   "1",
+	},
+})
 ```
 
-### `IsAuthorized(warrant Warrant)`
-
-This method returns `true` or `false` depending on whether the user with the specified `userId` has the specified `relation` to the object of type `objectType` with id `objectId` and `false` otherwise.
-
-```go
-//
-// Example Scenario:
-// An e-commerce website where Store Owners can edit store info
-//
-isAuthorized, err := client.IsAuthorized(warrant.Warrant{
-		ObjectType: "store",
-		ObjectId:   "store1",
-		Relation:   "editor",
-		User: warrant.WarrantUser{
-			UserId: "user1", // store owner
-		},
-	})
-```
 
 We’ve used a random API key in these code examples. Replace it with your
 [actual publishable API keys](https://app.warrant.dev) to
