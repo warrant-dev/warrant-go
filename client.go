@@ -2,8 +2,10 @@ package warrant
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/warrant-dev/warrant-go/client"
 )
@@ -43,6 +45,27 @@ func (c Client) Delete(params *WarrantParams) error {
 
 func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
+}
+
+func (c Client) Query(queryString string) (*QueryWarrantResult, error) {
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s", url.QueryEscape(queryString)), nil)
+	if err != nil {
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, client.WrapError("Error reading response", err)
+	}
+	var queryResult QueryWarrantResult
+	err = json.Unmarshal([]byte(body), &queryResult)
+	if err != nil {
+		return nil, client.WrapError("Invalid response from server", err)
+	}
+	return &queryResult, nil
+}
+
+func Query(queryString string) (*QueryWarrantResult, error) {
+	return getClient().Query(queryString)
 }
 
 func (c Client) Check(params *WarrantCheckParams) (bool, error) {
@@ -189,8 +212,10 @@ func getClient() Client {
 	}
 
 	config := client.ClientConfig{
-		ApiKey:            ApiKey,
-		AuthorizeEndpoint: AuthorizeEndpoint,
+		ApiKey:                  ApiKey,
+		ApiEndpoint:             ApiEndpoint,
+		AuthorizeEndpoint:       AuthorizeEndpoint,
+		SelfServiceDashEndpoint: SelfServiceDashEndpoint,
 	}
 
 	return Client{

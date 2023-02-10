@@ -1,12 +1,12 @@
 package warrant
 
 type Warrant struct {
-	ObjectType    string  `json:"objectType"`
-	ObjectId      string  `json:"objectId"`
-	Relation      string  `json:"relation"`
-	Subject       Subject `json:"subject"`
-	Context       Context `json:"context,omitempty"`
-	IsDirectMatch bool    `json:"isDirectMatch,omitempty"`
+	ObjectType string  `json:"objectType"`
+	ObjectId   string  `json:"objectId"`
+	Relation   string  `json:"relation"`
+	Subject    Subject `json:"subject"`
+	Context    Context `json:"context,omitempty"`
+	IsImplicit bool    `json:"isImplicit,omitempty"`
 }
 
 type Subject struct {
@@ -34,6 +34,11 @@ type WarrantObject struct {
 // 	Relation   string  `json:"relation" url:"relation,omitempty"`
 // 	Subject    Subject `json:"subject" url:"subject,omitempty"`
 // }
+
+type QueryWarrantResult struct {
+	Result interface{}            `json:"result"`
+	Meta   map[string]interface{} `json:"meta"`
+}
 
 type WarrantCheck struct {
 	Object   *WarrantObject `json:"object"`
