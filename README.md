@@ -89,12 +89,12 @@ err = warrant.Delete(&warrant.WarrantParams{
 
 // Check access
 isAuthorized, err := warrant.Check(&warrant.WarrantCheckParams{
-	Object: &warrant.WarrantObject{
+	Object: warrant.Object{
 		ObjectType: "tenant",
 		ObjectId:   "1",
 	},
 	Relation: "member",
-	Subject: &warrant.Subject{
+	Subject: warrant.Subject{
 		ObjectType: "user",
 		ObjectId:   "1",
 	},
