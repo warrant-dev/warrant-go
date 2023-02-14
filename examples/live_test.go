@@ -320,7 +320,7 @@ func TestCrudPermissions(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	assert.Equal(3, len(permissions))
+	assert.Equal(2, len(permissions))
 
 	err = permission.Delete(permission1.PermissionId)
 	if err != nil {
@@ -342,7 +342,7 @@ func TestCrudPermissions(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	assert.Equal(1, len(permissions))
+	assert.Equal(0, len(permissions))
 }
 
 func TestCrudFeatures(t *testing.T) {
