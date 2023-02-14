@@ -68,14 +68,16 @@ func (eia *EnsureIsAuthorized) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	}
 
 	isAuthorized, err := eia.mw.client.Check(&WarrantCheckParams{
-		Object: &WarrantObject{
-			ObjectType: eia.options.ObjectType,
-			ObjectId:   objectId,
-		},
-		Relation: eia.options.Relation,
-		Subject: &Subject{
-			ObjectType: "user",
-			ObjectId:   userId,
+		WarrantCheck: WarrantCheck{
+			Object: Object{
+				ObjectType: eia.options.ObjectType,
+				ObjectId:   objectId,
+			},
+			Relation: eia.options.Relation,
+			Subject: Subject{
+				ObjectType: "user",
+				ObjectId:   userId,
+			},
 		},
 	})
 	if err != nil {

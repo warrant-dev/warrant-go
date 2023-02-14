@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/client"
 	"github.com/warrant-dev/warrant-go/config"
 )
@@ -57,8 +58,13 @@ func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
 }
 
-func (c Client) Query(queryString string) (*QueryWarrantResult, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s", url.QueryEscape(queryString)), nil)
+func (c Client) Query(queryString string, listParams *ListWarrantParams) (*QueryWarrantResult, error) {
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return nil, client.WrapError("Could not parse listParams", err)
+	}
+
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -74,21 +80,13 @@ func (c Client) Query(queryString string) (*QueryWarrantResult, error) {
 	return &queryResult, nil
 }
 
-func Query(queryString string) (*QueryWarrantResult, error) {
-	return getClient().Query(queryString)
+func Query(queryString string, params *ListWarrantParams) (*QueryWarrantResult, error) {
+	return getClient().Query(queryString, params)
 }
 
 func (c Client) Check(params *WarrantCheckParams) (bool, error) {
 	accessCheckRequest := AccessCheckRequest{
-		Warrants: []Warrant{
-			{
-				ObjectType: params.Object.ObjectType,
-				ObjectId:   params.Object.ObjectId,
-				Relation:   params.Relation,
-				Subject:    *params.Subject,
-				Context:    params.Context,
-			},
-		},
+		Warrants:       []Warrant{params.WarrantCheck.ToWarrant()},
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	}
@@ -140,16 +138,18 @@ func CheckMany(params *WarrantCheckManyParams) (bool, error) {
 
 func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
-		Object: &WarrantObject{
-			ObjectType: "permission",
-			ObjectId:   params.PermissionId,
+		WarrantCheck: WarrantCheck{
+			Object: Object{
+				ObjectType: "permission",
+				ObjectId:   params.PermissionId,
+			},
+			Relation: "member",
+			Subject: Subject{
+				ObjectType: "user",
+				ObjectId:   params.UserId,
+			},
+			Context: params.Context,
 		},
-		Relation: "member",
-		Subject: &Subject{
-			ObjectType: "user",
-			ObjectId:   params.UserId,
-		},
-		Context:        params.Context,
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	})
@@ -161,16 +161,18 @@ func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 
 func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
-		Object: &WarrantObject{
-			ObjectType: "role",
-			ObjectId:   params.RoleId,
+		WarrantCheck: WarrantCheck{
+			Object: Object{
+				ObjectType: "role",
+				ObjectId:   params.RoleId,
+			},
+			Relation: "member",
+			Subject: Subject{
+				ObjectType: "user",
+				ObjectId:   params.UserId,
+			},
+			Context: params.Context,
 		},
-		Relation: "member",
-		Subject: &Subject{
-			ObjectType: "user",
-			ObjectId:   params.UserId,
-		},
-		Context:        params.Context,
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	})
@@ -182,13 +184,15 @@ func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 
 func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
-		Object: &WarrantObject{
-			ObjectType: "feature",
-			ObjectId:   params.FeatureId,
+		WarrantCheck: WarrantCheck{
+			Object: Object{
+				ObjectType: "feature",
+				ObjectId:   params.FeatureId,
+			},
+			Relation: "member",
+			Subject:  params.Subject,
+			Context:  params.Context,
 		},
-		Relation:       "member",
-		Subject:        params.Subject,
-		Context:        params.Context,
 		ConsistentRead: params.ConsistentRead,
 		Debug:          params.Debug,
 	})

@@ -9,13 +9,21 @@ type Warrant struct {
 	IsImplicit bool    `json:"isImplicit,omitempty"`
 }
 
+type Context map[string]string
+
 type Subject struct {
 	ObjectType string `json:"objectType"`
 	ObjectId   string `json:"objectId"`
 	Relation   string `json:"relation,omitempty"`
 }
 
-type Context map[string]string
+func (subject Subject) GetObjectType() string {
+	return subject.ObjectType
+}
+
+func (subject Subject) GetObjectId() string {
+	return subject.ObjectId
+}
 
 type WarrantParams struct {
 	ObjectType string  `json:"objectType"`
@@ -25,9 +33,26 @@ type WarrantParams struct {
 	Context    Context `json:"context,omitempty"`
 }
 
-type WarrantObject struct {
+type ListWarrantParams struct {
+	ListParams
+}
+
+type Object struct {
 	ObjectType string `json:"objectType"`
 	ObjectId   string `json:"objectId"`
+}
+
+func (object Object) GetObjectType() string {
+	return object.ObjectType
+}
+
+func (object Object) GetObjectId() string {
+	return object.ObjectId
+}
+
+type WarrantObject interface {
+	GetObjectType() string
+	GetObjectId() string
 }
 
 type QueryWarrantResult struct {
@@ -36,29 +61,40 @@ type QueryWarrantResult struct {
 }
 
 type WarrantCheck struct {
-	Object   *WarrantObject `json:"object"`
-	Relation string         `json:"relation"`
-	Subject  *Subject       `json:"subject"`
-	Context  Context        `json:"context,omitempty"`
+	Object   WarrantObject `json:"object"`
+	Relation string        `json:"relation"`
+	Subject  WarrantObject `json:"subject"`
+	Context  Context       `json:"context,omitempty"`
 }
 
 func (warrantCheck WarrantCheck) ToWarrant() Warrant {
+	subject, ok := warrantCheck.Subject.(Subject)
+	if ok {
+		return Warrant{
+			ObjectType: warrantCheck.Object.GetObjectType(),
+			ObjectId:   warrantCheck.Object.GetObjectId(),
+			Relation:   warrantCheck.Relation,
+			Subject:    subject,
+			Context:    warrantCheck.Context,
+		}
+	}
+
 	return Warrant{
-		ObjectType: warrantCheck.Object.ObjectType,
-		ObjectId:   warrantCheck.Object.ObjectId,
+		ObjectType: warrantCheck.Object.GetObjectType(),
+		ObjectId:   warrantCheck.Object.GetObjectId(),
 		Relation:   warrantCheck.Relation,
-		Subject:    *warrantCheck.Subject,
-		Context:    warrantCheck.Context,
+		Subject: Subject{
+			ObjectType: warrantCheck.Subject.GetObjectType(),
+			ObjectId:   warrantCheck.Subject.GetObjectId(),
+		},
+		Context: warrantCheck.Context,
 	}
 }
 
 type WarrantCheckParams struct {
-	Object         *WarrantObject `json:"object"`
-	Relation       string         `json:"relation"`
-	Subject        *Subject       `json:"subject"`
-	Context        Context        `json:"context,omitempty"`
-	ConsistentRead bool           `json:"consistentRead,omitempty"`
-	Debug          bool           `json:"debug,omitempty"`
+	WarrantCheck   WarrantCheck `json:"warrantCheck"`
+	ConsistentRead bool         `json:"consistentRead,omitempty"`
+	Debug          bool         `json:"debug,omitempty"`
 }
 
 type WarrantCheckManyParams struct {
@@ -90,11 +126,11 @@ type RoleCheckParams struct {
 }
 
 type FeatureCheckParams struct {
-	FeatureId      string   `json:"featureId"`
-	Subject        *Subject `json:"subject"`
-	Context        Context  `json:"context,omitempty"`
-	ConsistentRead bool     `json:"consistentRead,omitempty"`
-	Debug          bool     `json:"debug,omitempty"`
+	FeatureId      string  `json:"featureId"`
+	Subject        Subject `json:"subject"`
+	Context        Context `json:"context,omitempty"`
+	ConsistentRead bool    `json:"consistentRead,omitempty"`
+	Debug          bool    `json:"debug,omitempty"`
 }
 
 type AccessCheckRequest struct {
