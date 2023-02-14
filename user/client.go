@@ -173,44 +173,36 @@ func ListUsersForTenant(tenantId string, listParams *warrant.ListUserParams) ([]
 	return getClient().ListUsersForTenant(tenantId, listParams)
 }
 
-func (c Client) AssignUserToTenant(userId string, tenantId string) (*warrant.Warrant, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedWarrant warrant.Warrant
-	err = json.Unmarshal([]byte(body), &assignedWarrant)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedWarrant, nil
+func (c Client) AssignUserToTenant(userId string, tenantId string, role string) (*warrant.Warrant, error) {
+	return warrant.Create(&warrant.WarrantParams{
+		ObjectType: "tenant",
+		ObjectId:   tenantId,
+		Relation:   role,
+		Subject: warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
+		},
+	})
 }
 
-func AssignUserToTenant(userId string, tenantId string) (*warrant.Warrant, error) {
-	return getClient().AssignUserToTenant(userId, tenantId)
+func AssignUserToTenant(userId string, tenantId string, role string) (*warrant.Warrant, error) {
+	return getClient().AssignUserToTenant(userId, tenantId, role)
 }
 
-func (c Client) RemoveUserFromTenant(userId string, tenantId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/users/%s", tenantId, userId), nil)
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return client.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	return nil
+func (c Client) RemoveUserFromTenant(userId string, tenantId string, role string) error {
+	return warrant.Delete(&warrant.WarrantParams{
+		ObjectType: "tenant",
+		ObjectId:   tenantId,
+		Relation:   role,
+		Subject: warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
+		},
+	})
 }
 
-func RemoveUserFromTenant(userId string, tenantId string) error {
-	return getClient().RemoveUserFromTenant(userId, tenantId)
+func RemoveUserFromTenant(userId string, tenantId string, role string) error {
+	return getClient().RemoveUserFromTenant(userId, tenantId, role)
 }
 
 func getClient() Client {
