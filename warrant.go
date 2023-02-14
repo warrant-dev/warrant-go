@@ -139,9 +139,3 @@ type AccessCheckRequest struct {
 	ConsistentRead bool      `json:"consistentRead,omitempty"`
 	Debug          bool      `json:"debug,omitempty"`
 }
-
-// func (subject Subject) EncodeValues(key string, v *url.Values) error {
-// 	v.Set(key, fmt.Sprintf("%s:%s", subject.ObjectType, subject.ObjectId))
-
-// 	return nil
-// }

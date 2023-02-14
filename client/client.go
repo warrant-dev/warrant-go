@@ -19,13 +19,6 @@ type WarrantClient struct {
 	Config     config.ClientConfig
 }
 
-// type ClientConfig struct {
-// 	ApiKey                  string
-// 	ApiEndpoint             string
-// 	AuthorizeEndpoint       string
-// 	SelfServiceDashEndpoint string
-// }
-
 func (client WarrantClient) MakeRequest(method string, path string, payload interface{}) (*http.Response, error) {
 	url := client.Config.ApiEndpoint + path
 	if payload == nil {
