@@ -6,6 +6,14 @@ type Role struct {
 	Description string `json:"description,omitempty"`
 }
 
+func (role Role) GetObjectType() string {
+	return "role"
+}
+
+func (role Role) GetObjectId() string {
+	return role.RoleId
+}
+
 type ListRoleParams struct {
 	ListParams
 }

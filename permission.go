@@ -6,6 +6,14 @@ type Permission struct {
 	Description  string `json:"description,omitempty"`
 }
 
+func (permission Permission) GetObjectType() string {
+	return "permission"
+}
+
+func (permission Permission) GetObjectId() string {
+	return permission.PermissionId
+}
+
 type ListPermissionParams struct {
 	ListParams
 }

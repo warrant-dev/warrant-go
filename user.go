@@ -5,6 +5,14 @@ type User struct {
 	Email  string `json:"email,omitempty"`
 }
 
+func (user User) GetObjectType() string {
+	return "user"
+}
+
+func (user User) GetObjectId() string {
+	return user.UserId
+}
+
 type ListUserParams struct {
 	ListParams
 }

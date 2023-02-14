@@ -8,6 +8,14 @@ type Tenant struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
+func (tenant Tenant) GetObjectType() string {
+	return "tenant"
+}
+
+func (tenant Tenant) GetObjectId() string {
+	return tenant.TenantId
+}
+
 type ListTenantParams struct {
 	ListParams
 }
