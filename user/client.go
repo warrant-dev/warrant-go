@@ -89,7 +89,7 @@ func Get(userId string) (*warrant.User, error) {
 }
 
 func (c Client) Update(userId string, params *warrant.UserParams) (*warrant.User, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/users/%s", userId), nil)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/users/%s", userId), params)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (c Client) AssignUserToTenant(userId string, tenantId string) (*warrant.War
 }
 
 func AssignUserToTenant(userId string, tenantId string) (*warrant.Warrant, error) {
-	return getClient().AssignUserToTenant(tenantId, userId)
+	return getClient().AssignUserToTenant(userId, tenantId)
 }
 
 func (c Client) RemoveUserFromTenant(userId string, tenantId string) error {
@@ -210,7 +210,7 @@ func (c Client) RemoveUserFromTenant(userId string, tenantId string) error {
 }
 
 func RemoveUserFromTenant(userId string, tenantId string) error {
-	return getClient().RemoveUserFromTenant(tenantId, userId)
+	return getClient().RemoveUserFromTenant(userId, tenantId)
 }
 
 func getClient() Client {

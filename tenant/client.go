@@ -89,7 +89,7 @@ func Get(tenantId string) (*warrant.Tenant, error) {
 }
 
 func (c Client) Update(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/tenants/%s", tenantId), nil)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/tenants/%s", tenantId), params)
 	if err != nil {
 		return nil, err
 	}

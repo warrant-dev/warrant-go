@@ -68,7 +68,7 @@ func Get(roleId string) (*warrant.Role, error) {
 }
 
 func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), params)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (c Client) AssignRoleToUser(roleId string, userId string) (*warrant.Role, e
 }
 
 func AssignRoleToUser(roleId string, userId string) (*warrant.Role, error) {
-	return getClient().AssignRoleToUser(userId, roleId)
+	return getClient().AssignRoleToUser(roleId, userId)
 }
 
 func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
@@ -182,7 +182,7 @@ func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
 }
 
 func RemoveRoleFromUser(roleId string, userId string) error {
-	return getClient().RemoveRoleFromUser(userId, roleId)
+	return getClient().RemoveRoleFromUser(roleId, userId)
 }
 
 func getClient() Client {

@@ -68,7 +68,7 @@ func Get(permissionId string) (*warrant.Permission, error) {
 }
 
 func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), params)
 	if err != nil {
 		return nil, err
 	}
