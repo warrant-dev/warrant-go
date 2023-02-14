@@ -181,7 +181,7 @@ func TestCrudRoles(t *testing.T) {
 	assert := assert.New(t)
 
 	adminRole, err := role.Create(&warrant.RoleParams{
-		RoleId:      "administrator",
+		RoleId:      "admin",
 		Name:        "Admin",
 		Description: "The admin role",
 	})
@@ -189,7 +189,7 @@ func TestCrudRoles(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	assert.Equal("administrator", adminRole.RoleId)
+	assert.Equal("admin", adminRole.RoleId)
 	assert.Equal("Admin", adminRole.Name)
 	assert.Equal("The admin role", adminRole.Description)
 
@@ -238,7 +238,7 @@ func TestCrudRoles(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	assert.Equal(3, len(roles))
+	assert.Equal(2, len(roles))
 
 	err = role.Delete(adminRole.RoleId)
 	if err != nil {
@@ -260,7 +260,7 @@ func TestCrudRoles(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	assert.Equal(1, len(roles))
+	assert.Equal(0, len(roles))
 }
 
 func TestCrudPermissions(t *testing.T) {
