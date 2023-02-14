@@ -1,17 +1,15 @@
 package warrant
 
-import (
-	"fmt"
-	"net/url"
-)
-
 type Warrant struct {
-	ObjectType    string  `json:"objectType"`
-	ObjectId      string  `json:"objectId"`
-	Relation      string  `json:"relation"`
-	Subject       Subject `json:"subject"`
-	IsDirectMatch bool    `json:"isDirectMatch,omitempty"`
+	ObjectType string  `json:"objectType"`
+	ObjectId   string  `json:"objectId"`
+	Relation   string  `json:"relation"`
+	Subject    Subject `json:"subject"`
+	Context    Context `json:"context,omitempty"`
+	IsImplicit bool    `json:"isImplicit,omitempty"`
 }
+
+type Context map[string]string
 
 type Subject struct {
 	ObjectType string `json:"objectType"`
@@ -19,25 +17,91 @@ type Subject struct {
 	Relation   string `json:"relation,omitempty"`
 }
 
-type ListWarrantParams struct {
-	ListParams
-	ObjectType string `json:"objectType" url:"objectType,omitempty"`
-	ObjectId   string `json:"objectId" url:"objectId,omitempty"`
-	Relation   string `json:"relation" url:"relation,omitempty"`
-	UserId     string `json:"userId" url:"userId,omitempty"`
+func (subject Subject) GetObjectType() string {
+	return subject.ObjectType
 }
 
-type QueryWarrantParams struct {
-	ObjectType string  `json:"objectType" url:"objectType,omitempty"`
-	Relation   string  `json:"relation" url:"relation,omitempty"`
-	Subject    Subject `json:"subject" url:"subject,omitempty"`
+func (subject Subject) GetObjectId() string {
+	return subject.ObjectId
+}
+
+type WarrantParams struct {
+	ObjectType string  `json:"objectType"`
+	ObjectId   string  `json:"objectId"`
+	Relation   string  `json:"relation"`
+	Subject    Subject `json:"subject"`
+	Context    Context `json:"context,omitempty"`
+}
+
+type ListWarrantParams struct {
+	ListParams
+}
+
+type Object struct {
+	ObjectType string `json:"objectType"`
+	ObjectId   string `json:"objectId"`
+}
+
+func (object Object) GetObjectType() string {
+	return object.ObjectType
+}
+
+func (object Object) GetObjectId() string {
+	return object.ObjectId
+}
+
+type WarrantObject interface {
+	GetObjectType() string
+	GetObjectId() string
+}
+
+type QueryWarrantResult struct {
+	Result interface{}            `json:"result"`
+	Meta   map[string]interface{} `json:"meta"`
+}
+
+type WarrantCheck struct {
+	Object   WarrantObject `json:"object"`
+	Relation string        `json:"relation"`
+	Subject  WarrantObject `json:"subject"`
+	Context  Context       `json:"context,omitempty"`
+}
+
+func (warrantCheck WarrantCheck) ToWarrant() Warrant {
+	subject, ok := warrantCheck.Subject.(Subject)
+	if ok {
+		return Warrant{
+			ObjectType: warrantCheck.Object.GetObjectType(),
+			ObjectId:   warrantCheck.Object.GetObjectId(),
+			Relation:   warrantCheck.Relation,
+			Subject:    subject,
+			Context:    warrantCheck.Context,
+		}
+	}
+
+	return Warrant{
+		ObjectType: warrantCheck.Object.GetObjectType(),
+		ObjectId:   warrantCheck.Object.GetObjectId(),
+		Relation:   warrantCheck.Relation,
+		Subject: Subject{
+			ObjectType: warrantCheck.Subject.GetObjectType(),
+			ObjectId:   warrantCheck.Subject.GetObjectId(),
+		},
+		Context: warrantCheck.Context,
+	}
 }
 
 type WarrantCheckParams struct {
-	Op             string    `json:"op"`
-	Warrants       []Warrant `json:"warrants"`
-	ConsistentRead bool      `json:"consistentRead"`
-	Debug          bool      `json:"debug"`
+	WarrantCheck   WarrantCheck `json:"warrantCheck"`
+	ConsistentRead bool         `json:"consistentRead,omitempty"`
+	Debug          bool         `json:"debug,omitempty"`
+}
+
+type WarrantCheckManyParams struct {
+	Op             string         `json:"op"`
+	Warrants       []WarrantCheck `json:"warrants"`
+	ConsistentRead bool           `json:"consistentRead,omitempty"`
+	Debug          bool           `json:"debug,omitempty"`
 }
 
 type WarrantCheckResult struct {
@@ -46,14 +110,32 @@ type WarrantCheckResult struct {
 }
 
 type PermissionCheckParams struct {
-	PermissionId   string `json:"permissionId"`
-	UserId         string `json:"userId"`
-	ConsistentRead bool   `json:"consistentRead"`
-	Debug          bool   `json:"debug"`
+	PermissionId   string  `json:"permissionId"`
+	UserId         string  `json:"userId"`
+	Context        Context `json:"context,omitempty"`
+	ConsistentRead bool    `json:"consistentRead,omitempty"`
+	Debug          bool    `json:"debug,omitempty"`
 }
 
-func (subject Subject) EncodeValues(key string, v *url.Values) error {
-	v.Set(key, fmt.Sprintf("%s:%s", subject.ObjectType, subject.ObjectId))
+type RoleCheckParams struct {
+	RoleId         string  `json:"roleId"`
+	UserId         string  `json:"userId"`
+	Context        Context `json:"context,omitempty"`
+	ConsistentRead bool    `json:"consistentRead,omitempty"`
+	Debug          bool    `json:"debug,omitempty"`
+}
 
-	return nil
+type FeatureCheckParams struct {
+	FeatureId      string  `json:"featureId"`
+	Subject        Subject `json:"subject"`
+	Context        Context `json:"context,omitempty"`
+	ConsistentRead bool    `json:"consistentRead,omitempty"`
+	Debug          bool    `json:"debug,omitempty"`
+}
+
+type AccessCheckRequest struct {
+	Op             string    `json:"op"`
+	Warrants       []Warrant `json:"warrants"`
+	ConsistentRead bool      `json:"consistentRead,omitempty"`
+	Debug          bool      `json:"debug,omitempty"`
 }

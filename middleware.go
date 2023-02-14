@@ -3,6 +3,8 @@ package warrant
 import (
 	"log"
 	"net/http"
+
+	"github.com/warrant-dev/warrant-go/config"
 )
 
 type GetObjectIdFunc func(r *http.Request) string
@@ -22,7 +24,7 @@ type MiddlewareConfig struct {
 
 type Middleware struct {
 	config MiddlewareConfig
-	client WarrantClient
+	client Client
 }
 
 type EnsureIsAuthorizedOptions struct {
@@ -65,16 +67,16 @@ func (eia *EnsureIsAuthorized) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		userId = eia.mw.config.GetUserId(r)
 	}
 
-	isAuthorized, err := eia.mw.client.IsAuthorized(WarrantCheckParams{
-		Warrants: []Warrant{
-			{
+	isAuthorized, err := eia.mw.client.Check(&WarrantCheckParams{
+		WarrantCheck: WarrantCheck{
+			Object: Object{
 				ObjectType: eia.options.ObjectType,
 				ObjectId:   objectId,
-				Relation:   eia.options.Relation,
-				Subject: Subject{
-					ObjectType: "user",
-					ObjectId:   userId,
-				},
+			},
+			Relation: eia.options.Relation,
+			Subject: Subject{
+				ObjectType: "user",
+				ObjectId:   userId,
 			},
 		},
 	})
@@ -114,7 +116,7 @@ func (ehp *EnsureHasPermission) ServeHTTP(w http.ResponseWriter, r *http.Request
 		userId = ehp.mw.config.GetUserId(r)
 	}
 
-	isAuthorized, err := ehp.mw.client.HasPermission(PermissionCheckParams{
+	isAuthorized, err := ehp.mw.client.CheckUserHasPermission(&PermissionCheckParams{
 		PermissionId: ehp.options.PermissionId,
 		UserId:       userId,
 	})
@@ -140,16 +142,18 @@ func (mw Middleware) NewEnsureHasPermission(handler http.Handler, options Ensure
 	}
 }
 
-func NewMiddleware(config MiddlewareConfig) *Middleware {
-	middlewareConfig := config
+func NewMiddleware(middlewareConfig MiddlewareConfig) *Middleware {
 	if middlewareConfig.OnAccessDenied == nil {
 		middlewareConfig.OnAccessDenied = defaultOnAccessDenied
 	}
 
 	return &Middleware{
 		config: middlewareConfig,
-		client: NewClient(ClientConfig{
-			ApiKey: config.ApiKey,
+		client: NewClient(config.ClientConfig{
+			ApiKey:                  middlewareConfig.ApiKey,
+			ApiEndpoint:             ApiEndpoint,
+			AuthorizeEndpoint:       AuthorizeEndpoint,
+			SelfServiceDashEndpoint: SelfServiceDashEndpoint,
 		}),
 	}
 }
