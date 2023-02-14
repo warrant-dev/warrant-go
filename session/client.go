@@ -52,11 +52,19 @@ func CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (str
 
 func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParams) (string, error) {
 	sessionParams := map[string]interface{}{
-		"type":     "ssdash",
-		"userId":   params.UserId,
-		"tenantId": params.TenantId,
-		"ttl":      params.TTL,
+		"type":                "ssdash",
+		"userId":              params.UserId,
+		"tenantId":            params.TenantId,
+		"selfServiceStrategy": params.SelfServiceStrategy,
+		"ttl":                 params.TTL,
 	}
+	if params.ObjectType != "" {
+		sessionParams["objectType"] = params.ObjectType
+	}
+	if params.ObjectId != "" {
+		sessionParams["objectId"] = params.ObjectId
+	}
+
 	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
 	if err != nil {
 		return "", err

@@ -577,7 +577,7 @@ func TestMultiTenancy(t *testing.T) {
 	}
 	assert.Equal(0, len(tenant1Users))
 
-	_, err = user.AssignUserToTenant(user1.UserId, tenant1.TenantId)
+	_, err = user.AssignUserToTenant(user1.UserId, tenant1.TenantId, "member")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -608,7 +608,7 @@ func TestMultiTenancy(t *testing.T) {
 	assert.Equal(1, len(tenant1Users))
 	assert.Equal(user1.UserId, tenant1Users[0].UserId)
 
-	err = user.RemoveUserFromTenant(user1.UserId, tenant1.TenantId)
+	err = user.RemoveUserFromTenant(user1.UserId, tenant1.TenantId, "member")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -1629,13 +1629,7 @@ func TestSessions(t *testing.T) {
 		return
 	}
 
-	_, err = user.AssignUserToTenant(user1.UserId, tenant1.TenantId)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	_, err = permission.AssignPermissionToUser("view-self-service-dashboard", user1.UserId)
+	_, err = user.AssignUserToTenant(user1.UserId, tenant1.TenantId, "admin")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -1651,9 +1645,10 @@ func TestSessions(t *testing.T) {
 	assert.NotEmpty(authzSessionToken)
 
 	ssDashUrl, err := session.CreateSelfServiceSession((&warrant.SelfServiceSessionParams{
-		UserId:      user1.UserId,
-		TenantId:    tenant1.TenantId,
-		RedirectUrl: "http://localhost:8080",
+		UserId:              user1.UserId,
+		TenantId:            tenant1.TenantId,
+		RedirectUrl:         "http://localhost:8080",
+		SelfServiceStrategy: warrant.SelfServiceStrategyFGAC,
 	}))
 	if err != nil {
 		fmt.Println(err)
