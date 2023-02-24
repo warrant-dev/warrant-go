@@ -3,13 +3,13 @@ package warrant
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
 	"github.com/google/go-querystring/query"
-	"github.com/warrant-dev/warrant-go/client"
-	"github.com/warrant-dev/warrant-go/config"
+	"github.com/warrant-dev/warrant-go/v2/client"
+	"github.com/warrant-dev/warrant-go/v2/config"
 )
 
 type Client struct {
@@ -30,7 +30,7 @@ func (c Client) Create(params *WarrantParams) (*Warrant, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -68,7 +68,7 @@ func (c Client) Query(queryString string, listParams *ListWarrantParams) (*Query
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -208,7 +208,7 @@ func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckR
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
