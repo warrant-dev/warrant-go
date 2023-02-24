@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/warrant-dev/warrant-go/config"
+	"github.com/warrant-dev/warrant-go/v2/config"
 )
 
 type GetObjectIdFunc func(r *http.Request) string

@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/warrant-dev/warrant-go/config"
+	"github.com/warrant-dev/warrant-go/v2/config"
 )
 
 const (

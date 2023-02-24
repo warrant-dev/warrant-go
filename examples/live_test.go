@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/warrant-dev/warrant-go"
-	"github.com/warrant-dev/warrant-go/feature"
-	"github.com/warrant-dev/warrant-go/permission"
-	"github.com/warrant-dev/warrant-go/pricingtier"
-	"github.com/warrant-dev/warrant-go/role"
-	"github.com/warrant-dev/warrant-go/session"
-	"github.com/warrant-dev/warrant-go/tenant"
-	"github.com/warrant-dev/warrant-go/user"
+	"github.com/warrant-dev/warrant-go/v2"
+	"github.com/warrant-dev/warrant-go/v2/feature"
+	"github.com/warrant-dev/warrant-go/v2/permission"
+	"github.com/warrant-dev/warrant-go/v2/pricingtier"
+	"github.com/warrant-dev/warrant-go/v2/role"
+	"github.com/warrant-dev/warrant-go/v2/session"
+	"github.com/warrant-dev/warrant-go/v2/tenant"
+	"github.com/warrant-dev/warrant-go/v2/user"
 )
 
 func setup() {
