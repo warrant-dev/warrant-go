@@ -138,40 +138,32 @@ func ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFe
 	return getClient().ListFeaturesForPricingTier(pricingTierId, listParams)
 }
 
-func (c Client) AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/pricing-tiers/%s/features/%s", pricingTierId, featureId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedFeature warrant.Feature
-	err = json.Unmarshal([]byte(body), &assignedFeature)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedFeature, nil
+func (c Client) AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: "feature",
+		ObjectId:   featureId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "pricing-tier",
+			ObjectId:   pricingTierId,
+		},
+	})
 }
 
-func AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warrant.Feature, error) {
+func AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warrant.Warrant, error) {
 	return getClient().AssignFeatureToPricingTier(featureId, pricingTierId)
 }
 
 func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s/features/%s", pricingTierId, featureId), nil)
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return client.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
-		}
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: "feature",
+		ObjectId:   featureId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "pricing-tier",
+			ObjectId:   pricingTierId,
+		},
+	})
 }
 
 func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
@@ -204,34 +196,32 @@ func ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParam
 	return getClient().ListFeaturesForTenant(tenantId, listParams)
 }
 
-func (c Client) AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/tenants/%s/features/%s", tenantId, featureId), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedFeature warrant.Feature
-	err = json.Unmarshal([]byte(body), &assignedFeature)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedFeature, nil
+func (c Client) AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: "feature",
+		ObjectId:   featureId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "tenant",
+			ObjectId:   tenantId,
+		},
+	})
 }
 
-func AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Feature, error) {
+func AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant, error) {
 	return getClient().AssignFeatureToTenant(featureId, tenantId)
 }
 
 func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/features/%s", tenantId, featureId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: "feature",
+		ObjectId:   featureId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "tenant",
+			ObjectId:   tenantId,
+		},
+	})
 }
 
 func RemoveFeatureFromTenant(featureId string, tenantId string) error {
@@ -264,33 +254,32 @@ func ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) (
 	return getClient().ListFeaturesForUser(userId, listParams)
 }
 
-func (c Client) AssignFeatureToUser(featureId string, userId string) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/users/%s/features/%s", userId, featureId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedFeature warrant.Feature
-	err = json.Unmarshal([]byte(body), &assignedFeature)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedFeature, nil
+func (c Client) AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: "feature",
+		ObjectId:   featureId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
+		},
+	})
 }
 
-func AssignFeatureToUser(featureId string, userId string) (*warrant.Feature, error) {
+func AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, error) {
 	return getClient().AssignFeatureToUser(featureId, userId)
 }
 
 func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/features/%s", userId, featureId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: "feature",
+		ObjectId:   featureId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
+		},
+	})
 }
 
 func RemoveFeatureFromUser(featureId string, userId string) error {

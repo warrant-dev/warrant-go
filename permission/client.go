@@ -152,33 +152,32 @@ func ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionPar
 	return getClient().ListPermissionsForRole(roleId, listParams)
 }
 
-func (c Client) AssignPermissionToRole(permissionId string, roleId string) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedPermission warrant.Permission
-	err = json.Unmarshal([]byte(body), &assignedPermission)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedPermission, nil
+func (c Client) AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: "permission",
+		ObjectId:   permissionId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "role",
+			ObjectId:   roleId,
+		},
+	})
 }
 
-func AssignPermissionToRole(permissionId string, roleId string) (*warrant.Permission, error) {
+func AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warrant, error) {
 	return getClient().AssignPermissionToRole(permissionId, roleId)
 }
 
 func (c Client) RemovePermissionFromRole(permissionId string, roleId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s/permissions/%s", roleId, permissionId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: "permission",
+		ObjectId:   permissionId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "role",
+			ObjectId:   roleId,
+		},
+	})
 }
 
 func RemovePermissionFromRole(permissionId string, roleId string) error {
@@ -211,33 +210,32 @@ func ListPermissionsForUser(userId string, listParams *warrant.ListPermissionPar
 	return getClient().ListPermissionsForUser(userId, listParams)
 }
 
-func (c Client) AssignPermissionToUser(permissionId string, userId string) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedPermission warrant.Permission
-	err = json.Unmarshal([]byte(body), &assignedPermission)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedPermission, nil
+func (c Client) AssignPermissionToUser(permissionId string, userId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: "permission",
+		ObjectId:   permissionId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
+		},
+	})
 }
 
-func AssignPermissionToUser(permissionId string, userId string) (*warrant.Permission, error) {
+func AssignPermissionToUser(permissionId string, userId string) (*warrant.Warrant, error) {
 	return getClient().AssignPermissionToUser(permissionId, userId)
 }
 
 func (c Client) RemovePermissionFromUser(permissionId string, userId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/permissions/%s", userId, permissionId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: "permission",
+		ObjectId:   permissionId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: "user",
+			ObjectId:   userId,
+		},
+	})
 }
 
 func RemovePermissionFromUser(permissionId string, userId string) error {
