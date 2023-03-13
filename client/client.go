@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/warrant-dev/warrant-go/v2/config"
@@ -52,7 +52,7 @@ func (client WarrantClient) MakeRequest(method string, path string, payload inte
 
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
+		msg, _ := io.ReadAll(resp.Body)
 		return nil, Error{
 			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
