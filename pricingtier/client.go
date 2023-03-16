@@ -3,7 +3,7 @@ package pricingtier
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/google/go-querystring/query"
@@ -30,7 +30,7 @@ func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier,
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -51,7 +51,7 @@ func (c Client) Get(pricingTierId string) (*warrant.PricingTier, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -89,7 +89,7 @@ func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]w
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -115,7 +115,7 @@ func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.L
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -131,33 +131,32 @@ func ListPricingTiersForTenant(userId string, listParams *warrant.ListPricingTie
 	return getClient().ListPricingTiersForTenant(userId, listParams)
 }
 
-func (c Client) AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.PricingTier, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/tenants/%s/pricing-tiers/%s", tenantId, pricingTierId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedPricingTier warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &assignedPricingTier)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedPricingTier, nil
+func (c Client) AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypePricingTier,
+		ObjectId:   pricingTierId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeTenant,
+			ObjectId:   tenantId,
+		},
+	})
 }
 
-func AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.PricingTier, error) {
+func AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.Warrant, error) {
 	return getClient().AssignPricingTierToTenant(pricingTierId, tenantId)
 }
 
 func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s/pricing-tiers/%s", tenantId, pricingTierId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypePricingTier,
+		ObjectId:   pricingTierId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeTenant,
+			ObjectId:   tenantId,
+		},
+	})
 }
 
 func RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
@@ -174,7 +173,7 @@ func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListP
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -190,33 +189,32 @@ func ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierP
 	return getClient().ListPricingTiersForUser(userId, listParams)
 }
 
-func (c Client) AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.PricingTier, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/users/%s/pricing-tiers/%s", userId, pricingTierId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedPricingTier warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &assignedPricingTier)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedPricingTier, nil
+func (c Client) AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypePricingTier,
+		ObjectId:   pricingTierId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeUser,
+			ObjectId:   userId,
+		},
+	})
 }
 
-func AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.PricingTier, error) {
+func AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warrant, error) {
 	return getClient().AssignPricingTierToUser(pricingTierId, userId)
 }
 
 func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/pricing-tiers/%s", userId, pricingTierId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypePricingTier,
+		ObjectId:   pricingTierId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeUser,
+			ObjectId:   userId,
+		},
+	})
 }
 
 func RemovePricingTierFromUser(pricingTierId string, userId string) error {

@@ -1,5 +1,7 @@
 package warrant
 
+const ObjectTypeUser = "user"
+
 type User struct {
 	UserId string `json:"userId"`
 	Email  string `json:"email,omitempty"`

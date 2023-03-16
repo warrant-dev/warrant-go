@@ -3,7 +3,7 @@ package session
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/warrant-dev/warrant-go/v2"
@@ -34,7 +34,7 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 	if err != nil {
 		return "", err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", client.WrapError("Error reading response", err)
 	}
@@ -69,7 +69,7 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 	if err != nil {
 		return "", err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", client.WrapError("Error reading response", err)
 	}

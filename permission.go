@@ -1,5 +1,7 @@
 package warrant
 
+const ObjectTypePermission = "permission"
+
 type Permission struct {
 	PermissionId string `json:"permissionId"`
 	Name         string `json:"name,omitempty"`

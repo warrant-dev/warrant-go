@@ -3,7 +3,7 @@ package tenant
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/google/go-querystring/query"
@@ -30,7 +30,7 @@ func (c Client) Create(params *warrant.TenantParams) (*warrant.Tenant, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -51,7 +51,7 @@ func (c Client) BatchCreate(params []warrant.TenantParams) ([]warrant.Tenant, er
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -72,7 +72,7 @@ func (c Client) Get(tenantId string) (*warrant.Tenant, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -93,7 +93,7 @@ func (c Client) Update(tenantId string, params *warrant.TenantParams) (*warrant.
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -116,7 +116,7 @@ func (c Client) Delete(tenantId string) error {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
+		msg, _ := io.ReadAll(resp.Body)
 		return client.Error{
 			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
 		}
@@ -138,7 +138,7 @@ func (c Client) ListTenants(listParams *warrant.ListTenantParams) ([]warrant.Ten
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -164,7 +164,7 @@ func (c Client) ListTenantsForUser(userId string, listParams *warrant.ListTenant
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}

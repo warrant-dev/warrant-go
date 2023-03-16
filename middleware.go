@@ -75,7 +75,7 @@ func (eia *EnsureIsAuthorized) ServeHTTP(w http.ResponseWriter, r *http.Request)
 			},
 			Relation: eia.options.Relation,
 			Subject: Subject{
-				ObjectType: "user",
+				ObjectType: ObjectTypeUser,
 				ObjectId:   userId,
 			},
 		},

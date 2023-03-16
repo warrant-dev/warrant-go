@@ -3,7 +3,7 @@ package role
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/google/go-querystring/query"
@@ -30,7 +30,7 @@ func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -51,7 +51,7 @@ func (c Client) Get(roleId string) (*warrant.Role, error) {
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -72,7 +72,7 @@ func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -110,7 +110,7 @@ func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, e
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -136,7 +136,7 @@ func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRolePara
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, client.WrapError("Error reading response", err)
 	}
@@ -152,33 +152,32 @@ func ListRolesForUser(userId string, listParams *warrant.ListRoleParams) ([]warr
 	return getClient().ListRolesForUser(userId, listParams)
 }
 
-func (c Client) AssignRoleToUser(roleId string, userId string) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
-	if err != nil {
-		return nil, err
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
-	}
-	var assignedRole warrant.Role
-	err = json.Unmarshal([]byte(body), &assignedRole)
-	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
-	}
-	return &assignedRole, nil
+func (c Client) AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
+	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypeRole,
+		ObjectId:   roleId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeUser,
+			ObjectId:   userId,
+		},
+	})
 }
 
-func AssignRoleToUser(roleId string, userId string) (*warrant.Role, error) {
+func AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
 	return getClient().AssignRoleToUser(roleId, userId)
 }
 
 func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s/roles/%s", userId, roleId), nil)
-	if err != nil {
-		return err
-	}
-	return nil
+	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypeRole,
+		ObjectId:   roleId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeUser,
+			ObjectId:   userId,
+		},
+	})
 }
 
 func RemoveRoleFromUser(roleId string, userId string) error {

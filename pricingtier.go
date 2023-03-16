@@ -1,5 +1,7 @@
 package warrant
 
+const ObjectTypePricingTier = "pricing-tier"
+
 type PricingTier struct {
 	PricingTierId string `json:"pricingTierId"`
 }

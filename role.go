@@ -1,5 +1,7 @@
 package warrant
 
+const ObjectTypeRole = "role"
+
 type Role struct {
 	RoleId      string `json:"roleId"`
 	Name        string `json:"name,omitempty"`

@@ -1,5 +1,7 @@
 package warrant
 
+const ObjectTypeFeature = "feature"
+
 type Feature struct {
 	FeatureId string `json:"featureId"`
 }
