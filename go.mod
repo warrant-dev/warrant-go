@@ -1,4 +1,4 @@
-module github.com/warrant-dev/warrant-go/v2
+module github.com/warrant-dev/warrant-go/v3
 
 go 1.19
 
