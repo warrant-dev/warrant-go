@@ -8,8 +8,8 @@ import (
 	"net/url"
 
 	"github.com/google/go-querystring/query"
-	"github.com/warrant-dev/warrant-go/v2/client"
-	"github.com/warrant-dev/warrant-go/v2/config"
+	"github.com/warrant-dev/warrant-go/v3/client"
+	"github.com/warrant-dev/warrant-go/v3/config"
 )
 
 type Client struct {
@@ -203,7 +203,7 @@ func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 }
 
 func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v2/authorize", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v3/authorize", params)
 	if err != nil {
 		return nil, err
 	}
