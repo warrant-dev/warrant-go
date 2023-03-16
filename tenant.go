@@ -2,6 +2,8 @@ package warrant
 
 import "time"
 
+const ObjectTypeTenant = "tenant"
+
 type Tenant struct {
 	TenantId  string    `json:"tenantId"`
 	Name      string    `json:"name,omitempty"`

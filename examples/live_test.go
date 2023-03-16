@@ -1002,7 +1002,7 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	paidUserHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   paidUser.UserId,
 		},
 	})
@@ -1034,7 +1034,7 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	paidUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   paidUser.UserId,
 		},
 	})
@@ -1066,7 +1066,7 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	paidUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   paidUser.UserId,
 		},
 	})
@@ -1092,7 +1092,7 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	freeUserHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   freeUser.UserId,
 		},
 	})
@@ -1142,7 +1142,7 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	freeUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   freeUser.UserId,
 		},
 	})
@@ -1186,7 +1186,7 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	freeUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   freeUser.UserId,
 		},
 	})
@@ -1339,7 +1339,7 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	paidTenantHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   paidTenant.TenantId,
 		},
 	})
@@ -1371,7 +1371,7 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	paidTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   paidTenant.TenantId,
 		},
 	})
@@ -1403,7 +1403,7 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	paidTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   paidTenant.TenantId,
 		},
 	})
@@ -1429,7 +1429,7 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	freeTenantHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   freeTenant.TenantId,
 		},
 	})
@@ -1479,7 +1479,7 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	freeTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   freeTenant.TenantId,
 		},
 	})
@@ -1523,7 +1523,7 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	freeTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   freeTenant.TenantId,
 		},
 	})
@@ -1693,12 +1693,12 @@ func TestWarrants(t *testing.T) {
 	checkResult, err := warrant.Check(&warrant.WarrantCheckParams{
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
-				ObjectType: "permission",
+				ObjectType: warrant.ObjectTypePermission,
 				ObjectId:   newPermission.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
-				ObjectType: "user",
+				ObjectType: warrant.ObjectTypeUser,
 				ObjectId:   newUser.UserId,
 			},
 		},
@@ -1710,11 +1710,11 @@ func TestWarrants(t *testing.T) {
 	assert.False(checkResult)
 
 	_, err = warrant.Create(&warrant.WarrantParams{
-		ObjectType: "permission",
+		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   newPermission.PermissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   newUser.UserId,
 		},
 	})
@@ -1726,12 +1726,12 @@ func TestWarrants(t *testing.T) {
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
-				ObjectType: "permission",
+				ObjectType: warrant.ObjectTypePermission,
 				ObjectId:   newPermission.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
-				ObjectType: "user",
+				ObjectType: warrant.ObjectTypeUser,
 				ObjectId:   newUser.UserId,
 			},
 		},
@@ -1757,11 +1757,11 @@ func TestWarrants(t *testing.T) {
 	assert.Equal("member", result[0].Relation)
 
 	err = warrant.Delete(&warrant.WarrantParams{
-		ObjectType: "permission",
+		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   newPermission.PermissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   newUser.UserId,
 		},
 	})
@@ -1773,12 +1773,12 @@ func TestWarrants(t *testing.T) {
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
-				ObjectType: "permission",
+				ObjectType: warrant.ObjectTypePermission,
 				ObjectId:   newPermission.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
-				ObjectType: "user",
+				ObjectType: warrant.ObjectTypeUser,
 				ObjectId:   newUser.UserId,
 			},
 		},

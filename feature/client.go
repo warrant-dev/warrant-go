@@ -140,11 +140,11 @@ func ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFe
 
 func (c Client) AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "feature",
+		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "pricing-tier",
+			ObjectType: warrant.ObjectTypePricingTier,
 			ObjectId:   pricingTierId,
 		},
 	})
@@ -156,11 +156,11 @@ func AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warran
 
 func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "feature",
+		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "pricing-tier",
+			ObjectType: warrant.ObjectTypePricingTier,
 			ObjectId:   pricingTierId,
 		},
 	})
@@ -198,11 +198,11 @@ func ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParam
 
 func (c Client) AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "feature",
+		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   tenantId,
 		},
 	})
@@ -214,11 +214,11 @@ func AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant,
 
 func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "feature",
+		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   tenantId,
 		},
 	})
@@ -256,11 +256,11 @@ func ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) (
 
 func (c Client) AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "feature",
+		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})
@@ -272,11 +272,11 @@ func AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, err
 
 func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "feature",
+		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})

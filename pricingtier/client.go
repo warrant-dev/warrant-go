@@ -133,11 +133,11 @@ func ListPricingTiersForTenant(userId string, listParams *warrant.ListPricingTie
 
 func (c Client) AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "pricing-tier",
+		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   tenantId,
 		},
 	})
@@ -149,11 +149,11 @@ func AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.
 
 func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "pricing-tier",
+		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "tenant",
+			ObjectType: warrant.ObjectTypeTenant,
 			ObjectId:   tenantId,
 		},
 	})
@@ -191,11 +191,11 @@ func ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierP
 
 func (c Client) AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "pricing-tier",
+		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})
@@ -207,11 +207,11 @@ func AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warr
 
 func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "pricing-tier",
+		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})

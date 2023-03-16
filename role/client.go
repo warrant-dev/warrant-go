@@ -154,11 +154,11 @@ func ListRolesForUser(userId string, listParams *warrant.ListRoleParams) ([]warr
 
 func (c Client) AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "role",
+		ObjectType: warrant.ObjectTypeRole,
 		ObjectId:   roleId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})
@@ -170,11 +170,11 @@ func AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
 
 func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "role",
+		ObjectType: warrant.ObjectTypeRole,
 		ObjectId:   roleId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})

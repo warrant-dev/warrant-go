@@ -140,12 +140,12 @@ func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, err
 	return c.Check(&WarrantCheckParams{
 		WarrantCheck: WarrantCheck{
 			Object: Object{
-				ObjectType: "permission",
+				ObjectType: ObjectTypePermission,
 				ObjectId:   params.PermissionId,
 			},
 			Relation: "member",
 			Subject: Subject{
-				ObjectType: "user",
+				ObjectType: ObjectTypeUser,
 				ObjectId:   params.UserId,
 			},
 			Context: params.Context,
@@ -163,12 +163,12 @@ func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
 		WarrantCheck: WarrantCheck{
 			Object: Object{
-				ObjectType: "role",
+				ObjectType: ObjectTypeRole,
 				ObjectId:   params.RoleId,
 			},
 			Relation: "member",
 			Subject: Subject{
-				ObjectType: "user",
+				ObjectType: ObjectTypeUser,
 				ObjectId:   params.UserId,
 			},
 			Context: params.Context,
@@ -186,7 +186,7 @@ func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
 		WarrantCheck: WarrantCheck{
 			Object: Object{
-				ObjectType: "feature",
+				ObjectType: ObjectTypeFeature,
 				ObjectId:   params.FeatureId,
 			},
 			Relation: "member",

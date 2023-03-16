@@ -154,11 +154,11 @@ func ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionPar
 
 func (c Client) AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "permission",
+		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "role",
+			ObjectType: warrant.ObjectTypeRole,
 			ObjectId:   roleId,
 		},
 	})
@@ -170,11 +170,11 @@ func AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warran
 
 func (c Client) RemovePermissionFromRole(permissionId string, roleId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "permission",
+		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "role",
+			ObjectType: warrant.ObjectTypeRole,
 			ObjectId:   roleId,
 		},
 	})
@@ -212,11 +212,11 @@ func ListPermissionsForUser(userId string, listParams *warrant.ListPermissionPar
 
 func (c Client) AssignPermissionToUser(permissionId string, userId string) (*warrant.Warrant, error) {
 	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
-		ObjectType: "permission",
+		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})
@@ -228,11 +228,11 @@ func AssignPermissionToUser(permissionId string, userId string) (*warrant.Warran
 
 func (c Client) RemovePermissionFromUser(permissionId string, userId string) error {
 	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
-		ObjectType: "permission",
+		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})

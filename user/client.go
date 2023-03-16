@@ -175,11 +175,11 @@ func ListUsersForTenant(tenantId string, listParams *warrant.ListUserParams) ([]
 
 func (c Client) AssignUserToTenant(userId string, tenantId string, role string) (*warrant.Warrant, error) {
 	return warrant.Create(&warrant.WarrantParams{
-		ObjectType: "tenant",
+		ObjectType: warrant.ObjectTypeTenant,
 		ObjectId:   tenantId,
 		Relation:   role,
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})
@@ -191,11 +191,11 @@ func AssignUserToTenant(userId string, tenantId string, role string) (*warrant.W
 
 func (c Client) RemoveUserFromTenant(userId string, tenantId string, role string) error {
 	return warrant.Delete(&warrant.WarrantParams{
-		ObjectType: "tenant",
+		ObjectType: warrant.ObjectTypeTenant,
 		ObjectId:   tenantId,
 		Relation:   role,
 		Subject: warrant.Subject{
-			ObjectType: "user",
+			ObjectType: warrant.ObjectTypeUser,
 			ObjectId:   userId,
 		},
 	})
