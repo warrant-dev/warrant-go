@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ClientVersion string = "3.0.1"
+	ClientVersion string = "3.1.0"
 )
 
 type WarrantClient struct {
