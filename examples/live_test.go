@@ -17,7 +17,9 @@ import (
 )
 
 func setup() {
-	warrant.ApiKey = "YOUR_API_KEY"
+	warrant.ApiKey = ""
+	warrant.ApiEndpoint = "https://api.warrant.dev"
+	warrant.AuthorizeEndpoint = "https://api.warrant.dev"
 }
 
 func TestCrudUsers(t *testing.T) {
