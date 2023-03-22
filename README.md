@@ -45,7 +45,7 @@ client := warrant.NewClient(config.ClientConfig{
 ```
 
 ## Configuring Endpoints
-The API, Authorize, and Self-Service endpoints the SDK makes requests to is configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint` attributes:
+The API, Authorize, and Self-Service endpoints the SDK makes requests to are configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint` attributes:
 
 ```go
 import "github.com/warrant-dev/warrant-go"
