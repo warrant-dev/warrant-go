@@ -221,10 +221,6 @@ func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckR
 }
 
 func getClient() Client {
-	if ApiKey == "" {
-		panic("You must provide an ApiKey to initialize the Warrant Client")
-	}
-
 	config := config.ClientConfig{
 		ApiKey:                  ApiKey,
 		ApiEndpoint:             ApiEndpoint,

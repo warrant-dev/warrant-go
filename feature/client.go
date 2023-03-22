@@ -287,10 +287,6 @@ func RemoveFeatureFromUser(featureId string, userId string) error {
 }
 
 func getClient() Client {
-	if warrant.ApiKey == "" {
-		panic("You must provide an ApiKey to initialize the Warrant Client")
-	}
-
 	config := config.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
