@@ -26,7 +26,9 @@ func (client WarrantClient) MakeRequest(method string, path string, payload inte
 		if err != nil {
 			return nil, WrapError("Unable to create request", err)
 		}
-		req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.Config.ApiKey))
+		if client.Config.ApiKey != "" {
+			req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.Config.ApiKey))
+		}
 		req.Header.Add("User-Agent", fmt.Sprintf("warrant-go/%s", ClientVersion))
 		resp, err := client.HttpClient.Do(req)
 		if err != nil {

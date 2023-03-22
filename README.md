@@ -34,12 +34,35 @@ tenant, err := tenant.Create(&tenant.TenantParams{})
 Instantiate the Warrant client with your API key to get started:
 ```go
 import "github.com/warrant-dev/warrant-go"
+import "github.com/warrant-dev/warrant-go/v3/config"
 
 client := warrant.NewClient(config.ClientConfig{
     ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
 	ApiEndpoint: "https://api.warrant.dev",
 	AuthorizeEndpoint: "https://api.warrant.dev",
-	SelfServiceDashEndpoint: "https://self-serve.warrant.dev"
+	SelfServiceDashEndpoint: "https://self-serve.warrant.dev",
+})
+```
+
+## Configuring Endpoints
+The API, Authorize, and Self-Service endpoints the SDK makes requests to are configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint` attributes:
+
+```go
+import "github.com/warrant-dev/warrant-go"
+import "github.com/warrant-dev/warrant-go/v3/config"
+
+// Without client initialization
+// Set api and authorize endpoints to http://localhost:8000
+warrant.ApiEndpoint = "http://localhost:8000"
+warrant.AuthorizeEndpoint = "http://localhost:8000"
+
+// With client initialization
+// Set api and authorize endpoints to http://localhost:8000 and self-service endpoint to http://localhost:8080
+client := warrant.NewClient(config.ClientConfig{
+    ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
+	ApiEndpoint: "http://localhost:8000",
+	AuthorizeEndpoint: "http://localhost:8000",
+	SelfServiceDashEndpoint: "http://localhost:8080",
 })
 ```
 

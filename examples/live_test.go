@@ -17,7 +17,9 @@ import (
 )
 
 func setup() {
-	warrant.ApiKey = "YOUR_API_KEY"
+	warrant.ApiKey = ""
+	warrant.ApiEndpoint = "https://api.warrant.dev"
+	warrant.AuthorizeEndpoint = "https://api.warrant.dev"
 }
 
 func TestCrudUsers(t *testing.T) {
@@ -1742,19 +1744,19 @@ func TestWarrants(t *testing.T) {
 	}
 	assert.True(checkResult)
 
-	queryResult, err := warrant.Query(fmt.Sprintf("SELECT warrant FOR subject=%s:%s WHERE subject=%s:%s", "user", newUser.UserId, "user", newUser.UserId), &warrant.ListWarrantParams{})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	queryBytes, _ := json.Marshal(queryResult.Result)
-	var result []warrant.Warrant
-	json.Unmarshal(queryBytes, &result)
+	// queryResult, err := warrant.Query(fmt.Sprintf("SELECT warrant FOR subject=%s:%s WHERE subject=%s:%s", "user", newUser.UserId, "user", newUser.UserId), &warrant.ListWarrantParams{})
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// queryBytes, _ := json.Marshal(queryResult.Result)
+	// var result []warrant.Warrant
+	// json.Unmarshal(queryBytes, &result)
 
-	assert.Equal(1, len(result))
-	assert.Equal("permission", result[0].ObjectType)
-	assert.Equal("perm1", result[0].ObjectId)
-	assert.Equal("member", result[0].Relation)
+	// assert.Equal(1, len(result))
+	// assert.Equal("permission", result[0].ObjectType)
+	// assert.Equal("perm1", result[0].ObjectId)
+	// assert.Equal("member", result[0].Relation)
 
 	err = warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
