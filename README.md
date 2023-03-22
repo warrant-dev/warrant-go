@@ -5,14 +5,12 @@ Use [Warrant](https://warrant.dev/) in server-side Go projects.
 [![Slack](https://img.shields.io/badge/slack-join-brightgreen)](https://join.slack.com/t/warrantcommunity/shared_invite/zt-12g84updv-5l1pktJf2bI5WIKN4_~f4w)
 
 ## Installation
----
 
 ```shell
 go get github.com/warrant-dev/warrant-go
 ```
 
 ## Usage
----
 
 You can use the Warrant SDK with or without a client. Instantiating a client allows you to create different client instances each with their own config (API key, API endpoint, etc).
 
@@ -47,7 +45,6 @@ client := warrant.NewClient(config.ClientConfig{
 ```
 
 ## Configuring Endpoints
----
 The API, Authorize, and Self-Service endpoints the SDK makes requests to is configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint` attributes:
 
 ```go
@@ -70,7 +67,6 @@ client := warrant.NewClient(config.ClientConfig{
 ```
 
 ## Examples
----
 
 ### Users
 
@@ -139,6 +135,5 @@ For more information on how to use the Warrant API, please refer to the
 Note that we may release new [minor and patch](https://semver.org/) versions of this library with small but backwards-incompatible fixes to the type declarations. These changes will not affect Warrant itself.
 
 ## Warrant Documentation
----
 
 - [Warrant Docs](https://docs.warrant.dev/)
