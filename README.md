@@ -7,7 +7,7 @@ Use [Warrant](https://warrant.dev/) in server-side Go projects.
 ## Installation
 
 ```shell
-go get github.com/warrant-dev/warrant-go
+go get github.com/warrant-dev/warrant-go/v3
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ You can use the Warrant SDK with or without a client. Instantiating a client all
 ### Without a Client
 
 ```go
-import "github.com/warrant-dev/warrant-go"
+import "github.com/warrant-dev/warrant-go/v3"
 
 // Setup
 warrant.ApiKey = "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E="
@@ -33,7 +33,7 @@ tenant, err := tenant.Create(&tenant.TenantParams{})
 
 Instantiate the Warrant client with your API key to get started:
 ```go
-import "github.com/warrant-dev/warrant-go"
+import "github.com/warrant-dev/warrant-go/v3"
 import "github.com/warrant-dev/warrant-go/v3/config"
 
 client := warrant.NewClient(config.ClientConfig{
@@ -48,7 +48,7 @@ client := warrant.NewClient(config.ClientConfig{
 The API, Authorize, and Self-Service endpoints the SDK makes requests to are configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint` attributes:
 
 ```go
-import "github.com/warrant-dev/warrant-go"
+import "github.com/warrant-dev/warrant-go/v3"
 import "github.com/warrant-dev/warrant-go/v3/config"
 
 // Without client initialization
