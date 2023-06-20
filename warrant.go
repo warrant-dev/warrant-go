@@ -1,15 +1,20 @@
 package warrant
 
+import "encoding/json"
+
 type Warrant struct {
 	ObjectType string  `json:"objectType"`
 	ObjectId   string  `json:"objectId"`
 	Relation   string  `json:"relation"`
 	Subject    Subject `json:"subject"`
 	Context    Context `json:"context,omitempty"`
+	Policy     string  `json:"policy,omitempty"`
 	IsImplicit bool    `json:"isImplicit,omitempty"`
 }
 
 type Context map[string]string
+
+type PolicyContext map[string]interface{}
 
 type Subject struct {
 	ObjectType string `json:"objectType"`
@@ -31,6 +36,7 @@ type WarrantParams struct {
 	Relation   string  `json:"relation"`
 	Subject    Subject `json:"subject"`
 	Context    Context `json:"context,omitempty"`
+	Policy     string  `json:"policy,omitempty"`
 }
 
 type ListWarrantParams struct {
@@ -64,44 +70,30 @@ type WarrantCheck struct {
 	Object   WarrantObject `json:"object"`
 	Relation string        `json:"relation"`
 	Subject  WarrantObject `json:"subject"`
-	Context  Context       `json:"context,omitempty"`
+	Context  PolicyContext `json:"context,omitempty"`
 }
 
-func (warrantCheck WarrantCheck) ToWarrant() Warrant {
-	subject, ok := warrantCheck.Subject.(Subject)
-	if ok {
-		return Warrant{
-			ObjectType: warrantCheck.Object.GetObjectType(),
-			ObjectId:   warrantCheck.Object.GetObjectId(),
-			Relation:   warrantCheck.Relation,
-			Subject:    subject,
-			Context:    warrantCheck.Context,
-		}
+func (warrantCheck WarrantCheck) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"objectType": warrantCheck.Object.GetObjectType(),
+		"objectId":   warrantCheck.Object.GetObjectId(),
+		"relation":   warrantCheck.Relation,
+		"subject":    warrantCheck.Subject,
+		"context":    warrantCheck.Context,
 	}
 
-	return Warrant{
-		ObjectType: warrantCheck.Object.GetObjectType(),
-		ObjectId:   warrantCheck.Object.GetObjectId(),
-		Relation:   warrantCheck.Relation,
-		Subject: Subject{
-			ObjectType: warrantCheck.Subject.GetObjectType(),
-			ObjectId:   warrantCheck.Subject.GetObjectId(),
-		},
-		Context: warrantCheck.Context,
-	}
+	return json.Marshal(m)
 }
 
 type WarrantCheckParams struct {
-	WarrantCheck   WarrantCheck `json:"warrantCheck"`
-	ConsistentRead bool         `json:"consistentRead,omitempty"`
-	Debug          bool         `json:"debug,omitempty"`
+	WarrantCheck WarrantCheck `json:"warrantCheck"`
+	Debug        bool         `json:"debug,omitempty"`
 }
 
 type WarrantCheckManyParams struct {
-	Op             string         `json:"op"`
-	Warrants       []WarrantCheck `json:"warrants"`
-	ConsistentRead bool           `json:"consistentRead,omitempty"`
-	Debug          bool           `json:"debug,omitempty"`
+	Op       string         `json:"op"`
+	Warrants []WarrantCheck `json:"warrants"`
+	Debug    bool           `json:"debug,omitempty"`
 }
 
 type WarrantCheckResult struct {
@@ -110,32 +102,28 @@ type WarrantCheckResult struct {
 }
 
 type PermissionCheckParams struct {
-	PermissionId   string  `json:"permissionId"`
-	UserId         string  `json:"userId"`
-	Context        Context `json:"context,omitempty"`
-	ConsistentRead bool    `json:"consistentRead,omitempty"`
-	Debug          bool    `json:"debug,omitempty"`
+	PermissionId string        `json:"permissionId"`
+	UserId       string        `json:"userId"`
+	Context      PolicyContext `json:"context,omitempty"`
+	Debug        bool          `json:"debug,omitempty"`
 }
 
 type RoleCheckParams struct {
-	RoleId         string  `json:"roleId"`
-	UserId         string  `json:"userId"`
-	Context        Context `json:"context,omitempty"`
-	ConsistentRead bool    `json:"consistentRead,omitempty"`
-	Debug          bool    `json:"debug,omitempty"`
+	RoleId  string        `json:"roleId"`
+	UserId  string        `json:"userId"`
+	Context PolicyContext `json:"context,omitempty"`
+	Debug   bool          `json:"debug,omitempty"`
 }
 
 type FeatureCheckParams struct {
-	FeatureId      string  `json:"featureId"`
-	Subject        Subject `json:"subject"`
-	Context        Context `json:"context,omitempty"`
-	ConsistentRead bool    `json:"consistentRead,omitempty"`
-	Debug          bool    `json:"debug,omitempty"`
+	FeatureId string        `json:"featureId"`
+	Subject   Subject       `json:"subject"`
+	Context   PolicyContext `json:"context,omitempty"`
+	Debug     bool          `json:"debug,omitempty"`
 }
 
 type AccessCheckRequest struct {
-	Op             string    `json:"op"`
-	Warrants       []Warrant `json:"warrants"`
-	ConsistentRead bool      `json:"consistentRead,omitempty"`
-	Debug          bool      `json:"debug,omitempty"`
+	Op       string         `json:"op"`
+	Warrants []WarrantCheck `json:"warrants"`
+	Debug    bool           `json:"debug,omitempty"`
 }
