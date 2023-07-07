@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -67,7 +66,6 @@ func TestCrudUsers(t *testing.T) {
 
 	users, err := user.ListUsers(&warrant.ListUserParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -89,7 +87,6 @@ func TestCrudUsers(t *testing.T) {
 	}
 	users, err = user.ListUsers(&warrant.ListUserParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -145,7 +142,6 @@ func TestCrudTenants(t *testing.T) {
 
 	tenants, err := tenant.ListTenants(&warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -167,7 +163,6 @@ func TestCrudTenants(t *testing.T) {
 	}
 	tenants, err = tenant.ListTenants(&warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -232,7 +227,6 @@ func TestCrudRoles(t *testing.T) {
 
 	roles, err := role.ListRoles(&warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -254,7 +248,6 @@ func TestCrudRoles(t *testing.T) {
 	}
 	roles, err = role.ListRoles(&warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -314,7 +307,6 @@ func TestCrudPermissions(t *testing.T) {
 
 	permissions, err := permission.ListPermissions(&warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -336,7 +328,6 @@ func TestCrudPermissions(t *testing.T) {
 	}
 	permissions, err = permission.ListPermissions(&warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -376,7 +367,6 @@ func TestCrudFeatures(t *testing.T) {
 
 	features, err := feature.ListFeatures(&warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -398,7 +388,6 @@ func TestCrudFeatures(t *testing.T) {
 	}
 	features, err = feature.ListFeatures(&warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -438,7 +427,6 @@ func TestCrudPricingTiers(t *testing.T) {
 
 	tiers, err := pricingtier.ListPricingTiers(&warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -460,7 +448,6 @@ func TestCrudPricingTiers(t *testing.T) {
 	}
 	tiers, err = pricingtier.ListPricingTiers(&warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 10,
 		},
 	})
@@ -558,7 +545,6 @@ func TestMultiTenancy(t *testing.T) {
 	// Assign user1 -> tenant1
 	user1Tenants, err := tenant.ListTenantsForUser(user1.UserId, &warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -569,7 +555,6 @@ func TestMultiTenancy(t *testing.T) {
 	assert.Equal(0, len(user1Tenants))
 	tenant1Users, err := user.ListUsersForTenant(tenant1.TenantId, &warrant.ListUserParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -587,7 +572,6 @@ func TestMultiTenancy(t *testing.T) {
 
 	user1Tenants, err = tenant.ListTenantsForUser(user1.UserId, &warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -599,7 +583,6 @@ func TestMultiTenancy(t *testing.T) {
 	assert.Equal("tenant-1", user1Tenants[0].TenantId)
 	tenant1Users, err = user.ListUsersForTenant(tenant1.TenantId, &warrant.ListUserParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -698,7 +681,6 @@ func TestRBAC(t *testing.T) {
 	// Admin user tests
 	adminUserRoles, err := role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -710,7 +692,6 @@ func TestRBAC(t *testing.T) {
 
 	adminRolePermissions, err := permission.ListPermissionsForRole(adminRole.RoleId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -745,7 +726,6 @@ func TestRBAC(t *testing.T) {
 
 	adminRolePermissions, err = permission.ListPermissionsForRole(adminRole.RoleId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -768,7 +748,6 @@ func TestRBAC(t *testing.T) {
 
 	adminUserRoles, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -798,7 +777,6 @@ func TestRBAC(t *testing.T) {
 
 	adminUserRoles, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -816,7 +794,6 @@ func TestRBAC(t *testing.T) {
 
 	adminUserRoles, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -839,7 +816,6 @@ func TestRBAC(t *testing.T) {
 
 	viewerUserPermissions, err := permission.ListPermissionsForUser(viewerUser.UserId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -868,7 +844,6 @@ func TestRBAC(t *testing.T) {
 
 	viewerUserPermissions, err = permission.ListPermissionsForUser(viewerUser.UserId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -898,7 +873,6 @@ func TestRBAC(t *testing.T) {
 
 	viewerUserPermissions, err = permission.ListPermissionsForUser(viewerUser.UserId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1016,7 +990,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	paidUserFeatures, err := feature.ListFeaturesForUser(paidUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1048,7 +1021,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	paidUserFeatures, err = feature.ListFeaturesForUser(paidUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1080,7 +1052,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	paidUserFeatures, err = feature.ListFeaturesForUser(paidUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1106,7 +1077,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeTierFeatures, err := feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1118,7 +1088,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserFeatures, err := feature.ListFeaturesForUser(freeUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1156,7 +1125,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1168,7 +1136,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserTiers, err := pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1200,7 +1167,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1212,7 +1178,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserTiers, err = pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1230,7 +1195,6 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserTiers, err = pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1353,7 +1317,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	paidTenantFeatures, err := feature.ListFeaturesForTenant(paidTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1385,7 +1348,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	paidTenantFeatures, err = feature.ListFeaturesForTenant(paidTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1417,7 +1379,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	paidTenantFeatures, err = feature.ListFeaturesForTenant(paidTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1443,7 +1404,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTierFeatures, err := feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1455,7 +1415,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantFeatures, err := feature.ListFeaturesForTenant(freeTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1493,7 +1452,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1505,7 +1463,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantTiers, err := pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1537,7 +1494,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1549,7 +1505,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantTiers, err = pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
@@ -1567,7 +1522,6 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantTiers, err = pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
-			Page:  1,
 			Limit: 100,
 		},
 	})
