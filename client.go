@@ -86,9 +86,8 @@ func Query(queryString string, params *ListWarrantParams) (*QueryWarrantResult, 
 
 func (c Client) Check(params *WarrantCheckParams) (bool, error) {
 	accessCheckRequest := AccessCheckRequest{
-		Warrants:       []Warrant{params.WarrantCheck.ToWarrant()},
-		ConsistentRead: params.ConsistentRead,
-		Debug:          params.Debug,
+		Warrants: []WarrantCheck{params.WarrantCheck},
+		Debug:    params.Debug,
 	}
 
 	checkResult, err := c.makeAuthorizeRequest(&accessCheckRequest)
@@ -108,16 +107,15 @@ func Check(params *WarrantCheckParams) (bool, error) {
 }
 
 func (c Client) CheckMany(params *WarrantCheckManyParams) (bool, error) {
-	warrants := make([]Warrant, 0)
+	warrants := make([]WarrantCheck, 0)
 	for _, warrantCheck := range params.Warrants {
-		warrants = append(warrants, warrantCheck.ToWarrant())
+		warrants = append(warrants, warrantCheck)
 	}
 
 	accessCheckRequest := AccessCheckRequest{
-		Op:             params.Op,
-		Warrants:       warrants,
-		ConsistentRead: params.ConsistentRead,
-		Debug:          params.Debug,
+		Op:       params.Op,
+		Warrants: warrants,
+		Debug:    params.Debug,
 	}
 
 	checkResult, err := c.makeAuthorizeRequest(&accessCheckRequest)
@@ -150,8 +148,7 @@ func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, err
 			},
 			Context: params.Context,
 		},
-		ConsistentRead: params.ConsistentRead,
-		Debug:          params.Debug,
+		Debug: params.Debug,
 	})
 }
 
@@ -173,8 +170,7 @@ func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 			},
 			Context: params.Context,
 		},
-		ConsistentRead: params.ConsistentRead,
-		Debug:          params.Debug,
+		Debug: params.Debug,
 	})
 }
 
@@ -193,8 +189,7 @@ func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 			Subject:  params.Subject,
 			Context:  params.Context,
 		},
-		ConsistentRead: params.ConsistentRead,
-		Debug:          params.Debug,
+		Debug: params.Debug,
 	})
 }
 
