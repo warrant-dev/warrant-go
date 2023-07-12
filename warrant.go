@@ -7,12 +7,9 @@ type Warrant struct {
 	ObjectId   string  `json:"objectId"`
 	Relation   string  `json:"relation"`
 	Subject    Subject `json:"subject"`
-	Context    Context `json:"context,omitempty"`
 	Policy     string  `json:"policy,omitempty"`
 	IsImplicit bool    `json:"isImplicit,omitempty"`
 }
-
-type Context map[string]string
 
 type PolicyContext map[string]interface{}
 
@@ -35,7 +32,6 @@ type WarrantParams struct {
 	ObjectId   string  `json:"objectId"`
 	Relation   string  `json:"relation"`
 	Subject    Subject `json:"subject"`
-	Context    Context `json:"context,omitempty"`
 	Policy     string  `json:"policy,omitempty"`
 }
 
