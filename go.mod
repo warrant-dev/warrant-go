@@ -1,4 +1,4 @@
-module github.com/warrant-dev/warrant-go/v3
+module github.com/warrant-dev/warrant-go/v4
 
 go 1.20
 

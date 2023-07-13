@@ -6,9 +6,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/warrant-dev/warrant-go/v3"
-	"github.com/warrant-dev/warrant-go/v3/client"
-	"github.com/warrant-dev/warrant-go/v3/config"
+	"github.com/warrant-dev/warrant-go/v4"
+	"github.com/warrant-dev/warrant-go/v4/client"
+	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
