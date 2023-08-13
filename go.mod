@@ -1,6 +1,6 @@
 module github.com/warrant-dev/warrant-go/v4
 
-go 1.20
+go 1.21
 
 require (
 	github.com/google/go-querystring v1.1.0
