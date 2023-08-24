@@ -1,4 +1,4 @@
-package client
+package warrant
 
 import (
 	"bytes"
@@ -6,17 +6,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 const (
-	ClientVersion string = "3.1.0"
+	ClientVersion string = "4.0.0"
 )
 
 type WarrantClient struct {
 	HttpClient *http.Client
-	Config     config.ClientConfig
+	Config     ClientConfig
 }
 
 func (client WarrantClient) MakeRequest(method string, path string, payload interface{}) (*http.Response, error) {

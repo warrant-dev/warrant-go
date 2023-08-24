@@ -8,17 +8,15 @@ import (
 
 	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v4"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	warrantClient *warrant.WarrantClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
+		warrantClient: &warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -32,12 +30,12 @@ func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier,
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var newPricingTier warrant.PricingTier
 	err = json.Unmarshal([]byte(body), &newPricingTier)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &newPricingTier, nil
 }
@@ -53,12 +51,12 @@ func (c Client) Get(pricingTierId string) (*warrant.PricingTier, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var foundPricingTier warrant.PricingTier
 	err = json.Unmarshal([]byte(body), &foundPricingTier)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &foundPricingTier, nil
 }
@@ -82,7 +80,7 @@ func Delete(pricingTierId string) error {
 func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil)
@@ -91,12 +89,12 @@ func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]w
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.PricingTier
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -108,7 +106,7 @@ func ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]warrant.Pric
 func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/pricing-tiers?%s", tenantId, queryParams.Encode()), nil)
@@ -117,12 +115,12 @@ func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.L
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var pricingTiers []warrant.PricingTier
 	err = json.Unmarshal([]byte(body), &pricingTiers)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return pricingTiers, nil
 }
@@ -166,7 +164,7 @@ func RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
 func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil)
@@ -175,12 +173,12 @@ func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListP
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var pricingTiers []warrant.PricingTier
 	err = json.Unmarshal([]byte(body), &pricingTiers)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return pricingTiers, nil
 }
@@ -222,7 +220,7 @@ func RemovePricingTierFromUser(pricingTierId string, userId string) error {
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := warrant.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
@@ -230,7 +228,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&client.WarrantClient{
+		&warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

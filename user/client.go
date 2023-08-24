@@ -8,17 +8,15 @@ import (
 
 	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v4"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	warrantClient *warrant.WarrantClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
+		warrantClient: &warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -32,12 +30,12 @@ func (c Client) Create(params *warrant.UserParams) (*warrant.User, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var newUser warrant.User
 	err = json.Unmarshal([]byte(body), &newUser)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &newUser, nil
 }
@@ -53,12 +51,12 @@ func (c Client) BatchCreate(params []warrant.UserParams) ([]warrant.User, error)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var createdUsers []warrant.User
 	err = json.Unmarshal([]byte(body), &createdUsers)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return createdUsers, nil
 }
@@ -74,12 +72,12 @@ func (c Client) Get(userId string) (*warrant.User, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var foundUser warrant.User
 	err = json.Unmarshal([]byte(body), &foundUser)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &foundUser, nil
 }
@@ -95,12 +93,12 @@ func (c Client) Update(userId string, params *warrant.UserParams) (*warrant.User
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var updatedUser warrant.User
 	err = json.Unmarshal([]byte(body), &updatedUser)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &updatedUser, nil
 }
@@ -124,7 +122,7 @@ func Delete(userId string) error {
 func (c Client) ListUsers(listParams *warrant.ListUserParams) ([]warrant.User, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users?%s", queryParams.Encode()), nil)
@@ -133,12 +131,12 @@ func (c Client) ListUsers(listParams *warrant.ListUserParams) ([]warrant.User, e
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var users []warrant.User
 	err = json.Unmarshal([]byte(body), &users)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return users, nil
 }
@@ -150,7 +148,7 @@ func ListUsers(listParams *warrant.ListUserParams) ([]warrant.User, error) {
 func (c Client) ListUsersForTenant(tenantId string, listParams *warrant.ListUserParams) ([]warrant.User, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/users?%s", tenantId, queryParams.Encode()), nil)
@@ -159,12 +157,12 @@ func (c Client) ListUsersForTenant(tenantId string, listParams *warrant.ListUser
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var users []warrant.User
 	err = json.Unmarshal([]byte(body), &users)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return users, nil
 }
@@ -206,7 +204,7 @@ func RemoveUserFromTenant(userId string, tenantId string, role string) error {
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := warrant.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
@@ -214,7 +212,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&client.WarrantClient{
+		&warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

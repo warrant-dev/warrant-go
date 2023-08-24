@@ -8,17 +8,15 @@ import (
 
 	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v4"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	warrantClient *warrant.WarrantClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
+		warrantClient: &warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -32,12 +30,12 @@ func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, e
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var newPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &newPermission)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &newPermission, nil
 }
@@ -53,12 +51,12 @@ func (c Client) Get(permissionId string) (*warrant.Permission, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var foundPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &foundPermission)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &foundPermission, nil
 }
@@ -74,12 +72,12 @@ func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var updatedPermission warrant.Permission
 	err = json.Unmarshal([]byte(body), &updatedPermission)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &updatedPermission, nil
 }
@@ -103,7 +101,7 @@ func Delete(permissionId string) error {
 func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil)
@@ -112,12 +110,12 @@ func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]war
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -129,7 +127,7 @@ func ListPermissions(listParams *warrant.ListPermissionParams) ([]warrant.Permis
 func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil)
@@ -138,12 +136,12 @@ func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPe
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -187,7 +185,7 @@ func RemovePermissionFromRole(permissionId string, roleId string) error {
 func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil)
@@ -196,12 +194,12 @@ func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPe
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var permissions []warrant.Permission
 	err = json.Unmarshal([]byte(body), &permissions)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return permissions, nil
 }
@@ -243,7 +241,7 @@ func RemovePermissionFromUser(permissionId string, userId string) error {
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := warrant.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
@@ -251,7 +249,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&client.WarrantClient{
+		&warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

@@ -8,17 +8,15 @@ import (
 
 	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v4"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	warrantClient *warrant.WarrantClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
+		warrantClient: &warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -32,12 +30,12 @@ func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var newRole warrant.Role
 	err = json.Unmarshal([]byte(body), &newRole)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &newRole, nil
 }
@@ -53,12 +51,12 @@ func (c Client) Get(roleId string) (*warrant.Role, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var foundRole warrant.Role
 	err = json.Unmarshal([]byte(body), &foundRole)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &foundRole, nil
 }
@@ -74,12 +72,12 @@ func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var updatedRole warrant.Role
 	err = json.Unmarshal([]byte(body), &updatedRole)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return &updatedRole, nil
 }
@@ -103,7 +101,7 @@ func Delete(roleId string) error {
 func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil)
@@ -112,12 +110,12 @@ func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, e
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var roles []warrant.Role
 	err = json.Unmarshal([]byte(body), &roles)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return roles, nil
 }
@@ -129,7 +127,7 @@ func ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
 func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()), nil)
@@ -138,12 +136,12 @@ func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRolePara
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, warrant.WrapError("Error reading response", err)
 	}
 	var roles []warrant.Role
 	err = json.Unmarshal([]byte(body), &roles)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, warrant.WrapError("Invalid response from server", err)
 	}
 	return roles, nil
 }
@@ -185,7 +183,7 @@ func RemoveRoleFromUser(roleId string, userId string) error {
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := warrant.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
@@ -193,7 +191,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&client.WarrantClient{
+		&warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

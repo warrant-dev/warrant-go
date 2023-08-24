@@ -8,17 +8,15 @@ import (
 	"net/url"
 
 	"github.com/google/go-querystring/query"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	warrantClient *WarrantClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
+		warrantClient: &WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -32,12 +30,12 @@ func (c Client) Create(params *WarrantParams) (*Warrant, error) {
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, WrapError("Error reading response", err)
 	}
 	var createdWarrant Warrant
 	err = json.Unmarshal([]byte(body), &createdWarrant)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, WrapError("Invalid response from server", err)
 	}
 	return &createdWarrant, nil
 }
@@ -61,7 +59,7 @@ func Delete(params *WarrantParams) error {
 func (c Client) Query(queryString string, listParams *ListWarrantParams) (*QueryWarrantResult, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, client.WrapError("Could not parse listParams", err)
+		return nil, WrapError("Could not parse listParams", err)
 	}
 
 	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil)
@@ -70,12 +68,12 @@ func (c Client) Query(queryString string, listParams *ListWarrantParams) (*Query
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, WrapError("Error reading response", err)
 	}
 	var queryResult QueryWarrantResult
 	err = json.Unmarshal([]byte(body), &queryResult)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, WrapError("Invalid response from server", err)
 	}
 	return &queryResult, nil
 }
@@ -205,18 +203,18 @@ func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckR
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, client.WrapError("Error reading response", err)
+		return nil, WrapError("Error reading response", err)
 	}
 	var result WarrantCheckResult
 	err = json.Unmarshal([]byte(body), &result)
 	if err != nil {
-		return nil, client.WrapError("Invalid response from server", err)
+		return nil, WrapError("Invalid response from server", err)
 	}
 	return &result, nil
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := ClientConfig{
 		ApiKey:                  ApiKey,
 		ApiEndpoint:             ApiEndpoint,
 		AuthorizeEndpoint:       AuthorizeEndpoint,
@@ -224,7 +222,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&client.WarrantClient{
+		&WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

@@ -7,17 +7,15 @@ import (
 	"net/http"
 
 	"github.com/warrant-dev/warrant-go/v4"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	warrantClient *warrant.WarrantClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
+		warrantClient: &warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -36,12 +34,12 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", client.WrapError("Error reading response", err)
+		return "", warrant.WrapError("Error reading response", err)
 	}
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
-		return "", client.WrapError("Invalid response from server", err)
+		return "", warrant.WrapError("Invalid response from server", err)
 	}
 	return response["token"], nil
 }
@@ -71,12 +69,12 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", client.WrapError("Error reading response", err)
+		return "", warrant.WrapError("Error reading response", err)
 	}
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
-		return "", client.WrapError("Invalid response from server", err)
+		return "", warrant.WrapError("Invalid response from server", err)
 	}
 	return fmt.Sprintf("%s/%s?redirectUrl=%s", warrant.SelfServiceDashEndpoint, response["token"], params.RedirectUrl), nil
 }
@@ -86,7 +84,7 @@ func CreateSelfServiceSession(params *warrant.SelfServiceSessionParams) (string,
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := warrant.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
@@ -94,7 +92,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&client.WarrantClient{
+		&warrant.WarrantClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
