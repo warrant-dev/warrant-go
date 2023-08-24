@@ -30,29 +30,36 @@ func NewApiClient(config ClientConfig) *ApiClient {
 }
 
 func (client ApiClient) MakeRequest(method string, path string, payload interface{}, options *RequestOptions) (*http.Response, error) {
-	var requestBody *bytes.Buffer
+	var request *http.Request
+	var err error
+
+	url := client.Config.ApiEndpoint + path
 	if payload != nil {
 		postBody, err := json.Marshal(payload)
 		if err != nil {
 			return nil, WrapError("Invalid request payload", err)
 		}
-		requestBody = bytes.NewBuffer(postBody)
+		requestBody := bytes.NewBuffer(postBody)
+		request, err = http.NewRequest(method, url, requestBody)
+		if err != nil {
+			return nil, WrapError("Unable to create request", err)
+		}
+	} else {
+		request, err = http.NewRequest(method, url, nil)
+		if err != nil {
+			return nil, WrapError("Unable to create request", err)
+		}
 	}
 
-	url := client.Config.ApiEndpoint + path
-	req, err := http.NewRequest(method, url, requestBody)
-	if err != nil {
-		return nil, WrapError("Unable to create request", err)
-	}
 	if client.Config.ApiKey != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.Config.ApiKey))
+		request.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.Config.ApiKey))
 	}
 	if options.WarrantToken != "" {
-		req.Header.Add("Warrant-Token", options.WarrantToken)
+		request.Header.Add("Warrant-Token", options.WarrantToken)
 	}
-	req.Header.Add("User-Agent", fmt.Sprintf("warrant-go/%s", ClientVersion))
+	request.Header.Add("User-Agent", fmt.Sprintf("warrant-go/%s", ClientVersion))
 
-	resp, err := client.HttpClient.Do(req)
+	resp, err := client.HttpClient.Do(request)
 	if err != nil {
 		return nil, WrapError("Error making request", err)
 	}
