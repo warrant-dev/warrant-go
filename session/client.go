@@ -28,7 +28,7 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 		"userId": params.UserId,
 		"ttl":    params.TTL,
 	}
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +63,7 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 		sessionParams["objectId"] = params.ObjectId
 	}
 
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}

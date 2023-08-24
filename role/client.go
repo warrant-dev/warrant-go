@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/roles", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/roles", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func Create(params *warrant.RoleParams) (*warrant.Role, error) {
 	return getClient().Create(params)
 }
 
-func (c Client) Get(roleId string) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+func (c Client) Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +61,12 @@ func (c Client) Get(roleId string) (*warrant.Role, error) {
 	return &foundRole, nil
 }
 
-func Get(roleId string) (*warrant.Role, error) {
-	return getClient().Get(roleId)
+func Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
+	return getClient().Get(roleId, params)
 }
 
 func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), params)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Delete(roleId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, e
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRolePara
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}

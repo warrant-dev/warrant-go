@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/permissions", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/permissions", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
 	return getClient().Create(params)
 }
 
-func (c Client) Get(permissionId string) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+func (c Client) Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +61,12 @@ func (c Client) Get(permissionId string) (*warrant.Permission, error) {
 	return &foundPermission, nil
 }
 
-func Get(permissionId string) (*warrant.Permission, error) {
-	return getClient().Get(permissionId)
+func Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
+	return getClient().Get(permissionId, params)
 }
 
 func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), params)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func Update(permissionId string, params *warrant.PermissionParams) (*warrant.Per
 }
 
 func (c Client) Delete(permissionId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]war
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPe
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPe
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}

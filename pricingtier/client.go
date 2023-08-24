@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/pricing-tiers", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/pricing-tiers", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
 	return getClient().Create(params)
 }
 
-func (c Client) Get(pricingTierId string) (*warrant.PricingTier, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil)
+func (c Client) Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +61,12 @@ func (c Client) Get(pricingTierId string) (*warrant.PricingTier, error) {
 	return &foundPricingTier, nil
 }
 
-func Get(pricingTierId string) (*warrant.PricingTier, error) {
-	return getClient().Get(pricingTierId)
+func Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	return getClient().Get(pricingTierId, params)
 }
 
 func (c Client) Delete(pricingTierId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]w
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.L
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/pricing-tiers?%s", tenantId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/pricing-tiers?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListP
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}

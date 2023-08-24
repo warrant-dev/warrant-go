@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.UserParams) (*warrant.User, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/users", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/users", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *warrant.UserParams) (*warrant.User, error) {
 }
 
 func (c Client) BatchCreate(params []warrant.UserParams) ([]warrant.User, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/users", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/users", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +65,8 @@ func BatchCreate(params []warrant.UserParams) ([]warrant.User, error) {
 	return getClient().BatchCreate(params)
 }
 
-func (c Client) Get(userId string) (*warrant.User, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s", userId), nil)
+func (c Client) Get(userId string, params *warrant.UserParams) (*warrant.User, error) {
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s", userId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -82,12 +82,12 @@ func (c Client) Get(userId string) (*warrant.User, error) {
 	return &foundUser, nil
 }
 
-func Get(userId string) (*warrant.User, error) {
-	return getClient().Get(userId)
+func Get(userId string, params *warrant.UserParams) (*warrant.User, error) {
+	return getClient().Get(userId, params)
 }
 
 func (c Client) Update(userId string, params *warrant.UserParams) (*warrant.User, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/users/%s", userId), params)
+	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/users/%s", userId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func Update(userId string, params *warrant.UserParams) (*warrant.User, error) {
 }
 
 func (c Client) Delete(userId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s", userId), nil)
+	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/users/%s", userId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (c Client) ListUsers(listParams *warrant.ListUserParams) ([]warrant.User, e
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users?%s", queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c Client) ListUsersForTenant(tenantId string, listParams *warrant.ListUser
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/users?%s", tenantId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/users?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}

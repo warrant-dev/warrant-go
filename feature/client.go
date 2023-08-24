@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/features", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/features", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
 	return getClient().Create(params)
 }
 
-func (c Client) Get(featureId string) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features/%s", featureId), nil)
+func (c Client) Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features/%s", featureId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -61,12 +61,12 @@ func (c Client) Get(featureId string) (*warrant.Feature, error) {
 	return &foundFeature, nil
 }
 
-func Get(featureId string) (*warrant.Feature, error) {
-	return getClient().Get(featureId)
+func Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
+	return getClient().Get(featureId, params)
 }
 
 func (c Client) Delete(featureId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/features/%s", featureId), nil)
+	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/features/%s", featureId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.F
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features?%s", queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *war
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s/features?%s", pricingTierId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s/features?%s", pricingTierId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListF
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/features?%s", tenantId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/features?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +232,7 @@ func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatu
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/features?%s", userId, queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/features?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}

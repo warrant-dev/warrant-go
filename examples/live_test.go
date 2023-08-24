@@ -38,7 +38,9 @@ func TestCrudUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedUser, err := user.Get(user2.UserId)
+	fetchUserParams := &warrant.UserParams{}
+	fetchUserParams.SetWarrantToken("latest")
+	refetchedUser, err := user.Get(user2.UserId, fetchUserParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +53,7 @@ func TestCrudUsers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedUser, err = user.Get("some_id")
+	refetchedUser, err = user.Get("some_id", fetchUserParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,6 +62,9 @@ func TestCrudUsers(t *testing.T) {
 
 	users, err := user.ListUsers(&warrant.ListUserParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -78,6 +83,9 @@ func TestCrudUsers(t *testing.T) {
 	}
 	users, err = user.ListUsers(&warrant.ListUserParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -105,7 +113,9 @@ func TestCrudTenants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedTenant, err := tenant.Get(tenant2.TenantId)
+	fetchTenantParams := &warrant.TenantParams{}
+	fetchTenantParams.SetWarrantToken("latest")
+	refetchedTenant, err := tenant.Get(tenant2.TenantId, fetchTenantParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +128,7 @@ func TestCrudTenants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedTenant, err = tenant.Get("some_tenant_id")
+	refetchedTenant, err = tenant.Get("some_tenant_id", fetchTenantParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,6 +137,9 @@ func TestCrudTenants(t *testing.T) {
 
 	tenants, err := tenant.ListTenants(&warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -145,6 +158,9 @@ func TestCrudTenants(t *testing.T) {
 	}
 	tenants, err = tenant.ListTenants(&warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -178,7 +194,9 @@ func TestCrudRoles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedRole, err := role.Get(viewerRole.RoleId)
+	fetchRoleParams := &warrant.RoleParams{}
+	fetchRoleParams.SetWarrantToken("latest")
+	refetchedRole, err := role.Get(viewerRole.RoleId, fetchRoleParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,7 +211,7 @@ func TestCrudRoles(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedRole, err = role.Get(viewerRole.RoleId)
+	refetchedRole, err = role.Get(viewerRole.RoleId, fetchRoleParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,6 +221,9 @@ func TestCrudRoles(t *testing.T) {
 
 	roles, err := role.ListRoles(&warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -221,6 +242,9 @@ func TestCrudRoles(t *testing.T) {
 	}
 	roles, err = role.ListRoles(&warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -265,7 +289,9 @@ func TestCrudPermissions(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedPermission, err := permission.Get("perm2")
+	fetchPermissionParams := &warrant.PermissionParams{}
+	fetchPermissionParams.SetWarrantToken("latest")
+	refetchedPermission, err := permission.Get("perm2", fetchPermissionParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -275,6 +301,9 @@ func TestCrudPermissions(t *testing.T) {
 
 	permissions, err := permission.ListPermissions(&warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -293,6 +322,9 @@ func TestCrudPermissions(t *testing.T) {
 	}
 	permissions, err = permission.ListPermissions(&warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -320,7 +352,9 @@ func TestCrudFeatures(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedFeature, err := feature.Get(feature2.FeatureId)
+	fetchFeatureParams := &warrant.FeatureParams{}
+	fetchFeatureParams.SetWarrantToken("latest")
+	refetchedFeature, err := feature.Get(feature2.FeatureId, fetchFeatureParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -328,6 +362,9 @@ func TestCrudFeatures(t *testing.T) {
 
 	features, err := feature.ListFeatures(&warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -346,6 +383,9 @@ func TestCrudFeatures(t *testing.T) {
 	}
 	features, err = feature.ListFeatures(&warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -373,7 +413,9 @@ func TestCrudPricingTiers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	refetchedTier, err := pricingtier.Get(tier2.PricingTierId)
+	fetchTierParams := &warrant.PricingTierParams{}
+	fetchTierParams.SetWarrantToken("latest")
+	refetchedTier, err := pricingtier.Get(tier2.PricingTierId, fetchTierParams)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -381,6 +423,9 @@ func TestCrudPricingTiers(t *testing.T) {
 
 	tiers, err := pricingtier.ListPricingTiers(&warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -399,6 +444,9 @@ func TestCrudPricingTiers(t *testing.T) {
 	}
 	tiers, err = pricingtier.ListPricingTiers(&warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 10,
 		},
 	})
@@ -485,6 +533,9 @@ func TestMultiTenancy(t *testing.T) {
 	// Assign user1 -> tenant1
 	user1Tenants, err := tenant.ListTenantsForUser(user1.UserId, &warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -494,6 +545,9 @@ func TestMultiTenancy(t *testing.T) {
 	assert.Equal(0, len(user1Tenants))
 	tenant1Users, err := user.ListUsersForTenant(tenant1.TenantId, &warrant.ListUserParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -509,6 +563,9 @@ func TestMultiTenancy(t *testing.T) {
 
 	user1Tenants, err = tenant.ListTenantsForUser(user1.UserId, &warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -519,6 +576,9 @@ func TestMultiTenancy(t *testing.T) {
 	assert.Equal("tenant-1", user1Tenants[0].TenantId)
 	tenant1Users, err = user.ListUsersForTenant(tenant1.TenantId, &warrant.ListUserParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -605,6 +665,9 @@ func TestRBAC(t *testing.T) {
 	// Admin user tests
 	adminUserRoles, err := role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -615,6 +678,9 @@ func TestRBAC(t *testing.T) {
 
 	adminRolePermissions, err := permission.ListPermissionsForRole(adminRole.RoleId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -624,6 +690,9 @@ func TestRBAC(t *testing.T) {
 	assert.Equal(0, len(adminRolePermissions))
 
 	adminUserHasPermission, err := warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		PermissionId: "create-report",
 		UserId:       adminUser.UserId,
 	})
@@ -645,6 +714,9 @@ func TestRBAC(t *testing.T) {
 
 	adminRolePermissions, err = permission.ListPermissionsForRole(adminRole.RoleId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -655,6 +727,9 @@ func TestRBAC(t *testing.T) {
 	assert.Equal("create-report", adminRolePermissions[0].PermissionId)
 
 	adminUserHasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		PermissionId: "create-report",
 		UserId:       adminUser.UserId,
 	})
@@ -665,6 +740,9 @@ func TestRBAC(t *testing.T) {
 
 	adminUserRoles, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -681,6 +759,9 @@ func TestRBAC(t *testing.T) {
 	}
 
 	adminUserHasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		PermissionId: "create-report",
 		UserId:       adminUser.UserId,
 	})
@@ -691,6 +772,9 @@ func TestRBAC(t *testing.T) {
 
 	adminUserRoles, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -706,6 +790,9 @@ func TestRBAC(t *testing.T) {
 
 	adminUserRoles, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -716,6 +803,9 @@ func TestRBAC(t *testing.T) {
 
 	// Viewer user tests
 	viewerUserHasPermission, err := warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		PermissionId: "view-report",
 		UserId:       viewerUser.UserId,
 	})
@@ -726,6 +816,9 @@ func TestRBAC(t *testing.T) {
 
 	viewerUserPermissions, err := permission.ListPermissionsForUser(viewerUser.UserId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -741,6 +834,9 @@ func TestRBAC(t *testing.T) {
 	}
 
 	viewerUserHasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		PermissionId: "view-report",
 		UserId:       viewerUser.UserId,
 	})
@@ -751,6 +847,9 @@ func TestRBAC(t *testing.T) {
 
 	viewerUserPermissions, err = permission.ListPermissionsForUser(viewerUser.UserId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -767,6 +866,9 @@ func TestRBAC(t *testing.T) {
 	}
 
 	viewerUserHasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		PermissionId: "view-report",
 		UserId:       viewerUser.UserId,
 	})
@@ -777,6 +879,9 @@ func TestRBAC(t *testing.T) {
 
 	viewerUserPermissions, err = permission.ListPermissionsForUser(viewerUser.UserId, &warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -866,6 +971,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	// Paid user tests
 	paidUserHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -879,6 +987,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	paidUserFeatures, err := feature.ListFeaturesForUser(paidUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -894,6 +1005,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	}
 
 	paidUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -907,6 +1021,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	paidUserFeatures, err = feature.ListFeaturesForUser(paidUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -922,6 +1039,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	}
 
 	paidUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -935,6 +1055,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	paidUserFeatures, err = feature.ListFeaturesForUser(paidUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -945,6 +1068,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	// Free user tests
 	freeUserHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -958,6 +1084,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeTierFeatures, err := feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -968,6 +1097,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserFeatures, err := feature.ListFeaturesForUser(freeUser.UserId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -988,6 +1120,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	}
 
 	freeUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -1001,6 +1136,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1011,6 +1149,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserTiers, err := pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1026,6 +1167,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	}
 
 	freeUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -1039,6 +1183,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1049,6 +1196,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserTiers, err = pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1064,6 +1214,9 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 
 	freeUserTiers, err = pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1157,6 +1310,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	// Paid tenant tests
 	paidTenantHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeTenant,
@@ -1170,6 +1326,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	paidTenantFeatures, err := feature.ListFeaturesForTenant(paidTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1185,6 +1344,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	}
 
 	paidTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeTenant,
@@ -1198,6 +1360,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	paidTenantFeatures, err = feature.ListFeaturesForTenant(paidTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1213,6 +1378,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	}
 
 	paidTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "custom-feature",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeTenant,
@@ -1226,6 +1394,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	paidTenantFeatures, err = feature.ListFeaturesForTenant(paidTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1236,6 +1407,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	// Free tenant tests
 	freeTenantHasFeature, err := warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeTenant,
@@ -1249,6 +1423,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTierFeatures, err := feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1259,6 +1436,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantFeatures, err := feature.ListFeaturesForTenant(freeTenant.TenantId, &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1279,6 +1459,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	}
 
 	freeTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeTenant,
@@ -1292,6 +1475,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1302,6 +1488,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantTiers, err := pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1317,6 +1506,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	}
 
 	freeTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		FeatureId: "feature-1",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeTenant,
@@ -1330,6 +1522,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTierFeatures, err = feature.ListFeaturesForPricingTier("free", &warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1340,6 +1535,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantTiers, err = pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1355,6 +1553,9 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 
 	freeTenantTiers, err = pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
 			Limit: 100,
 		},
 	})
@@ -1463,6 +1664,9 @@ func TestWarrants(t *testing.T) {
 	}
 
 	checkResult, err := warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
@@ -1494,6 +1698,9 @@ func TestWarrants(t *testing.T) {
 	}
 
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
@@ -1539,6 +1746,9 @@ func TestWarrants(t *testing.T) {
 	}
 
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
@@ -1587,6 +1797,9 @@ func TestWarrantPolicies(t *testing.T) {
 	}
 
 	checkResult, err := warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
@@ -1608,6 +1821,9 @@ func TestWarrantPolicies(t *testing.T) {
 	assert.True(checkResult)
 
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,

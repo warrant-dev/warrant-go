@@ -24,7 +24,7 @@ func NewClient(config ClientConfig) Client {
 }
 
 func (c Client) Create(params *WarrantParams) (*Warrant, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/warrants", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v1/warrants", params, &RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *WarrantParams) (*Warrant, error) {
 }
 
 func (c Client) Delete(params *WarrantParams) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", "/v1/warrants", params)
+	_, err := c.warrantClient.MakeRequest("DELETE", "/v1/warrants", params, &RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (c Client) Query(queryString string, listParams *ListWarrantParams) (*Query
 		return nil, WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil)
+	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +84,9 @@ func Query(queryString string, params *ListWarrantParams) (*QueryWarrantResult, 
 
 func (c Client) Check(params *WarrantCheckParams) (bool, error) {
 	accessCheckRequest := AccessCheckRequest{
-		Warrants: []WarrantCheck{params.WarrantCheck},
-		Debug:    params.Debug,
+		RequestOptions: params.RequestOptions,
+		Warrants:       []WarrantCheck{params.WarrantCheck},
+		Debug:          params.Debug,
 	}
 
 	checkResult, err := c.makeAuthorizeRequest(&accessCheckRequest)
@@ -111,9 +112,10 @@ func (c Client) CheckMany(params *WarrantCheckManyParams) (bool, error) {
 	}
 
 	accessCheckRequest := AccessCheckRequest{
-		Op:       params.Op,
-		Warrants: warrants,
-		Debug:    params.Debug,
+		RequestOptions: params.RequestOptions,
+		Op:             params.Op,
+		Warrants:       warrants,
+		Debug:          params.Debug,
 	}
 
 	checkResult, err := c.makeAuthorizeRequest(&accessCheckRequest)
@@ -134,6 +136,7 @@ func CheckMany(params *WarrantCheckManyParams) (bool, error) {
 
 func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
+		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
 			Object: Object{
 				ObjectType: ObjectTypePermission,
@@ -156,6 +159,7 @@ func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 
 func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
+		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
 			Object: Object{
 				ObjectType: ObjectTypeRole,
@@ -178,6 +182,7 @@ func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 
 func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
+		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
 			Object: Object{
 				ObjectType: ObjectTypeFeature,
@@ -196,7 +201,7 @@ func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 }
 
 func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v2/authorize", params)
+	resp, err := c.warrantClient.MakeRequest("POST", "/v2/authorize", params, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
