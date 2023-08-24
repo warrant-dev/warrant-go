@@ -1,5 +1,7 @@
 package warrant
 
+import "net/http"
+
 var ApiKey string
 var ApiEndpoint string = "https://api.warrant.dev"
 var AuthorizeEndpoint string = "https://api.warrant.dev"
@@ -10,4 +12,5 @@ type ClientConfig struct {
 	ApiEndpoint             string
 	AuthorizeEndpoint       string
 	SelfServiceDashEndpoint string
+	HttpClient              *http.Client
 }

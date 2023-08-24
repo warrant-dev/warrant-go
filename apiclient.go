@@ -17,6 +17,18 @@ type ApiClient struct {
 	Config     ClientConfig
 }
 
+func NewApiClient(config ClientConfig) *ApiClient {
+	httpClient := config.HttpClient
+	if httpClient == nil {
+		httpClient = http.DefaultClient
+	}
+
+	return &ApiClient{
+		HttpClient: httpClient,
+		Config:     config,
+	}
+}
+
 func (client ApiClient) MakeRequest(method string, path string, payload interface{}, options *RequestOptions) (*http.Response, error) {
 	url := client.Config.ApiEndpoint + path
 	if payload == nil {
