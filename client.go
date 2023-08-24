@@ -224,11 +224,12 @@ func getClient() Client {
 		ApiEndpoint:             ApiEndpoint,
 		AuthorizeEndpoint:       AuthorizeEndpoint,
 		SelfServiceDashEndpoint: SelfServiceDashEndpoint,
+		HttpClient:              HttpClient,
 	}
 
 	return Client{
 		&ApiClient{
-			HttpClient: http.DefaultClient,
+			HttpClient: HttpClient,
 			Config:     config,
 		},
 	}

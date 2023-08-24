@@ -290,11 +290,12 @@ func getClient() Client {
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
 		SelfServiceDashEndpoint: warrant.SelfServiceDashEndpoint,
+		HttpClient:              warrant.HttpClient,
 	}
 
 	return Client{
 		&warrant.ApiClient{
-			HttpClient: http.DefaultClient,
+			HttpClient: warrant.HttpClient,
 			Config:     config,
 		},
 	}
