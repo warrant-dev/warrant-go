@@ -37,7 +37,7 @@ import "github.com/warrant-dev/warrant-go/v5"
 import "github.com/warrant-dev/warrant-go/v5/config"
 
 client := warrant.NewClient(config.ClientConfig{
-    ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
+	ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
 	ApiEndpoint: "https://api.warrant.dev",
 	AuthorizeEndpoint: "https://api.warrant.dev",
 	SelfServiceDashEndpoint: "https://self-serve.warrant.dev",
@@ -59,7 +59,7 @@ warrant.AuthorizeEndpoint = "http://localhost:8000"
 // With client initialization
 // Set api and authorize endpoints to http://localhost:8000 and self-service endpoint to http://localhost:8080
 client := warrant.NewClient(config.ClientConfig{
-    ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
+	ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
 	ApiEndpoint: "http://localhost:8000",
 	AuthorizeEndpoint: "http://localhost:8000",
 	SelfServiceDashEndpoint: "http://localhost:8080",
