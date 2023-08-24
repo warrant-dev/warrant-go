@@ -3,8 +3,6 @@ package warrant
 import (
 	"log"
 	"net/http"
-
-	"github.com/warrant-dev/warrant-go/v4/config"
 )
 
 type GetObjectIdFunc func(r *http.Request) string
@@ -24,7 +22,7 @@ type MiddlewareConfig struct {
 
 type Middleware struct {
 	config MiddlewareConfig
-	client Client
+	client WarrantClient
 }
 
 type EnsureIsAuthorizedOptions struct {
@@ -149,7 +147,7 @@ func NewMiddleware(middlewareConfig MiddlewareConfig) *Middleware {
 
 	return &Middleware{
 		config: middlewareConfig,
-		client: NewClient(config.ClientConfig{
+		client: NewClient(ClientConfig{
 			ApiKey:                  middlewareConfig.ApiKey,
 			ApiEndpoint:             ApiEndpoint,
 			AuthorizeEndpoint:       AuthorizeEndpoint,

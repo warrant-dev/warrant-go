@@ -7,7 +7,7 @@ Use [Warrant](https://warrant.dev/) in server-side Go projects.
 ## Installation
 
 ```shell
-go get github.com/warrant-dev/warrant-go/v4
+go get github.com/warrant-dev/warrant-go/v5
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ You can use the Warrant SDK with or without a client. Instantiating a client all
 ### Without a Client
 
 ```go
-import "github.com/warrant-dev/warrant-go/v4"
+import "github.com/warrant-dev/warrant-go/v5"
 
 // Setup
 warrant.ApiKey = "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E="
@@ -33,11 +33,11 @@ tenant, err := tenant.Create(&tenant.TenantParams{})
 
 Instantiate the Warrant client with your API key to get started:
 ```go
-import "github.com/warrant-dev/warrant-go/v4"
-import "github.com/warrant-dev/warrant-go/v4/config"
+import "github.com/warrant-dev/warrant-go/v5"
+import "github.com/warrant-dev/warrant-go/v5/config"
 
 client := warrant.NewClient(config.ClientConfig{
-    ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
+	ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
 	ApiEndpoint: "https://api.warrant.dev",
 	AuthorizeEndpoint: "https://api.warrant.dev",
 	SelfServiceDashEndpoint: "https://self-serve.warrant.dev",
@@ -48,8 +48,8 @@ client := warrant.NewClient(config.ClientConfig{
 The API, Authorize, and Self-Service endpoints the SDK makes requests to are configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint` attributes:
 
 ```go
-import "github.com/warrant-dev/warrant-go/v4"
-import "github.com/warrant-dev/warrant-go/v4/config"
+import "github.com/warrant-dev/warrant-go/v5"
+import "github.com/warrant-dev/warrant-go/v5/config"
 
 // Without client initialization
 // Set api and authorize endpoints to http://localhost:8000
@@ -59,7 +59,7 @@ warrant.AuthorizeEndpoint = "http://localhost:8000"
 // With client initialization
 // Set api and authorize endpoints to http://localhost:8000 and self-service endpoint to http://localhost:8080
 client := warrant.NewClient(config.ClientConfig{
-    ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
+	ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
 	ApiEndpoint: "http://localhost:8000",
 	AuthorizeEndpoint: "http://localhost:8000",
 	SelfServiceDashEndpoint: "http://localhost:8080",

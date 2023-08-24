@@ -21,6 +21,7 @@ type ListRoleParams struct {
 }
 
 type RoleParams struct {
+	RequestOptions
 	RoleId      string `json:"roleId"`
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`

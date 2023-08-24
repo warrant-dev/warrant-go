@@ -19,5 +19,6 @@ type ListFeatureParams struct {
 }
 
 type FeatureParams struct {
+	RequestOptions
 	FeatureId string `json:"featureId"`
 }

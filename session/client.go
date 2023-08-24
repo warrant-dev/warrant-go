@@ -4,23 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 
-	"github.com/warrant-dev/warrant-go/v4"
-	"github.com/warrant-dev/warrant-go/v4/client"
-	"github.com/warrant-dev/warrant-go/v4/config"
+	"github.com/warrant-dev/warrant-go/v5"
 )
 
 type Client struct {
-	warrantClient *client.WarrantClient
+	apiClient *warrant.ApiClient
 }
 
-func NewClient(config config.ClientConfig) Client {
+func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &client.WarrantClient{
-			HttpClient: http.DefaultClient,
-			Config:     config,
-		},
+		apiClient: warrant.NewApiClient(config),
 	}
 }
 
@@ -30,18 +24,18 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 		"userId": params.UserId,
 		"ttl":    params.TTL,
 	}
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", client.WrapError("Error reading response", err)
+		return "", warrant.WrapError("Error reading response", err)
 	}
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
-		return "", client.WrapError("Invalid response from server", err)
+		return "", warrant.WrapError("Invalid response from server", err)
 	}
 	return response["token"], nil
 }
@@ -65,18 +59,18 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 		sessionParams["objectId"] = params.ObjectId
 	}
 
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams)
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", client.WrapError("Error reading response", err)
+		return "", warrant.WrapError("Error reading response", err)
 	}
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
-		return "", client.WrapError("Invalid response from server", err)
+		return "", warrant.WrapError("Invalid response from server", err)
 	}
 	return fmt.Sprintf("%s/%s?redirectUrl=%s", warrant.SelfServiceDashEndpoint, response["token"], params.RedirectUrl), nil
 }
@@ -86,16 +80,17 @@ func CreateSelfServiceSession(params *warrant.SelfServiceSessionParams) (string,
 }
 
 func getClient() Client {
-	config := config.ClientConfig{
+	config := warrant.ClientConfig{
 		ApiKey:                  warrant.ApiKey,
 		ApiEndpoint:             warrant.ApiEndpoint,
 		AuthorizeEndpoint:       warrant.AuthorizeEndpoint,
 		SelfServiceDashEndpoint: warrant.SelfServiceDashEndpoint,
+		HttpClient:              warrant.HttpClient,
 	}
 
 	return Client{
-		&client.WarrantClient{
-			HttpClient: http.DefaultClient,
+		&warrant.ApiClient{
+			HttpClient: warrant.HttpClient,
 			Config:     config,
 		},
 	}
