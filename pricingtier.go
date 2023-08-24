@@ -19,5 +19,6 @@ type ListPricingTierParams struct {
 }
 
 type PricingTierParams struct {
+	RequestOptions
 	PricingTierId string `json:"pricingTierId"`
 }

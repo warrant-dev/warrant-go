@@ -21,6 +21,7 @@ type ListPermissionParams struct {
 }
 
 type PermissionParams struct {
+	RequestOptions
 	PermissionId string `json:"permissionId"`
 	Name         string `json:"name,omitempty"`
 	Description  string `json:"description,omitempty"`

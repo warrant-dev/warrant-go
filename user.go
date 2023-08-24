@@ -20,6 +20,7 @@ type ListUserParams struct {
 }
 
 type UserParams struct {
+	RequestOptions
 	UserId string `json:"userId,omitempty"`
 	Email  string `json:"email,omitempty"`
 }

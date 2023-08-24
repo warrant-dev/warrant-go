@@ -82,11 +82,13 @@ func (warrantCheck WarrantCheck) MarshalJSON() ([]byte, error) {
 }
 
 type WarrantCheckParams struct {
+	RequestOptions
 	WarrantCheck WarrantCheck `json:"warrantCheck"`
 	Debug        bool         `json:"debug,omitempty"`
 }
 
 type WarrantCheckManyParams struct {
+	RequestOptions
 	Op       string         `json:"op"`
 	Warrants []WarrantCheck `json:"warrants"`
 	Debug    bool           `json:"debug,omitempty"`
@@ -98,6 +100,7 @@ type WarrantCheckResult struct {
 }
 
 type PermissionCheckParams struct {
+	RequestOptions
 	PermissionId string        `json:"permissionId"`
 	UserId       string        `json:"userId"`
 	Context      PolicyContext `json:"context,omitempty"`
@@ -105,6 +108,7 @@ type PermissionCheckParams struct {
 }
 
 type RoleCheckParams struct {
+	RequestOptions
 	RoleId  string        `json:"roleId"`
 	UserId  string        `json:"userId"`
 	Context PolicyContext `json:"context,omitempty"`
@@ -112,6 +116,7 @@ type RoleCheckParams struct {
 }
 
 type FeatureCheckParams struct {
+	RequestOptions
 	FeatureId string        `json:"featureId"`
 	Subject   Subject       `json:"subject"`
 	Context   PolicyContext `json:"context,omitempty"`
@@ -119,6 +124,7 @@ type FeatureCheckParams struct {
 }
 
 type AccessCheckRequest struct {
+	RequestOptions
 	Op       string         `json:"op"`
 	Warrants []WarrantCheck `json:"warrants"`
 	Debug    bool           `json:"debug,omitempty"`

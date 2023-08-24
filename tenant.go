@@ -23,6 +23,7 @@ type ListTenantParams struct {
 }
 
 type TenantParams struct {
+	RequestOptions
 	TenantId string `json:"tenantId,omitempty"`
 	Name     string `json:"name,omitempty"`
 }

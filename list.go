@@ -1,6 +1,7 @@
 package warrant
 
 type ListParams struct {
+	RequestOptions
 	BeforeId    string `json:"beforeId"`
 	BeforeValue string `json:"beforeValue"`
 	AfterId     string `json:"afterId"`
