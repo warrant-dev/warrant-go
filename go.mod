@@ -1,4 +1,4 @@
-module github.com/warrant-dev/warrant-go/v4
+module github.com/warrant-dev/warrant-go/v5
 
 go 1.21
 

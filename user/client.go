@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/google/go-querystring/query"
-	"github.com/warrant-dev/warrant-go/v4"
+	"github.com/warrant-dev/warrant-go/v5"
 )
 
 type Client struct {
