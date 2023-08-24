@@ -22,7 +22,7 @@ type MiddlewareConfig struct {
 
 type Middleware struct {
 	config MiddlewareConfig
-	client Client
+	client WarrantClient
 }
 
 type EnsureIsAuthorizedOptions struct {

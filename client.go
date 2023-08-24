@@ -10,12 +10,12 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-type Client struct {
+type WarrantClient struct {
 	apiClient *ApiClient
 }
 
-func NewClient(config ClientConfig) Client {
-	return Client{
+func NewClient(config ClientConfig) WarrantClient {
+	return WarrantClient{
 		apiClient: &ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
@@ -23,7 +23,7 @@ func NewClient(config ClientConfig) Client {
 	}
 }
 
-func (c Client) Create(params *WarrantParams) (*Warrant, error) {
+func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
 	resp, err := c.apiClient.MakeRequest("POST", "/v1/warrants", params, &RequestOptions{})
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func Create(params *WarrantParams) (*Warrant, error) {
 	return getClient().Create(params)
 }
 
-func (c Client) Delete(params *WarrantParams) error {
+func (c WarrantClient) Delete(params *WarrantParams) error {
 	_, err := c.apiClient.MakeRequest("DELETE", "/v1/warrants", params, &RequestOptions{})
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
 }
 
-func (c Client) Query(queryString string, listParams *ListWarrantParams) (*QueryWarrantResult, error) {
+func (c WarrantClient) Query(queryString string, listParams *ListWarrantParams) (*QueryWarrantResult, error) {
 	queryParams, err := query.Values(listParams)
 	if err != nil {
 		return nil, WrapError("Could not parse listParams", err)
@@ -82,7 +82,7 @@ func Query(queryString string, params *ListWarrantParams) (*QueryWarrantResult, 
 	return getClient().Query(queryString, params)
 }
 
-func (c Client) Check(params *WarrantCheckParams) (bool, error) {
+func (c WarrantClient) Check(params *WarrantCheckParams) (bool, error) {
 	accessCheckRequest := AccessCheckRequest{
 		RequestOptions: params.RequestOptions,
 		Warrants:       []WarrantCheck{params.WarrantCheck},
@@ -105,7 +105,7 @@ func Check(params *WarrantCheckParams) (bool, error) {
 	return getClient().Check(params)
 }
 
-func (c Client) CheckMany(params *WarrantCheckManyParams) (bool, error) {
+func (c WarrantClient) CheckMany(params *WarrantCheckManyParams) (bool, error) {
 	warrants := make([]WarrantCheck, 0)
 	for _, warrantCheck := range params.Warrants {
 		warrants = append(warrants, warrantCheck)
@@ -134,7 +134,7 @@ func CheckMany(params *WarrantCheckManyParams) (bool, error) {
 	return getClient().CheckMany(params)
 }
 
-func (c Client) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
+func (c WarrantClient) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -157,7 +157,7 @@ func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 	return getClient().CheckUserHasPermission(params)
 }
 
-func (c Client) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
+func (c WarrantClient) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -180,7 +180,7 @@ func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 	return getClient().CheckUserHasRole(params)
 }
 
-func (c Client) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
+func (c WarrantClient) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -200,7 +200,7 @@ func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 	return getClient().CheckHasFeature(params)
 }
 
-func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
+func (c WarrantClient) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
 	resp, err := c.apiClient.MakeRequest("POST", "/v2/authorize", params, &params.RequestOptions)
 	if err != nil {
 		return nil, err
@@ -218,7 +218,7 @@ func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckR
 	return &result, nil
 }
 
-func getClient() Client {
+func getClient() WarrantClient {
 	config := ClientConfig{
 		ApiKey:                  ApiKey,
 		ApiEndpoint:             ApiEndpoint,
@@ -227,7 +227,7 @@ func getClient() Client {
 		HttpClient:              HttpClient,
 	}
 
-	return Client{
+	return WarrantClient{
 		&ApiClient{
 			HttpClient: HttpClient,
 			Config:     config,
