@@ -11,12 +11,12 @@ import (
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	apiClient *warrant.ApiClient
 }
 
 func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &warrant.WarrantClient{
+		apiClient: &warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/features", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/features", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
 }
 
 func (c Client) Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features/%s", featureId), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/features/%s", featureId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, err
 }
 
 func (c Client) Delete(featureId string) error {
-	resp, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/features/%s", featureId), nil, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/features/%s", featureId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.F
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/features?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/features?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *war
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s/features?%s", pricingTierId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s/features?%s", pricingTierId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFe
 }
 
 func (c Client) AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
@@ -153,7 +153,7 @@ func AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warran
 }
 
 func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
@@ -174,7 +174,7 @@ func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListF
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/features?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/features?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParam
 }
 
 func (c Client) AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
@@ -211,7 +211,7 @@ func AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant,
 }
 
 func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
@@ -232,7 +232,7 @@ func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatu
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/features?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/features?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) (
 }
 
 func (c Client) AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
@@ -269,7 +269,7 @@ func AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, err
 }
 
 func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
 		Relation:   "member",
@@ -293,7 +293,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

@@ -11,12 +11,12 @@ import (
 )
 
 type Client struct {
-	warrantClient *WarrantClient
+	apiClient *ApiClient
 }
 
 func NewClient(config ClientConfig) Client {
 	return Client{
-		warrantClient: &WarrantClient{
+		apiClient: &ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -24,7 +24,7 @@ func NewClient(config ClientConfig) Client {
 }
 
 func (c Client) Create(params *WarrantParams) (*Warrant, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/warrants", params, &RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/warrants", params, &RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *WarrantParams) (*Warrant, error) {
 }
 
 func (c Client) Delete(params *WarrantParams) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", "/v1/warrants", params, &RequestOptions{})
+	_, err := c.apiClient.MakeRequest("DELETE", "/v1/warrants", params, &RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (c Client) Query(queryString string, listParams *ListWarrantParams) (*Query
 		return nil, WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 }
 
 func (c Client) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v2/authorize", params, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/authorize", params, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +227,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&WarrantClient{
+		&ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

@@ -11,12 +11,12 @@ import (
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	apiClient *warrant.ApiClient
 }
 
 func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &warrant.WarrantClient{
+		apiClient: &warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/roles", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/roles", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Delete(roleId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil, &warrant.RequestOptions{})
+	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, e
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRolePara
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func ListRolesForUser(userId string, listParams *warrant.ListRoleParams) ([]warr
 }
 
 func (c Client) AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeRole,
 		ObjectId:   roleId,
 		Relation:   "member",
@@ -167,7 +167,7 @@ func AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
 }
 
 func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeRole,
 		ObjectId:   roleId,
 		Relation:   "member",
@@ -191,7 +191,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

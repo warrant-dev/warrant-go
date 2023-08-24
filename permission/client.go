@@ -11,12 +11,12 @@ import (
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	apiClient *warrant.ApiClient
 }
 
 func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &warrant.WarrantClient{
+		apiClient: &warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/permissions", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/permissions", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
 }
 
 func (c Client) Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permis
 }
 
 func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.warrantClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func Update(permissionId string, params *warrant.PermissionParams) (*warrant.Per
 }
 
 func (c Client) Delete(permissionId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &warrant.RequestOptions{})
+	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]war
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPe
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionPar
 }
 
 func (c Client) AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
@@ -167,7 +167,7 @@ func AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warran
 }
 
 func (c Client) RemovePermissionFromRole(permissionId string, roleId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
@@ -188,7 +188,7 @@ func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPe
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func ListPermissionsForUser(userId string, listParams *warrant.ListPermissionPar
 }
 
 func (c Client) AssignPermissionToUser(permissionId string, userId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
@@ -225,7 +225,7 @@ func AssignPermissionToUser(permissionId string, userId string) (*warrant.Warran
 }
 
 func (c Client) RemovePermissionFromUser(permissionId string, userId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
 		Relation:   "member",
@@ -249,7 +249,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

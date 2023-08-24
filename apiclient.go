@@ -12,12 +12,12 @@ const (
 	ClientVersion string = "4.0.0"
 )
 
-type WarrantClient struct {
+type ApiClient struct {
 	HttpClient *http.Client
 	Config     ClientConfig
 }
 
-func (client WarrantClient) MakeRequest(method string, path string, payload interface{}, options *RequestOptions) (*http.Response, error) {
+func (client ApiClient) MakeRequest(method string, path string, payload interface{}, options *RequestOptions) (*http.Response, error) {
 	url := client.Config.ApiEndpoint + path
 	if payload == nil {
 		req, err := http.NewRequest(method, url, nil)

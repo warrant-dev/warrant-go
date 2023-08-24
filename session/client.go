@@ -10,12 +10,12 @@ import (
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	apiClient *warrant.ApiClient
 }
 
 func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &warrant.WarrantClient{
+		apiClient: &warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -28,7 +28,7 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 		"userId": params.UserId,
 		"ttl":    params.TTL,
 	}
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +63,7 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 		sessionParams["objectId"] = params.ObjectId
 	}
 
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -92,7 +92,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},

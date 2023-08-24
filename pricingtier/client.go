@@ -11,12 +11,12 @@ import (
 )
 
 type Client struct {
-	warrantClient *warrant.WarrantClient
+	apiClient *warrant.ApiClient
 }
 
 func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		warrantClient: &warrant.WarrantClient{
+		apiClient: &warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
@@ -24,7 +24,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
-	resp, err := c.warrantClient.MakeRequest("POST", "/v1/pricing-tiers", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v1/pricing-tiers", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
 }
 
 func (c Client) Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.Pric
 }
 
 func (c Client) Delete(pricingTierId string) error {
-	_, err := c.warrantClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &warrant.RequestOptions{})
+	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]w
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.L
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/pricing-tiers?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/pricing-tiers?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func ListPricingTiersForTenant(userId string, listParams *warrant.ListPricingTie
 }
 
 func (c Client) AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
@@ -146,7 +146,7 @@ func AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.
 }
 
 func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
@@ -167,7 +167,7 @@ func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListP
 		return nil, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.warrantClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierP
 }
 
 func (c Client) AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warrant, error) {
-	return warrant.NewClient(c.warrantClient.Config).Create(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
@@ -204,7 +204,7 @@ func AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warr
 }
 
 func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) error {
-	return warrant.NewClient(c.warrantClient.Config).Delete(&warrant.WarrantParams{
+	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
 		Relation:   "member",
@@ -228,7 +228,7 @@ func getClient() Client {
 	}
 
 	return Client{
-		&warrant.WarrantClient{
+		&warrant.ApiClient{
 			HttpClient: http.DefaultClient,
 			Config:     config,
 		},
