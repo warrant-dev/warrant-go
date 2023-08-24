@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/warrant-dev/warrant-go/v5"
 )
@@ -15,10 +14,7 @@ type Client struct {
 
 func NewClient(config warrant.ClientConfig) Client {
 	return Client{
-		apiClient: &warrant.ApiClient{
-			HttpClient: http.DefaultClient,
-			Config:     config,
-		},
+		apiClient: warrant.NewApiClient(config),
 	}
 }
 
