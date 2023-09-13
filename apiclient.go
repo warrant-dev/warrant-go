@@ -65,9 +65,13 @@ func (client ApiClient) MakeRequest(method string, path string, payload interfac
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := io.ReadAll(resp.Body)
+		msg, err := io.ReadAll(resp.Body)
+		errMsg := ""
+		if err == nil {
+			errMsg = string(msg)
+		}
 		return nil, Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, errMsg),
 		}
 	}
 

@@ -110,9 +110,13 @@ func (c Client) Delete(tenantId string) error {
 	}
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := io.ReadAll(resp.Body)
+		msg, err := io.ReadAll(resp.Body)
+		errMsg := ""
+		if err == nil {
+			errMsg = string(msg)
+		}
 		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, string(msg)),
+			Message: fmt.Sprintf("HTTP %d %s", respStatus, errMsg),
 		}
 	}
 	return nil
