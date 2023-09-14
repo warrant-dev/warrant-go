@@ -1884,8 +1884,8 @@ func TestObjectTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal("new-type", objType.Type)
+	assert.Len(objType.Relations, 1)
 	assert.NotNil(objType.Relations["relation-1"])
-	assert.Nil(objType.Relations["relation-2"])
 
 	types, err := objecttype.ListObjectTypes(&warrant.ListObjectTypeParams{})
 	if err != nil {
@@ -1904,6 +1904,7 @@ func TestObjectTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal("new-type", objType.Type)
+	assert.Len(objType.Relations, 2)
 	assert.NotNil(objType.Relations["relation-1"])
 	assert.NotNil(objType.Relations["relation-2"])
 
