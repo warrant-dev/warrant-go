@@ -1,6 +1,8 @@
 package warrant
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Warrant struct {
 	ObjectType string  `json:"objectType"`
@@ -40,8 +42,9 @@ type ListWarrantParams struct {
 }
 
 type Object struct {
-	ObjectType string `json:"objectType"`
-	ObjectId   string `json:"objectId"`
+	ObjectType string                 `json:"objectType"`
+	ObjectId   string                 `json:"objectId"`
+	Meta       map[string]interface{} `json:"meta"`
 }
 
 func (object Object) GetObjectType() string {
@@ -50,6 +53,17 @@ func (object Object) GetObjectType() string {
 
 func (object Object) GetObjectId() string {
 	return object.ObjectId
+}
+
+type ObjectParams struct {
+	RequestOptions
+	ObjectType string                 `json:"objectType"`
+	ObjectId   string                 `json:"objectId,omitempty"`
+	Meta       map[string]interface{} `json:"meta,omitempty"`
+}
+
+type ListObjectParams struct {
+	ListParams
 }
 
 type WarrantObject interface {

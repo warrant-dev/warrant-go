@@ -6,6 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/warrant-dev/warrant-go/v5"
 	"github.com/warrant-dev/warrant-go/v5/feature"
+	"github.com/warrant-dev/warrant-go/v5/object"
+	"github.com/warrant-dev/warrant-go/v5/objecttype"
 	"github.com/warrant-dev/warrant-go/v5/permission"
 	"github.com/warrant-dev/warrant-go/v5/pricingtier"
 	"github.com/warrant-dev/warrant-go/v5/role"
@@ -1857,4 +1859,119 @@ func TestWarrantPolicies(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestObjectTypes(t *testing.T) {
+	setup()
+	assert := assert.New(t)
+
+	relations := make(map[string]interface{})
+	relations["relation-1"] = struct{}{}
+
+	newType, err := objecttype.Create(&warrant.ObjectTypeParams{
+		Type:      "new-type",
+		Relations: relations,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal("new-type", newType.Type)
+	assert.NotNil(newType.Relations["relation-1"])
+	assert.Nil(newType.Relations["relation-2"])
+
+	objType, err := objecttype.Get("new-type", &warrant.ObjectTypeParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal("new-type", objType.Type)
+	assert.Len(objType.Relations, 1)
+	assert.NotNil(objType.Relations["relation-1"])
+
+	types, err := objecttype.ListObjectTypes(&warrant.ListObjectTypeParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(types, 7)
+
+	newRelations := make(map[string]interface{})
+	newRelations["relation-1"] = struct{}{}
+	newRelations["relation-2"] = struct{}{}
+	objType, err = objecttype.Update("new-type", &warrant.ObjectTypeParams{
+		Type:      "new-type",
+		Relations: newRelations,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal("new-type", objType.Type)
+	assert.Len(objType.Relations, 2)
+	assert.NotNil(objType.Relations["relation-1"])
+	assert.NotNil(objType.Relations["relation-2"])
+
+	err = objecttype.Delete("new-type")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	types, err = objecttype.ListObjectTypes(&warrant.ListObjectTypeParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(types, 6)
+}
+
+func TestObjects(t *testing.T) {
+	setup()
+	assert := assert.New(t)
+
+	newObj, err := object.Create(&warrant.ObjectParams{
+		ObjectType: "role",
+		ObjectId:   "admin2",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal("role", newObj.ObjectType)
+	assert.Equal("admin2", newObj.ObjectId)
+	assert.Len(newObj.Meta, 0)
+
+	obj, err := object.Get("role", "admin2", &warrant.ObjectParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal("role", obj.ObjectType)
+	assert.Equal("admin2", obj.ObjectId)
+	assert.Len(obj.Meta, 0)
+
+	objects, err := object.ListObjects(&warrant.ListObjectParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(objects, 1)
+
+	meta := make(map[string]interface{})
+	meta["name"] = "new name"
+	obj, err = object.Update("role", "admin2", &warrant.ObjectParams{
+		ObjectType: "role",
+		ObjectId:   "admin2",
+		Meta:       meta,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal("role", obj.ObjectType)
+	assert.Equal("admin2", obj.ObjectId)
+	assert.Len(obj.Meta, 1)
+	assert.Equal("new name", obj.Meta["name"])
+
+	err = object.Delete("role", "admin2")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	objects, err = object.ListObjects(&warrant.ListObjectParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(objects, 0)
 }
