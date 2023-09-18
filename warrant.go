@@ -71,11 +71,6 @@ type WarrantObject interface {
 	GetObjectId() string
 }
 
-type QueryWarrantResult struct {
-	Result interface{}            `json:"result"`
-	Meta   map[string]interface{} `json:"meta"`
-}
-
 type WarrantCheck struct {
 	Object   WarrantObject `json:"object"`
 	Relation string        `json:"relation"`
