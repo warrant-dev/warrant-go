@@ -7,7 +7,7 @@ type QueryParams struct {
 
 type QueryResponse struct {
 	Results []QueryResult `json:"results"`
-	LastId  *string       `json:"lastId"`
+	LastId  *string       `json:"lastId,omitempty"`
 }
 
 type QueryResult struct {
