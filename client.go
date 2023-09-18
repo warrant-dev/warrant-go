@@ -56,13 +56,13 @@ func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
 }
 
-func (c WarrantClient) Query(queryString string, listParams *ListWarrantParams) (*QueryWarrantResult, error) {
-	queryParams, err := query.Values(listParams)
+func (c WarrantClient) Query(queryString string, params *QueryParams) (*QueryResponse, error) {
+	queryParams, err := query.Values(params)
 	if err != nil {
-		return nil, WrapError("Could not parse listParams", err)
+		return nil, WrapError("Could not parse params", err)
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -70,15 +70,15 @@ func (c WarrantClient) Query(queryString string, listParams *ListWarrantParams) 
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
-	var queryResult QueryWarrantResult
-	err = json.Unmarshal([]byte(body), &queryResult)
+	var queryResponse QueryResponse
+	err = json.Unmarshal([]byte(body), &queryResponse)
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
-	return &queryResult, nil
+	return &queryResponse, nil
 }
 
-func Query(queryString string, params *ListWarrantParams) (*QueryWarrantResult, error) {
+func Query(queryString string, params *QueryParams) (*QueryResponse, error) {
 	return getClient().Query(queryString, params)
 }
 

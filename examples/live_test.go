@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -1720,19 +1721,19 @@ func TestWarrants(t *testing.T) {
 	}
 	assert.True(checkResult)
 
-	// queryResult, err := warrant.Query(fmt.Sprintf("SELECT warrant FOR subject=%s:%s WHERE subject=%s:%s", "user", newUser.UserId, "user", newUser.UserId), &warrant.ListWarrantParams{})
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// queryBytes, _ := json.Marshal(queryResult.Result)
-	// var result []warrant.Warrant
-	// json.Unmarshal(queryBytes, &result)
+	queryResult, err := warrant.Query(fmt.Sprintf("select * where %s:%s is *", "user", newUser.UserId), &warrant.QueryParams{})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	// assert.Equal(1, len(result))
-	// assert.Equal("permission", result[0].ObjectType)
-	// assert.Equal("perm1", result[0].ObjectId)
-	// assert.Equal("member", result[0].Relation)
+	assert.Equal(1, len(queryResult.Results))
+	assert.Equal("permission", queryResult.Results[0].ObjectType)
+	assert.Equal("perm1", queryResult.Results[0].ObjectId)
+	assert.Equal("member", queryResult.Results[0].Warrant.Relation)
+	assert.NotNil(queryResult.Results[0].Meta)
+	assert.Equal("Permission 1", queryResult.Results[0].Meta["name"])
+	assert.Equal("Permission with id 1", queryResult.Results[0].Meta["description"])
 
 	err = warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
@@ -1784,13 +1785,27 @@ func TestWarrantPolicies(t *testing.T) {
 	setup()
 	assert := assert.New(t)
 
-	_, err := warrant.Create(&warrant.WarrantParams{
+	newUser, err := user.Create(&warrant.UserParams{
+		UserId: "user-1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	newPermission, err := permission.Create(&warrant.PermissionParams{
+		PermissionId: "test-permission",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = warrant.Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
-		ObjectId:   "test-permission",
+		ObjectId:   newPermission.PermissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
-			ObjectId:   "user-1",
+			ObjectId:   newUser.UserId,
 		},
 		Policy: `geo == "us"`,
 	})
@@ -1805,7 +1820,7 @@ func TestWarrantPolicies(t *testing.T) {
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
-				ObjectId:   "test-permission",
+				ObjectId:   newPermission.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
@@ -1829,7 +1844,7 @@ func TestWarrantPolicies(t *testing.T) {
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
-				ObjectId:   "test-permission",
+				ObjectId:   newPermission.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
@@ -1846,9 +1861,10 @@ func TestWarrantPolicies(t *testing.T) {
 	}
 	assert.False(checkResult)
 
+	// Clean up
 	err = warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
-		ObjectId:   "test-permission",
+		ObjectId:   newPermission.PermissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -1856,6 +1872,16 @@ func TestWarrantPolicies(t *testing.T) {
 		},
 		Policy: `geo == "us"`,
 	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = user.Delete(newUser.UserId)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = permission.Delete(newPermission.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
