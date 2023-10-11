@@ -82,6 +82,27 @@ func Update(objectTypeId string, params *warrant.ObjectTypeParams) (*warrant.Obj
 	return getClient().Update(objectTypeId, params)
 }
 
+func (c Client) BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.ObjectType, error) {
+	resp, err := c.apiClient.MakeRequest("PUT", "/v1/object-types", params, &warrant.RequestOptions{})
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, warrant.WrapError("Error reading response", err)
+	}
+	var updatedObjectTypes []warrant.ObjectType
+	err = json.Unmarshal([]byte(body), &updatedObjectTypes)
+	if err != nil {
+		return nil, warrant.WrapError("Invalid response from server", err)
+	}
+	return updatedObjectTypes, nil
+}
+
+func BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.ObjectType, error) {
+	return getClient().BatchUpdate(params)
+}
+
 func (c Client) Delete(objectTypeId string) error {
 	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/object-types/%s", objectTypeId), nil, &warrant.RequestOptions{})
 	if err != nil {
