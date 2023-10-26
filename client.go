@@ -24,7 +24,7 @@ func NewClient(config ClientConfig) WarrantClient {
 }
 
 func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/warrants", params, &RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func Create(params *WarrantParams) (*Warrant, error) {
 }
 
 func (c WarrantClient) Delete(params *WarrantParams) error {
-	_, err := c.apiClient.MakeRequest("DELETE", "/v1/warrants", params, &RequestOptions{})
+	_, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -56,29 +56,29 @@ func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
 }
 
-func (c WarrantClient) Query(queryString string, params *QueryParams) (*QueryResponse, error) {
+func (c WarrantClient) Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
+	var queryResponse ListResponse[QueryResult]
 	queryParams, err := query.Values(params)
 	if err != nil {
-		return nil, WrapError("Could not parse params", err)
+		return queryResponse, WrapError("Could not parse params", err)
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), queryResponse, &params.RequestOptions)
 	if err != nil {
-		return nil, err
+		return queryResponse, err
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, WrapError("Error reading response", err)
+		return queryResponse, WrapError("Error reading response", err)
 	}
-	var queryResponse QueryResponse
 	err = json.Unmarshal([]byte(body), &queryResponse)
 	if err != nil {
-		return nil, WrapError("Invalid response from server", err)
+		return queryResponse, WrapError("Invalid response from server", err)
 	}
-	return &queryResponse, nil
+	return queryResponse, nil
 }
 
-func Query(queryString string, params *QueryParams) (*QueryResponse, error) {
+func Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
 	return getClient().Query(queryString, params)
 }
 

@@ -1969,11 +1969,13 @@ func TestObjects(t *testing.T) {
 	assert.Equal("admin2", obj.ObjectId)
 	assert.Len(obj.Meta, 0)
 
-	objects, err := object.ListObjects(&warrant.ListObjectParams{})
+	objectsList, err := object.ListObjects(&warrant.ListObjectParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Len(objects, 1)
+	assert.Len(objectsList.Results, 1)
+	assert.Equal("role", objectsList.Results[0].GetObjectType())
+	assert.Equal("admin2", objectsList.Results[0].GetObjectId())
 
 	meta := make(map[string]interface{})
 	meta["name"] = "new name"
@@ -1995,9 +1997,9 @@ func TestObjects(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	objects, err = object.ListObjects(&warrant.ListObjectParams{})
+	objectsList, err = object.ListObjects(&warrant.ListObjectParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Len(objects, 0)
+	assert.Len(objectsList.Results, 0)
 }

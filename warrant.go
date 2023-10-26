@@ -64,6 +64,8 @@ type ObjectParams struct {
 
 type ListObjectParams struct {
 	ListParams
+	ObjectType string `json:"objectType,omitempty" url:"objectType,omitempty"`
+	Query      string `json:"q,omitempty" url:"q,omitempty"`
 }
 
 type WarrantObject interface {

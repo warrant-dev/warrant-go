@@ -20,7 +20,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.ObjectParams) (*warrant.Object, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/objects", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/objects", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func Create(params *warrant.ObjectParams) (*warrant.Object, error) {
 }
 
 func (c Client) Get(objectType string, objectId string, params *warrant.ObjectParams) (*warrant.Object, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/objects/%s/%s", objectType, objectId), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func Get(objectType string, objectId string, params *warrant.ObjectParams) (*war
 }
 
 func (c Client) Update(objectType string, objectId string, params *warrant.ObjectParams) (*warrant.Object, error) {
-	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/objects/%s/%s", objectType, objectId), params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func Update(objectType string, objectId string, params *warrant.ObjectParams) (*
 }
 
 func (c Client) Delete(objectType string, objectId string) error {
-	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/objects/%s/%s", objectType, objectId), nil, &warrant.RequestOptions{})
+	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), nil, &warrant.RequestOptions{})
 	if err != nil {
 		return err
 	}
@@ -94,29 +94,29 @@ func Delete(objectType string, objectId string) error {
 	return getClient().Delete(objectType, objectId)
 }
 
-func (c Client) ListObjects(listParams *warrant.ListObjectParams) ([]warrant.Object, error) {
+func (c Client) ListObjects(listParams *warrant.ListObjectParams) (warrant.ListResponse[warrant.Object], error) {
+	var objectsListResponse warrant.ListResponse[warrant.Object]
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return objectsListResponse, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/objects?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/objects?%s", queryParams.Encode()), objectsListResponse, &listParams.RequestOptions)
 	if err != nil {
-		return nil, err
+		return objectsListResponse, err
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return objectsListResponse, warrant.WrapError("Error reading response", err)
 	}
-	var permissions []warrant.Object
-	err = json.Unmarshal([]byte(body), &permissions)
+	err = json.Unmarshal([]byte(body), &objectsListResponse)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return objectsListResponse, warrant.WrapError("Invalid response from server", err)
 	}
-	return permissions, nil
+	return objectsListResponse, nil
 }
 
-func ListObjects(listParams *warrant.ListObjectParams) ([]warrant.Object, error) {
+func ListObjects(listParams *warrant.ListObjectParams) (warrant.ListResponse[warrant.Object], error) {
 	return getClient().ListObjects(listParams)
 }
 

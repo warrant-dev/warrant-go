@@ -1,7 +1,7 @@
 package warrant
 
 type RequestOptions struct {
-	WarrantToken string
+	WarrantToken string `json:"warrantToken,omitempty" url:"warrantToken,omitempty"`
 }
 
 func (requestOptions *RequestOptions) SetWarrantToken(token string) {
