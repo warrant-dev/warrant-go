@@ -2003,3 +2003,77 @@ func TestObjects(t *testing.T) {
 	}
 	assert.Len(objectsList.Results, 0)
 }
+
+func TestBatchObjects(t *testing.T) {
+	setup()
+	assert := assert.New(t)
+
+	createdObjects, err := object.BatchCreate([]warrant.ObjectParams{
+		{ObjectType: "document", ObjectId: "document-a"},
+		{ObjectType: "document", ObjectId: "document-b"},
+		{ObjectType: "folder", ObjectId: "resources", Meta: map[string]interface{}{"description": "Helpful documents"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(createdObjects, 3)
+
+	fetchedObjects, err := object.ListObjects(&warrant.ListObjectParams{
+		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
+			Limit: 10,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(fetchedObjects.Results, 3)
+	assert.Equal("document", fetchedObjects.Results[0].GetObjectType())
+	assert.Equal("document-a", fetchedObjects.Results[0].GetObjectId())
+	assert.Equal("document", fetchedObjects.Results[1].GetObjectType())
+	assert.Equal("document-b", fetchedObjects.Results[1].GetObjectId())
+	assert.Equal("folder", fetchedObjects.Results[2].GetObjectType())
+	assert.Equal("resources", fetchedObjects.Results[2].GetObjectId())
+	assert.Equal(map[string]interface{}{"description": "Helpful documents"}, fetchedObjects.Results[2].GetMeta())
+
+	fetchedObjects, err = object.ListObjects(&warrant.ListObjectParams{
+		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
+			Limit: 10,
+		},
+		Query: "resource",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(fetchedObjects.Results, 1)
+	assert.Equal("folder", fetchedObjects.Results[0].GetObjectType())
+	assert.Equal("resources", fetchedObjects.Results[0].GetObjectId())
+	assert.Equal(map[string]interface{}{"description": "Helpful documents"}, fetchedObjects.Results[0].GetMeta())
+
+	err = object.BatchDelete([]warrant.ObjectParams{
+		{ObjectType: "document", ObjectId: "document-a"},
+		{ObjectType: "document", ObjectId: "document-b"},
+		{ObjectType: "folder", ObjectId: "resources"},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fetchedObjects, err = object.ListObjects(&warrant.ListObjectParams{
+		ListParams: warrant.ListParams{
+			RequestOptions: warrant.RequestOptions{
+				WarrantToken: "latest",
+			},
+			Limit: 10,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(fetchedObjects.Results, 0)
+}

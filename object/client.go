@@ -40,6 +40,27 @@ func Create(params *warrant.ObjectParams) (*warrant.Object, error) {
 	return getClient().Create(params)
 }
 
+func (c Client) BatchCreate(params []warrant.ObjectParams) ([]warrant.Object, error) {
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/objects", params, &warrant.RequestOptions{})
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, warrant.WrapError("Error reading response", err)
+	}
+	var newObjects []warrant.Object
+	err = json.Unmarshal([]byte(body), &newObjects)
+	if err != nil {
+		return nil, warrant.WrapError("Invalid response from server", err)
+	}
+	return newObjects, nil
+}
+
+func BatchCreate(params []warrant.ObjectParams) ([]warrant.Object, error) {
+	return getClient().BatchCreate(params)
+}
+
 func (c Client) Get(objectType string, objectId string, params *warrant.ObjectParams) (*warrant.Object, error) {
 	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), nil, &params.RequestOptions)
 	if err != nil {
@@ -92,6 +113,18 @@ func (c Client) Delete(objectType string, objectId string) error {
 
 func Delete(objectType string, objectId string) error {
 	return getClient().Delete(objectType, objectId)
+}
+
+func (c Client) BatchDelete(params []warrant.ObjectParams) error {
+	_, err := c.apiClient.MakeRequest("DELETE", "/v2/objects", params, &warrant.RequestOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func BatchDelete(params []warrant.ObjectParams) error {
+	return getClient().BatchDelete(params)
 }
 
 func (c Client) ListObjects(listParams *warrant.ListObjectParams) (warrant.ListResponse[warrant.Object], error) {
