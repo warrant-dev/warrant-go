@@ -201,7 +201,7 @@ func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v2/authorize", params, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/check", params, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
