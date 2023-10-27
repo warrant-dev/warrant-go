@@ -1858,6 +1858,156 @@ func TestWarrants(t *testing.T) {
 	}
 }
 
+func TestBatchWarrants(t *testing.T) {
+	setup()
+	assert := assert.New(t)
+
+	newUser, err := user.Create(&warrant.UserParams{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	permission1, err := permission.Create(&warrant.PermissionParams{
+		PermissionId: "perm1",
+		Meta: map[string]interface{}{
+			"name":        "Permission 1",
+			"description": "Permission 1",
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	permission2, err := permission.Create(&warrant.PermissionParams{
+		PermissionId: "perm2",
+		Meta: map[string]interface{}{
+			"name":        "Permission 2",
+			"description": "Permission 2",
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	userHasPermission1, err := warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
+		WarrantCheck: warrant.WarrantCheck{
+			Object:   permission1,
+			Relation: "member",
+			Subject:  newUser,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.False(userHasPermission1)
+
+	userHasPermission2, err := warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
+		WarrantCheck: warrant.WarrantCheck{
+			Object:   permission2,
+			Relation: "member",
+			Subject:  newUser,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.False(userHasPermission2)
+
+	warrants, err := warrant.BatchCreate([]warrant.WarrantParams{
+		{
+			ObjectType: warrant.ObjectTypePermission,
+			ObjectId:   permission1.PermissionId,
+			Relation:   "member",
+			Subject: warrant.Subject{
+				ObjectType: warrant.ObjectTypeUser,
+				ObjectId:   newUser.UserId,
+			},
+		},
+		{
+			ObjectType: warrant.ObjectTypePermission,
+			ObjectId:   permission2.PermissionId,
+			Relation:   "member",
+			Subject: warrant.Subject{
+				ObjectType: warrant.ObjectTypeUser,
+				ObjectId:   newUser.UserId,
+			},
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Len(warrants, 2)
+
+	userHasPermission1, err = warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
+		WarrantCheck: warrant.WarrantCheck{
+			Object:   permission1,
+			Relation: "member",
+			Subject:  newUser,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(userHasPermission1)
+
+	userHasPermission2, err = warrant.Check(&warrant.WarrantCheckParams{
+		RequestOptions: warrant.RequestOptions{
+			WarrantToken: "latest",
+		},
+		WarrantCheck: warrant.WarrantCheck{
+			Object:   permission2,
+			Relation: "member",
+			Subject:  newUser,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.True(userHasPermission2)
+
+	err = warrant.BatchDelete([]warrant.WarrantParams{
+		{
+			ObjectType: warrant.ObjectTypePermission,
+			ObjectId:   permission1.PermissionId,
+			Relation:   "member",
+			Subject: warrant.Subject{
+				ObjectType: warrant.ObjectTypeUser,
+				ObjectId:   newUser.UserId,
+			},
+		},
+		{
+			ObjectType: warrant.ObjectTypePermission,
+			ObjectId:   permission2.PermissionId,
+			Relation:   "member",
+			Subject: warrant.Subject{
+				ObjectType: warrant.ObjectTypeUser,
+				ObjectId:   newUser.UserId,
+			},
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = object.BatchDelete([]warrant.ObjectParams{
+		{ObjectType: warrant.ObjectTypePermission, ObjectId: permission1.PermissionId},
+		{ObjectType: warrant.ObjectTypePermission, ObjectId: permission2.PermissionId},
+		{ObjectType: warrant.ObjectTypeUser, ObjectId: newUser.UserId},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestWarrantPolicies(t *testing.T) {
 	setup()
 	assert := assert.New(t)

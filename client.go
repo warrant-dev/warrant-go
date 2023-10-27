@@ -44,6 +44,27 @@ func Create(params *WarrantParams) (*Warrant, error) {
 	return getClient().Create(params)
 }
 
+func (c WarrantClient) BatchCreate(params []WarrantParams) ([]Warrant, error) {
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/warrants", params, &RequestOptions{})
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, WrapError("Error reading response", err)
+	}
+	var createdWarrants []Warrant
+	err = json.Unmarshal([]byte(body), &createdWarrants)
+	if err != nil {
+		return nil, WrapError("Invalid response from server", err)
+	}
+	return createdWarrants, nil
+}
+
+func BatchCreate(params []WarrantParams) ([]Warrant, error) {
+	return getClient().BatchCreate(params)
+}
+
 func (c WarrantClient) Delete(params *WarrantParams) error {
 	_, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
@@ -54,6 +75,18 @@ func (c WarrantClient) Delete(params *WarrantParams) error {
 
 func Delete(params *WarrantParams) error {
 	return getClient().Delete(params)
+}
+
+func (c WarrantClient) BatchDelete(params []WarrantParams) error {
+	_, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func BatchDelete(params []WarrantParams) error {
+	return getClient().BatchDelete(params)
 }
 
 func (c WarrantClient) Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
