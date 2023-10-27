@@ -33,8 +33,8 @@ func (c Client) Create(params *warrant.ObjectTypeParams) (*warrant.ObjectType, e
 	if err != nil {
 		return nil, warrant.WrapError("Invalid response from server", err)
 	}
-	wookie := resp.Header.Get("Warrant-Token")
-	newObjectType.Wookie = wookie
+	warrantToken := resp.Header.Get("Warrant-Token")
+	newObjectType.WarrantToken = warrantToken
 	return &newObjectType, nil
 }
 
@@ -77,8 +77,8 @@ func (c Client) Update(objectTypeId string, params *warrant.ObjectTypeParams) (*
 	if err != nil {
 		return nil, warrant.WrapError("Invalid response from server", err)
 	}
-	wookie := resp.Header.Get("Warrant-Token")
-	updatedObjectType.Wookie = wookie
+	warrantToken := resp.Header.Get("Warrant-Token")
+	updatedObjectType.WarrantToken = warrantToken
 	return &updatedObjectType, nil
 }
 
@@ -100,9 +100,9 @@ func (c Client) BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.Object
 	if err != nil {
 		return nil, warrant.WrapError("Invalid response from server", err)
 	}
-	wookie := resp.Header.Get("Warrant-Token")
+	warrantToken := resp.Header.Get("Warrant-Token")
 	for i := range updatedObjectTypes {
-		updatedObjectTypes[i].Wookie = wookie
+		updatedObjectTypes[i].WarrantToken = warrantToken
 	}
 	return updatedObjectTypes, nil
 }
@@ -116,8 +116,8 @@ func (c Client) Delete(objectTypeId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	wookie := resp.Header.Get("Warrant-Token")
-	return wookie, nil
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
 }
 
 func Delete(objectTypeId string) (string, error) {

@@ -37,8 +37,8 @@ func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
-	wookie := resp.Header.Get("Warrant-Token")
-	createdWarrant.Wookie = wookie
+	warrantToken := resp.Header.Get("Warrant-Token")
+	createdWarrant.WarrantToken = warrantToken
 	return &createdWarrant, nil
 }
 
@@ -60,9 +60,9 @@ func (c WarrantClient) BatchCreate(params []WarrantParams) ([]Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
-	wookie := resp.Header.Get("Warrant-Token")
+	warrantToken := resp.Header.Get("Warrant-Token")
 	for i := range createdWarrants {
-		createdWarrants[i].Wookie = wookie
+		createdWarrants[i].WarrantToken = warrantToken
 	}
 	return createdWarrants, nil
 }
@@ -76,8 +76,8 @@ func (c WarrantClient) Delete(params *WarrantParams) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	wookie := resp.Header.Get("Warrant-Token")
-	return wookie, nil
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
 }
 
 func Delete(params *WarrantParams) (string, error) {
@@ -89,8 +89,8 @@ func (c WarrantClient) BatchDelete(params []WarrantParams) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	wookie := resp.Header.Get("Warrant-Token")
-	return wookie, nil
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
 }
 
 func BatchDelete(params []WarrantParams) (string, error) {

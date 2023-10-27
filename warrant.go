@@ -5,13 +5,13 @@ import (
 )
 
 type Warrant struct {
-	ObjectType string  `json:"objectType"`
-	ObjectId   string  `json:"objectId"`
-	Relation   string  `json:"relation"`
-	Subject    Subject `json:"subject"`
-	Policy     string  `json:"policy,omitempty"`
-	IsImplicit bool    `json:"isImplicit,omitempty"`
-	Wookie     string  `json:"wookie,omitempty"`
+	ObjectType   string  `json:"objectType"`
+	ObjectId     string  `json:"objectId"`
+	Relation     string  `json:"relation"`
+	Subject      Subject `json:"subject"`
+	Policy       string  `json:"policy,omitempty"`
+	IsImplicit   bool    `json:"isImplicit,omitempty"`
+	WarrantToken string  `json:"warrantToken,omitempty"`
 }
 
 type PolicyContext map[string]interface{}
