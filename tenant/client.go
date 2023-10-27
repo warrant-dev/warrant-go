@@ -115,15 +115,15 @@ func Update(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, err
 	return getClient().Update(tenantId, params)
 }
 
-func (c Client) Delete(tenantId string) error {
+func (c Client) Delete(tenantId string) (string, error) {
 	return object.Delete(warrant.ObjectTypeTenant, tenantId)
 }
 
-func Delete(tenantId string) error {
+func Delete(tenantId string) (string, error) {
 	return getClient().Delete(tenantId)
 }
 
-func (c Client) BatchDelete(params []warrant.TenantParams) error {
+func (c Client) BatchDelete(params []warrant.TenantParams) (string, error) {
 	objectsToDelete := make([]warrant.ObjectParams, 0)
 	for _, tenantParam := range params {
 		objectsToDelete = append(objectsToDelete, warrant.ObjectParams{
@@ -134,15 +134,15 @@ func (c Client) BatchDelete(params []warrant.TenantParams) error {
 		})
 	}
 
-	err := object.BatchDelete(objectsToDelete)
+	warrantToken, err := object.BatchDelete(objectsToDelete)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return warrantToken, nil
 }
 
-func BatchDelete(params []warrant.TenantParams) error {
+func BatchDelete(params []warrant.TenantParams) (string, error) {
 	return getClient().BatchDelete(params)
 }
 

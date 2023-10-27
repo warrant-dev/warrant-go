@@ -84,11 +84,11 @@ func Update(permissionId string, params *warrant.PermissionParams) (*warrant.Per
 	return getClient().Update(permissionId, params)
 }
 
-func (c Client) Delete(permissionId string) error {
+func (c Client) Delete(permissionId string) (string, error) {
 	return object.Delete(warrant.ObjectTypePermission, permissionId)
 }
 
-func Delete(permissionId string) error {
+func Delete(permissionId string) (string, error) {
 	return getClient().Delete(permissionId)
 }
 

@@ -80,11 +80,12 @@ func TestCrudUsers(t *testing.T) {
 	}
 	assert.Equal(2, len(usersList.Results))
 
-	err = user.Delete(user1.UserId)
+	warrantToken, err := user.Delete(user1.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = user.Delete(user2.UserId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = user.Delete(user2.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,14 +160,16 @@ func TestCrudTenants(t *testing.T) {
 	}
 	assert.Equal(2, len(tenantsList.Results))
 
-	err = tenant.Delete(tenant1.TenantId)
+	warrantToken, err := tenant.Delete(tenant1.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tenant.Delete(tenant2.TenantId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = tenant.Delete(tenant2.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 	tenantsList, err = tenant.ListTenants(&warrant.ListTenantParams{
 		ListParams: warrant.ListParams{
 			RequestOptions: warrant.RequestOptions{
@@ -252,14 +255,16 @@ func TestCrudRoles(t *testing.T) {
 	}
 	assert.Equal(2, len(rolesList.Results))
 
-	err = role.Delete(adminRole.RoleId)
+	warrantToken, err := role.Delete(adminRole.RoleId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = role.Delete(viewerRole.RoleId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = role.Delete(viewerRole.RoleId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 	rolesList, err = role.ListRoles(&warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
 			RequestOptions: warrant.RequestOptions{
@@ -344,14 +349,16 @@ func TestCrudPermissions(t *testing.T) {
 	}
 	assert.Equal(2, len(permissionsList.Results))
 
-	err = permission.Delete(permission1.PermissionId)
+	warrantToken, err := permission.Delete(permission1.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = permission.Delete(permission2.PermissionId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = permission.Delete(permission2.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 	permissionsList, err = permission.ListPermissions(&warrant.ListPermissionParams{
 		ListParams: warrant.ListParams{
 			RequestOptions: warrant.RequestOptions{
@@ -424,14 +431,16 @@ func TestCrudFeatures(t *testing.T) {
 	}
 	assert.Equal(2, len(featuresList.Results))
 
-	err = feature.Delete(feature1.FeatureId)
+	warrantToken, err := feature.Delete(feature1.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(feature2.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(feature2.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 	featuresList, err = feature.ListFeatures(&warrant.ListFeatureParams{
 		ListParams: warrant.ListParams{
 			RequestOptions: warrant.RequestOptions{
@@ -500,14 +509,16 @@ func TestCrudPricingTiers(t *testing.T) {
 	}
 	assert.Equal(2, len(tiersList.Results))
 
-	err = pricingtier.Delete(tier1.PricingTierId)
+	warrantToken, err := pricingtier.Delete(tier1.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pricingtier.Delete(tier2.PricingTierId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = pricingtier.Delete(tier2.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 	tiersList, err = pricingtier.ListPricingTiers(&warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
 			RequestOptions: warrant.RequestOptions{
@@ -548,22 +559,26 @@ func TestBatchCreateUsersAndTenants(t *testing.T) {
 	assert.Equal("tenant-1", createdTenants[0].TenantId)
 	assert.Equal("tenant-2", createdTenants[1].TenantId)
 
-	err = user.Delete("user-1")
+	warrantToken, err := user.Delete("user-1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = user.Delete("user-2")
+	assert.NotNil(warrantToken)
+	warrantToken, err = user.Delete("user-2")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tenant.Delete("tenant-1")
+	assert.NotNil(warrantToken)
+	warrantToken, err = tenant.Delete("tenant-1")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tenant.Delete("tenant-2")
+	assert.NotNil(warrantToken)
+	warrantToken, err = tenant.Delete("tenant-2")
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestMultiTenancy(t *testing.T) {
@@ -658,29 +673,33 @@ func TestMultiTenancy(t *testing.T) {
 	assert.Equal(1, len(tenant1UsersList.Results))
 	assert.Equal(user1.UserId, tenant1UsersList.Results[0].UserId)
 
-	wookie, err := user.RemoveUserFromTenant(user1.UserId, tenant1.TenantId, "member")
+	warrantToken, err := user.RemoveUserFromTenant(user1.UserId, tenant1.TenantId, "member")
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	// Clean up
-	err = user.Delete(user1.UserId)
+	warrantToken, err = user.Delete(user1.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = user.Delete(user2.UserId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = user.Delete(user2.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tenant.Delete(tenant1.TenantId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = tenant.Delete(tenant1.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tenant.Delete(tenant2.TenantId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = tenant.Delete(tenant2.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestRBAC(t *testing.T) {
@@ -832,11 +851,11 @@ func TestRBAC(t *testing.T) {
 	assert.Equal("administrator", adminUserRolesList.Results[0].RoleId)
 
 	// Remove create-report permission -> admin role -> admin user
-	wookie, err := permission.RemovePermissionFromRole(createPermission.PermissionId, adminRole.RoleId)
+	warrantToken, err := permission.RemovePermissionFromRole(createPermission.PermissionId, adminRole.RoleId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	adminUserHasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -863,11 +882,11 @@ func TestRBAC(t *testing.T) {
 	}
 	assert.Equal(1, len(adminUserRolesList.Results))
 
-	wookie, err = role.RemoveRoleFromUser(adminRole.RoleId, adminUser.UserId)
+	warrantToken, err = role.RemoveRoleFromUser(adminRole.RoleId, adminUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	adminUserRolesList, err = role.ListRolesForUser(adminUser.UserId, &warrant.ListRoleParams{
 		ListParams: warrant.ListParams{
@@ -941,11 +960,11 @@ func TestRBAC(t *testing.T) {
 	assert.Equal("view-report", viewerUserPermissionsList.Results[0].PermissionId)
 
 	// Remove view-report permission -> viewer user
-	wookie, err = permission.RemovePermissionFromUser(viewPermission.PermissionId, viewerUser.UserId)
+	warrantToken, err = permission.RemovePermissionFromUser(viewPermission.PermissionId, viewerUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	viewerUserHasPermission, err = warrant.CheckUserHasPermission(&warrant.PermissionCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -973,30 +992,36 @@ func TestRBAC(t *testing.T) {
 	assert.Equal(0, len(viewerUserPermissionsList.Results))
 
 	// Clean up
-	err = user.Delete(adminUser.UserId)
+	warrantToken, err = user.Delete(adminUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = user.Delete(viewerUser.UserId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = user.Delete(viewerUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = role.Delete(adminRole.RoleId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = role.Delete(adminRole.RoleId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = role.Delete(viewerRole.RoleId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = role.Delete(viewerRole.RoleId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = permission.Delete(createPermission.PermissionId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = permission.Delete(createPermission.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = permission.Delete(viewPermission.PermissionId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = permission.Delete(viewPermission.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestPricingTiersAndFeaturesUsers(t *testing.T) {
@@ -1115,11 +1140,11 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	assert.Equal(1, len(paidUserFeaturesList.Results))
 	assert.Equal("custom-feature", paidUserFeaturesList.Results[0].FeatureId)
 
-	wookie, err := feature.RemoveFeatureFromUser(customFeature.FeatureId, paidUser.UserId)
+	warrantToken, err := feature.RemoveFeatureFromUser(customFeature.FeatureId, paidUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	paidUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1244,11 +1269,11 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	assert.Equal(1, len(freeUserTiersList.Results))
 	assert.Equal("free", freeUserTiersList.Results[0].PricingTierId)
 
-	wookie, err = feature.RemoveFeatureFromPricingTier(feature1.FeatureId, freeTier.PricingTierId)
+	warrantToken, err = feature.RemoveFeatureFromPricingTier(feature1.FeatureId, freeTier.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	freeUserHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1291,11 +1316,11 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	}
 	assert.Equal(1, len(freeUserTiersList.Results))
 
-	wookie, err = pricingtier.RemovePricingTierFromUser(freeTier.PricingTierId, freeUser.UserId)
+	warrantToken, err = pricingtier.RemovePricingTierFromUser(freeTier.PricingTierId, freeUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	freeUserTiersList, err = pricingtier.ListPricingTiersForUser(freeUser.UserId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
@@ -1311,34 +1336,41 @@ func TestPricingTiersAndFeaturesUsers(t *testing.T) {
 	assert.Equal(0, len(freeUserTiersList.Results))
 
 	// Clean up
-	err = user.Delete(freeUser.UserId)
+	warrantToken, err = user.Delete(freeUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = user.Delete(paidUser.UserId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = user.Delete(paidUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pricingtier.Delete(freeTier.PricingTierId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = pricingtier.Delete(freeTier.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pricingtier.Delete(paidTier.PricingTierId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = pricingtier.Delete(paidTier.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(customFeature.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(customFeature.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(feature1.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(feature1.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(feature2.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(feature2.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestPricingTiersAndFeaturesTenants(t *testing.T) {
@@ -1457,11 +1489,11 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	assert.Equal(1, len(paidTenantFeaturesList.Results))
 	assert.Equal("custom-feature", paidTenantFeaturesList.Results[0].FeatureId)
 
-	wookie, err := feature.RemoveFeatureFromTenant(customFeature.FeatureId, paidTenant.TenantId)
+	warrantToken, err := feature.RemoveFeatureFromTenant(customFeature.FeatureId, paidTenant.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	paidTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1586,11 +1618,11 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	assert.Equal(1, len(freeTenantTiersList.Results))
 	assert.Equal("free", freeTenantTiersList.Results[0].PricingTierId)
 
-	wookie, err = feature.RemoveFeatureFromPricingTier(feature1.FeatureId, freeTier.PricingTierId)
+	warrantToken, err = feature.RemoveFeatureFromPricingTier(feature1.FeatureId, freeTier.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	freeTenantHasFeature, err = warrant.CheckHasFeature(&warrant.FeatureCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1633,11 +1665,11 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	}
 	assert.Equal(1, len(freeTenantTiersList.Results))
 
-	wookie, err = pricingtier.RemovePricingTierFromTenant(freeTier.PricingTierId, freeTenant.TenantId)
+	warrantToken, err = pricingtier.RemovePricingTierFromTenant(freeTier.PricingTierId, freeTenant.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	freeTenantTiersList, err = pricingtier.ListPricingTiersForTenant(freeTenant.TenantId, &warrant.ListPricingTierParams{
 		ListParams: warrant.ListParams{
@@ -1653,34 +1685,41 @@ func TestPricingTiersAndFeaturesTenants(t *testing.T) {
 	assert.Equal(0, len(freeTenantTiersList.Results))
 
 	// Clean up
-	err = tenant.Delete(freeTenant.TenantId)
+	warrantToken, err = tenant.Delete(freeTenant.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = tenant.Delete(paidTenant.TenantId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = tenant.Delete(paidTenant.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pricingtier.Delete(freeTier.PricingTierId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = pricingtier.Delete(freeTier.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = pricingtier.Delete(paidTier.PricingTierId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = pricingtier.Delete(paidTier.PricingTierId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(customFeature.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(customFeature.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(feature1.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(feature1.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = feature.Delete(feature2.FeatureId)
+	assert.NotNil(warrantToken)
+	warrantToken, err = feature.Delete(feature2.FeatureId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestSessions(t *testing.T) {
@@ -1722,15 +1761,17 @@ func TestSessions(t *testing.T) {
 	assert.NotEmpty(ssDashUrl)
 
 	// Clean up
-	err = user.Delete(user1.UserId)
+	warrantToken, err := user.Delete(user1.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 
-	err = tenant.Delete(tenant1.TenantId)
+	warrantToken, err = tenant.Delete(tenant1.TenantId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestWarrants(t *testing.T) {
@@ -1786,7 +1827,7 @@ func TestWarrants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(newWarrant.Wookie)
+	assert.NotNil(newWarrant.WarrantToken)
 
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1823,7 +1864,7 @@ func TestWarrants(t *testing.T) {
 	assert.Equal("Permission 1", queryResult.Results[0].Meta["name"])
 	assert.Equal("Permission with id 1", queryResult.Results[0].Meta["description"])
 
-	wookie, err := warrant.Delete(&warrant.WarrantParams{
+	warrantToken, err := warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   newPermission.PermissionId,
 		Relation:   "member",
@@ -1835,7 +1876,7 @@ func TestWarrants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1859,15 +1900,17 @@ func TestWarrants(t *testing.T) {
 	assert.False(checkResult)
 
 	// Clean up
-	err = user.Delete(newUser.UserId)
+	warrantToken, err = user.Delete(newUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 
-	err = permission.Delete(newPermission.PermissionId)
+	warrantToken, err = permission.Delete(newPermission.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestBatchWarrants(t *testing.T) {
@@ -1955,8 +1998,8 @@ func TestBatchWarrants(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Len(warrants, 2)
-	assert.NotNil(warrants[0].Wookie)
-	assert.NotNil(warrants[1].Wookie)
+	assert.NotNil(warrants[0].WarrantToken)
+	assert.NotNil(warrants[1].WarrantToken)
 
 	userHasPermission1, err = warrant.Check(&warrant.WarrantCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1988,7 +2031,7 @@ func TestBatchWarrants(t *testing.T) {
 	}
 	assert.True(userHasPermission2)
 
-	wookie, err := warrant.BatchDelete([]warrant.WarrantParams{
+	warrantToken, err := warrant.BatchDelete([]warrant.WarrantParams{
 		{
 			ObjectType: warrant.ObjectTypePermission,
 			ObjectId:   permission1.PermissionId,
@@ -2011,13 +2054,14 @@ func TestBatchWarrants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
-	err = object.BatchDelete([]warrant.ObjectParams{
+	warrantToken, err = object.BatchDelete([]warrant.ObjectParams{
 		{ObjectType: warrant.ObjectTypePermission, ObjectId: permission1.PermissionId},
 		{ObjectType: warrant.ObjectTypePermission, ObjectId: permission2.PermissionId},
 		{ObjectType: warrant.ObjectTypeUser, ObjectId: newUser.UserId},
 	})
+	assert.NotNil(warrantToken)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2104,7 +2148,7 @@ func TestWarrantPolicies(t *testing.T) {
 	assert.False(checkResult)
 
 	// Clean up
-	wookie, err := warrant.Delete(&warrant.WarrantParams{
+	warrantToken, err := warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   newPermission.PermissionId,
 		Relation:   "member",
@@ -2117,17 +2161,19 @@ func TestWarrantPolicies(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
-	err = user.Delete(newUser.UserId)
+	warrantToken, err = user.Delete(newUser.UserId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 
-	err = permission.Delete(newPermission.PermissionId)
+	warrantToken, err = permission.Delete(newPermission.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 }
 
 func TestObjectTypes(t *testing.T) {
@@ -2147,7 +2193,7 @@ func TestObjectTypes(t *testing.T) {
 	assert.Equal("new-type", newType.Type)
 	assert.NotNil(newType.Relations["relation-1"])
 	assert.Nil(newType.Relations["relation-2"])
-	assert.NotNil(newType.Wookie)
+	assert.NotNil(newType.WarrantToken)
 
 	objType, err := objecttype.Get("new-type", &warrant.ObjectTypeParams{})
 	if err != nil {
@@ -2177,13 +2223,13 @@ func TestObjectTypes(t *testing.T) {
 	assert.Len(objType.Relations, 2)
 	assert.NotNil(objType.Relations["relation-1"])
 	assert.NotNil(objType.Relations["relation-2"])
-	assert.NotNil(objType.Wookie)
+	assert.NotNil(objType.WarrantToken)
 
-	wookie, err := objecttype.Delete("new-type")
+	warrantToken, err := objecttype.Delete("new-type")
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(wookie)
+	assert.NotNil(warrantToken)
 
 	typesList, err = objecttype.ListObjectTypes(&warrant.ListObjectTypeParams{})
 	if err != nil {
@@ -2238,10 +2284,11 @@ func TestObjects(t *testing.T) {
 	assert.Len(obj.Meta, 1)
 	assert.Equal("new name", obj.Meta["name"])
 
-	err = object.Delete("role", "admin2")
+	warrantToken, err := object.Delete("role", "admin2")
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 
 	objectsList, err = object.ListObjects(&warrant.ListObjectParams{})
 	if err != nil {
@@ -2301,7 +2348,7 @@ func TestBatchObjects(t *testing.T) {
 	assert.Equal("resources", fetchedObjects.Results[0].ObjectId)
 	assert.Equal(map[string]interface{}{"description": "Helpful documents"}, fetchedObjects.Results[0].Meta)
 
-	err = object.BatchDelete([]warrant.ObjectParams{
+	warrantToken, err := object.BatchDelete([]warrant.ObjectParams{
 		{ObjectType: "document", ObjectId: "document-a"},
 		{ObjectType: "document", ObjectId: "document-b"},
 		{ObjectType: "folder", ObjectId: "resources"},
@@ -2309,6 +2356,7 @@ func TestBatchObjects(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	assert.NotNil(warrantToken)
 
 	fetchedObjects, err = object.ListObjects(&warrant.ListObjectParams{
 		ListParams: warrant.ListParams{

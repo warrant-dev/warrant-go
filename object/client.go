@@ -103,27 +103,29 @@ func Update(objectType string, objectId string, params *warrant.ObjectParams) (*
 	return getClient().Update(objectType, objectId, params)
 }
 
-func (c Client) Delete(objectType string, objectId string) error {
-	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), nil, &warrant.RequestOptions{})
+func (c Client) Delete(objectType string, objectId string) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), nil, &warrant.RequestOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
 }
 
-func Delete(objectType string, objectId string) error {
+func Delete(objectType string, objectId string) (string, error) {
 	return getClient().Delete(objectType, objectId)
 }
 
-func (c Client) BatchDelete(params []warrant.ObjectParams) error {
-	_, err := c.apiClient.MakeRequest("DELETE", "/v2/objects", params, &warrant.RequestOptions{})
+func (c Client) BatchDelete(params []warrant.ObjectParams) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", "/v2/objects", params, &warrant.RequestOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
 }
 
-func BatchDelete(params []warrant.ObjectParams) error {
+func BatchDelete(params []warrant.ObjectParams) (string, error) {
 	return getClient().BatchDelete(params)
 }
 

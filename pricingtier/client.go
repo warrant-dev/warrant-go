@@ -84,11 +84,11 @@ func Update(pricingTierId string, params *warrant.PricingTierParams) (*warrant.P
 	return getClient().Update(pricingTierId, params)
 }
 
-func (c Client) Delete(pricingTierId string) error {
+func (c Client) Delete(pricingTierId string) (string, error) {
 	return object.Delete(warrant.ObjectTypePricingTier, pricingTierId)
 }
 
-func Delete(pricingTierId string) error {
+func Delete(pricingTierId string) (string, error) {
 	return getClient().Delete(pricingTierId)
 }
 

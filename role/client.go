@@ -84,11 +84,11 @@ func Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 	return getClient().Update(roleId, params)
 }
 
-func (c Client) Delete(roleId string) error {
+func (c Client) Delete(roleId string) (string, error) {
 	return object.Delete(warrant.ObjectTypeRole, roleId)
 }
 
-func Delete(roleId string) error {
+func Delete(roleId string) (string, error) {
 	return getClient().Delete(roleId)
 }
 

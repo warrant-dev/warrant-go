@@ -84,11 +84,11 @@ func Update(featureId string, params *warrant.FeatureParams) (*warrant.Feature, 
 	return getClient().Update(featureId, params)
 }
 
-func (c Client) Delete(featureId string) error {
+func (c Client) Delete(featureId string) (string, error) {
 	return object.Delete(warrant.ObjectTypeFeature, featureId)
 }
 
-func Delete(featureId string) error {
+func Delete(featureId string) (string, error) {
 	return getClient().Delete(featureId)
 }
 
