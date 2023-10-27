@@ -3,9 +3,8 @@ package warrant
 const ObjectTypeRole = "role"
 
 type Role struct {
-	RoleId      string `json:"roleId"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	RoleId string                 `json:"roleId"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (role Role) GetObjectType() string {
@@ -22,7 +21,6 @@ type ListRoleParams struct {
 
 type RoleParams struct {
 	RequestOptions
-	RoleId      string `json:"roleId"`
-	Name        string `json:"name,omitempty"`
-	Description string `json:"description,omitempty"`
+	RoleId string                 `json:"roleId"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
 }

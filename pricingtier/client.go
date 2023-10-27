@@ -1,12 +1,10 @@
 package pricingtier
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 
-	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v5"
+	"github.com/warrant-dev/warrant-go/v5/object"
 )
 
 type Client struct {
@@ -20,20 +18,24 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/pricing-tiers", params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypePricingTier,
+		RequestOptions: params.RequestOptions,
+	}
+	if params.PricingTierId != "" {
+		objectParams.ObjectId = params.PricingTierId
+	}
+	if params.Meta != nil {
+		objectParams.Meta = params.Meta
+	}
+	object, err := object.Create(&objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var newPricingTier warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &newPricingTier)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &newPricingTier, nil
+	return &warrant.PricingTier{
+		PricingTierId: object.ObjectId,
+		Meta:          object.Meta,
+	}, nil
 }
 
 func Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
@@ -41,87 +43,115 @@ func Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
 }
 
 func (c Client) Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &params.RequestOptions)
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypePricingTier,
+		ObjectId:       pricingTierId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Get(warrant.ObjectTypePricingTier, pricingTierId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var foundPricingTier warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &foundPricingTier)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &foundPricingTier, nil
+	return &warrant.PricingTier{
+		PricingTierId: object.ObjectId,
+		Meta:          object.Meta,
+	}, nil
 }
 
 func Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
 	return getClient().Get(pricingTierId, params)
 }
 
-func (c Client) Delete(pricingTierId string) error {
-	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/pricing-tiers/%s", pricingTierId), nil, &warrant.RequestOptions{})
-	if err != nil {
-		return err
+func (c Client) Update(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypePricingTier,
+		ObjectId:       pricingTierId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
 	}
-	return nil
+	object, err := object.Update(warrant.ObjectTypePricingTier, pricingTierId, &objectParams)
+	if err != nil {
+		return nil, err
+	}
+	return &warrant.PricingTier{
+		PricingTierId: object.ObjectId,
+		Meta:          object.Meta,
+	}, nil
+}
+
+func Update(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	return getClient().Update(pricingTierId, params)
+}
+
+func (c Client) Delete(pricingTierId string) error {
+	return object.Delete(warrant.ObjectTypePricingTier, pricingTierId)
 }
 
 func Delete(pricingTierId string) error {
 	return getClient().Delete(pricingTierId)
 }
 
-func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
+	var pricingTiersListResponse warrant.ListResponse[warrant.PricingTier]
+
+	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
+		ListParams: listParams.ListParams,
+		ObjectType: warrant.ObjectTypePricingTier,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return pricingTiersListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	users := make([]warrant.PricingTier, 0)
+	for _, object := range objectsListResponse.Results {
+		users = append(users, warrant.PricingTier{
+			PricingTierId: object.ObjectId,
+			Meta:          object.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	pricingTiersListResponse = warrant.ListResponse[warrant.PricingTier]{
+		Results:    users,
+		PrevCursor: objectsListResponse.PrevCursor,
+		NextCursor: objectsListResponse.NextCursor,
 	}
-	var permissions []warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &permissions)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return permissions, nil
+
+	return pricingTiersListResponse, nil
 }
 
-func ListPricingTiers(listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
+func ListPricingTiers(listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
 	return getClient().ListPricingTiers(listParams)
 }
 
-func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
+	var pricingTiersListResponse warrant.ListResponse[warrant.PricingTier]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select pricing-tier where tenant:%s is *", tenantId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return pricingTiersListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/pricing-tiers?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	users := make([]warrant.PricingTier, 0)
+	for _, queryResult := range queryResponse.Results {
+		users = append(users, warrant.PricingTier{
+			PricingTierId: queryResult.ObjectId,
+			Meta:          queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	pricingTiersListResponse = warrant.ListResponse[warrant.PricingTier]{
+		Results:    users,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var pricingTiers []warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &pricingTiers)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return pricingTiers, nil
+
+	return pricingTiersListResponse, nil
 }
 
-func ListPricingTiersForTenant(userId string, listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
+func ListPricingTiersForTenant(userId string, listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
 	return getClient().ListPricingTiersForTenant(userId, listParams)
 }
 
@@ -157,29 +187,34 @@ func RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
 	return getClient().RemovePricingTierFromTenant(pricingTierId, tenantId)
 }
 
-func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
+	var pricingTiersListResponse warrant.ListResponse[warrant.PricingTier]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select pricing-tier where user:%s is *", userId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return pricingTiersListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/pricing-tiers?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	users := make([]warrant.PricingTier, 0)
+	for _, queryResult := range queryResponse.Results {
+		users = append(users, warrant.PricingTier{
+			PricingTierId: queryResult.ObjectId,
+			Meta:          queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	pricingTiersListResponse = warrant.ListResponse[warrant.PricingTier]{
+		Results:    users,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var pricingTiers []warrant.PricingTier
-	err = json.Unmarshal([]byte(body), &pricingTiers)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return pricingTiers, nil
+
+	return pricingTiersListResponse, nil
 }
 
-func ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierParams) ([]warrant.PricingTier, error) {
+func ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
 	return getClient().ListPricingTiersForUser(userId, listParams)
 }
 

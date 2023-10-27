@@ -3,9 +3,8 @@ package warrant
 const ObjectTypePermission = "permission"
 
 type Permission struct {
-	PermissionId string `json:"permissionId"`
-	Name         string `json:"name,omitempty"`
-	Description  string `json:"description,omitempty"`
+	PermissionId string                 `json:"permissionId"`
+	Meta         map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (permission Permission) GetObjectType() string {
@@ -22,7 +21,6 @@ type ListPermissionParams struct {
 
 type PermissionParams struct {
 	RequestOptions
-	PermissionId string `json:"permissionId"`
-	Name         string `json:"name,omitempty"`
-	Description  string `json:"description,omitempty"`
+	PermissionId string                 `json:"permissionId"`
+	Meta         map[string]interface{} `json:"meta,omitempty"`
 }

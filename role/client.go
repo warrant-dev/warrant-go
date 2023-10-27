@@ -1,12 +1,10 @@
 package role
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 
-	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v5"
+	"github.com/warrant-dev/warrant-go/v5/object"
 )
 
 type Client struct {
@@ -20,20 +18,24 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/roles", params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeRole,
+		RequestOptions: params.RequestOptions,
+	}
+	if params.RoleId != "" {
+		objectParams.ObjectId = params.RoleId
+	}
+	if params.Meta != nil {
+		objectParams.Meta = params.Meta
+	}
+	object, err := object.Create(&objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var newRole warrant.Role
-	err = json.Unmarshal([]byte(body), &newRole)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &newRole, nil
+	return &warrant.Role{
+		RoleId: object.ObjectId,
+		Meta:   object.Meta,
+	}, nil
 }
 
 func Create(params *warrant.RoleParams) (*warrant.Role, error) {
@@ -41,20 +43,20 @@ func Create(params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s", roleId), nil, &params.RequestOptions)
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeRole,
+		ObjectId:       roleId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Get(warrant.ObjectTypeRole, roleId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var foundRole warrant.Role
-	err = json.Unmarshal([]byte(body), &foundRole)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &foundRole, nil
+	return &warrant.Role{
+		RoleId: object.ObjectId,
+		Meta:   object.Meta,
+	}, nil
 }
 
 func Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
@@ -62,20 +64,20 @@ func Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
-	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/roles/%s", roleId), params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeRole,
+		ObjectId:       roleId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Update(warrant.ObjectTypeRole, roleId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var updatedRole warrant.Role
-	err = json.Unmarshal([]byte(body), &updatedRole)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &updatedRole, nil
+	return &warrant.Role{
+		RoleId: object.ObjectId,
+		Meta:   object.Meta,
+	}, nil
 }
 
 func Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
@@ -83,66 +85,73 @@ func Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Delete(roleId string) error {
-	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/roles/%s", roleId), nil, &warrant.RequestOptions{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return object.Delete(warrant.ObjectTypeRole, roleId)
 }
 
 func Delete(roleId string) error {
 	return getClient().Delete(roleId)
 }
 
-func (c Client) ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListRoles(listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant.Role], error) {
+	var rolesListResponse warrant.ListResponse[warrant.Role]
+
+	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
+		ListParams: listParams.ListParams,
+		ObjectType: warrant.ObjectTypeRole,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return rolesListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/roles?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	roles := make([]warrant.Role, 0)
+	for _, object := range objectsListResponse.Results {
+		roles = append(roles, warrant.Role{
+			RoleId: object.ObjectId,
+			Meta:   object.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	rolesListResponse = warrant.ListResponse[warrant.Role]{
+		Results:    roles,
+		PrevCursor: objectsListResponse.PrevCursor,
+		NextCursor: objectsListResponse.NextCursor,
 	}
-	var roles []warrant.Role
-	err = json.Unmarshal([]byte(body), &roles)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return roles, nil
+
+	return rolesListResponse, nil
 }
 
-func ListRoles(listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
+func ListRoles(listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant.Role], error) {
 	return getClient().ListRoles(listParams)
 }
 
-func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant.Role], error) {
+	var rolesListResponse warrant.ListResponse[warrant.Role]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select role where user:%s is *", userId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return rolesListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/roles?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	users := make([]warrant.Role, 0)
+	for _, queryResult := range queryResponse.Results {
+		users = append(users, warrant.Role{
+			RoleId: queryResult.ObjectId,
+			Meta:   queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	rolesListResponse = warrant.ListResponse[warrant.Role]{
+		Results:    users,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var roles []warrant.Role
-	err = json.Unmarshal([]byte(body), &roles)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return roles, nil
+
+	return rolesListResponse, nil
 }
 
-func ListRolesForUser(userId string, listParams *warrant.ListRoleParams) ([]warrant.Role, error) {
+func ListRolesForUser(userId string, listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant.Role], error) {
 	return getClient().ListRolesForUser(userId, listParams)
 }
 

@@ -3,7 +3,8 @@ package warrant
 const ObjectTypePricingTier = "pricing-tier"
 
 type PricingTier struct {
-	PricingTierId string `json:"pricingTierId"`
+	PricingTierId string                 `json:"pricingTierId"`
+	Meta          map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (pricingTier PricingTier) GetObjectType() string {
@@ -20,5 +21,6 @@ type ListPricingTierParams struct {
 
 type PricingTierParams struct {
 	RequestOptions
-	PricingTierId string `json:"pricingTierId"`
+	PricingTierId string                 `json:"pricingTierId"`
+	Meta          map[string]interface{} `json:"meta,omitempty"`
 }

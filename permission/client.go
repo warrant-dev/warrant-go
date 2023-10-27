@@ -1,12 +1,10 @@
 package permission
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 
-	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v5"
+	"github.com/warrant-dev/warrant-go/v5/object"
 )
 
 type Client struct {
@@ -20,20 +18,24 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/permissions", params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypePermission,
+		RequestOptions: params.RequestOptions,
+	}
+	if params.PermissionId != "" {
+		objectParams.ObjectId = params.PermissionId
+	}
+	if params.Meta != nil {
+		objectParams.Meta = params.Meta
+	}
+	object, err := object.Create(&objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var newPermission warrant.Permission
-	err = json.Unmarshal([]byte(body), &newPermission)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &newPermission, nil
+	return &warrant.Permission{
+		PermissionId: object.ObjectId,
+		Meta:         object.Meta,
+	}, nil
 }
 
 func Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
@@ -41,20 +43,20 @@ func Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
 }
 
 func (c Client) Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &params.RequestOptions)
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypePermission,
+		ObjectId:       permissionId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Get(warrant.ObjectTypePermission, permissionId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var foundPermission warrant.Permission
-	err = json.Unmarshal([]byte(body), &foundPermission)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &foundPermission, nil
+	return &warrant.Permission{
+		PermissionId: object.ObjectId,
+		Meta:         object.Meta,
+	}, nil
 }
 
 func Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
@@ -62,20 +64,20 @@ func Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permis
 }
 
 func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
-	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/permissions/%s", permissionId), params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypePermission,
+		ObjectId:       permissionId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Update(warrant.ObjectTypePermission, permissionId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var updatedPermission warrant.Permission
-	err = json.Unmarshal([]byte(body), &updatedPermission)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &updatedPermission, nil
+	return &warrant.Permission{
+		PermissionId: object.ObjectId,
+		Meta:         object.Meta,
+	}, nil
 }
 
 func Update(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
@@ -83,66 +85,73 @@ func Update(permissionId string, params *warrant.PermissionParams) (*warrant.Per
 }
 
 func (c Client) Delete(permissionId string) error {
-	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/permissions/%s", permissionId), nil, &warrant.RequestOptions{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return object.Delete(warrant.ObjectTypePermission, permissionId)
 }
 
 func Delete(permissionId string) error {
 	return getClient().Delete(permissionId)
 }
 
-func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
+	var permissionsListResponse warrant.ListResponse[warrant.Permission]
+
+	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
+		ListParams: listParams.ListParams,
+		ObjectType: warrant.ObjectTypePermission,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return permissionsListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/permissions?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	permissions := make([]warrant.Permission, 0)
+	for _, object := range objectsListResponse.Results {
+		permissions = append(permissions, warrant.Permission{
+			PermissionId: object.ObjectId,
+			Meta:         object.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	permissionsListResponse = warrant.ListResponse[warrant.Permission]{
+		Results:    permissions,
+		PrevCursor: objectsListResponse.PrevCursor,
+		NextCursor: objectsListResponse.NextCursor,
 	}
-	var permissions []warrant.Permission
-	err = json.Unmarshal([]byte(body), &permissions)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return permissions, nil
+
+	return permissionsListResponse, nil
 }
 
-func ListPermissions(listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
+func ListPermissions(listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
 	return getClient().ListPermissions(listParams)
 }
 
-func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
+	var permissionsListResponse warrant.ListResponse[warrant.Permission]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select permission where role:%s is *", roleId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return permissionsListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/roles/%s/permissions?%s", roleId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	permissions := make([]warrant.Permission, 0)
+	for _, queryResult := range queryResponse.Results {
+		permissions = append(permissions, warrant.Permission{
+			PermissionId: queryResult.ObjectId,
+			Meta:         queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	permissionsListResponse = warrant.ListResponse[warrant.Permission]{
+		Results:    permissions,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var permissions []warrant.Permission
-	err = json.Unmarshal([]byte(body), &permissions)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return permissions, nil
+
+	return permissionsListResponse, nil
 }
 
-func ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
+func ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
 	return getClient().ListPermissionsForRole(roleId, listParams)
 }
 
@@ -178,29 +187,34 @@ func RemovePermissionFromRole(permissionId string, roleId string) error {
 	return getClient().RemovePermissionFromRole(permissionId, roleId)
 }
 
-func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
+	var permissionsListResponse warrant.ListResponse[warrant.Permission]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select permission where user:%s is *", userId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return permissionsListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/permissions?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	permissions := make([]warrant.Permission, 0)
+	for _, queryResult := range queryResponse.Results {
+		permissions = append(permissions, warrant.Permission{
+			PermissionId: queryResult.ObjectId,
+			Meta:         queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	permissionsListResponse = warrant.ListResponse[warrant.Permission]{
+		Results:    permissions,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var permissions []warrant.Permission
-	err = json.Unmarshal([]byte(body), &permissions)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return permissions, nil
+
+	return permissionsListResponse, nil
 }
 
-func ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) ([]warrant.Permission, error) {
+func ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
 	return getClient().ListPermissionsForUser(userId, listParams)
 }
 
