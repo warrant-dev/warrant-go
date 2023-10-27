@@ -29,6 +29,10 @@ func (subject Subject) GetObjectId() string {
 	return subject.ObjectId
 }
 
+func (subject Subject) GetRelation() string {
+	return subject.Relation
+}
+
 type WarrantParams struct {
 	ObjectType string  `json:"objectType"`
 	ObjectId   string  `json:"objectId"`
