@@ -37,6 +37,8 @@ func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
+	wookie := resp.Header.Get("Warrant-Token")
+	createdWarrant.Wookie = wookie
 	return &createdWarrant, nil
 }
 
@@ -58,6 +60,10 @@ func (c WarrantClient) BatchCreate(params []WarrantParams) ([]Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
+	wookie := resp.Header.Get("Warrant-Token")
+	for i := range createdWarrants {
+		createdWarrants[i].Wookie = wookie
+	}
 	return createdWarrants, nil
 }
 
@@ -65,27 +71,29 @@ func BatchCreate(params []WarrantParams) ([]Warrant, error) {
 	return getClient().BatchCreate(params)
 }
 
-func (c WarrantClient) Delete(params *WarrantParams) error {
-	_, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
+func (c WarrantClient) Delete(params *WarrantParams) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	wookie := resp.Header.Get("Warrant-Token")
+	return wookie, nil
 }
 
-func Delete(params *WarrantParams) error {
+func Delete(params *WarrantParams) (string, error) {
 	return getClient().Delete(params)
 }
 
-func (c WarrantClient) BatchDelete(params []WarrantParams) error {
-	_, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
+func (c WarrantClient) BatchDelete(params []WarrantParams) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	wookie := resp.Header.Get("Warrant-Token")
+	return wookie, nil
 }
 
-func BatchDelete(params []WarrantParams) error {
+func BatchDelete(params []WarrantParams) (string, error) {
 	return getClient().BatchDelete(params)
 }
 

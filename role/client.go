@@ -171,7 +171,7 @@ func AssignRoleToUser(roleId string, userId string) (*warrant.Warrant, error) {
 	return getClient().AssignRoleToUser(roleId, userId)
 }
 
-func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
+func (c Client) RemoveRoleFromUser(roleId string, userId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeRole,
 		ObjectId:   roleId,
@@ -183,7 +183,7 @@ func (c Client) RemoveRoleFromUser(roleId string, userId string) error {
 	})
 }
 
-func RemoveRoleFromUser(roleId string, userId string) error {
+func RemoveRoleFromUser(roleId string, userId string) (string, error) {
 	return getClient().RemoveRoleFromUser(roleId, userId)
 }
 

@@ -171,7 +171,7 @@ func AssignPricingTierToTenant(pricingTierId string, tenantId string) (*warrant.
 	return getClient().AssignPricingTierToTenant(pricingTierId, tenantId)
 }
 
-func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
+func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
@@ -183,7 +183,7 @@ func (c Client) RemovePricingTierFromTenant(pricingTierId string, tenantId strin
 	})
 }
 
-func RemovePricingTierFromTenant(pricingTierId string, tenantId string) error {
+func RemovePricingTierFromTenant(pricingTierId string, tenantId string) (string, error) {
 	return getClient().RemovePricingTierFromTenant(pricingTierId, tenantId)
 }
 
@@ -234,7 +234,7 @@ func AssignPricingTierToUser(pricingTierId string, userId string) (*warrant.Warr
 	return getClient().AssignPricingTierToUser(pricingTierId, userId)
 }
 
-func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) error {
+func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePricingTier,
 		ObjectId:   pricingTierId,
@@ -246,7 +246,7 @@ func (c Client) RemovePricingTierFromUser(pricingTierId string, userId string) e
 	})
 }
 
-func RemovePricingTierFromUser(pricingTierId string, userId string) error {
+func RemovePricingTierFromUser(pricingTierId string, userId string) (string, error) {
 	return getClient().RemovePricingTierFromUser(pricingTierId, userId)
 }
 

@@ -171,7 +171,7 @@ func AssignPermissionToRole(permissionId string, roleId string) (*warrant.Warran
 	return getClient().AssignPermissionToRole(permissionId, roleId)
 }
 
-func (c Client) RemovePermissionFromRole(permissionId string, roleId string) error {
+func (c Client) RemovePermissionFromRole(permissionId string, roleId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
@@ -183,7 +183,7 @@ func (c Client) RemovePermissionFromRole(permissionId string, roleId string) err
 	})
 }
 
-func RemovePermissionFromRole(permissionId string, roleId string) error {
+func RemovePermissionFromRole(permissionId string, roleId string) (string, error) {
 	return getClient().RemovePermissionFromRole(permissionId, roleId)
 }
 
@@ -234,7 +234,7 @@ func AssignPermissionToUser(permissionId string, userId string) (*warrant.Warran
 	return getClient().AssignPermissionToUser(permissionId, userId)
 }
 
-func (c Client) RemovePermissionFromUser(permissionId string, userId string) error {
+func (c Client) RemovePermissionFromUser(permissionId string, userId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
 		ObjectId:   permissionId,
@@ -246,7 +246,7 @@ func (c Client) RemovePermissionFromUser(permissionId string, userId string) err
 	})
 }
 
-func RemovePermissionFromUser(permissionId string, userId string) error {
+func RemovePermissionFromUser(permissionId string, userId string) (string, error) {
 	return getClient().RemovePermissionFromUser(permissionId, userId)
 }
 

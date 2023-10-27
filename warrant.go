@@ -11,6 +11,7 @@ type Warrant struct {
 	Subject    Subject `json:"subject"`
 	Policy     string  `json:"policy,omitempty"`
 	IsImplicit bool    `json:"isImplicit,omitempty"`
+	Wookie     string  `json:"wookie,omitempty"`
 }
 
 type PolicyContext map[string]interface{}

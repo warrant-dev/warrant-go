@@ -225,7 +225,7 @@ func AssignUserToTenant(userId string, tenantId string, role string) (*warrant.W
 	return getClient().AssignUserToTenant(userId, tenantId, role)
 }
 
-func (c Client) RemoveUserFromTenant(userId string, tenantId string, role string) error {
+func (c Client) RemoveUserFromTenant(userId string, tenantId string, role string) (string, error) {
 	return warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeTenant,
 		ObjectId:   tenantId,
@@ -237,7 +237,7 @@ func (c Client) RemoveUserFromTenant(userId string, tenantId string, role string
 	})
 }
 
-func RemoveUserFromTenant(userId string, tenantId string, role string) error {
+func RemoveUserFromTenant(userId string, tenantId string, role string) (string, error) {
 	return getClient().RemoveUserFromTenant(userId, tenantId, role)
 }
 

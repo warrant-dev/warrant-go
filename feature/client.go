@@ -171,7 +171,7 @@ func AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warran
 	return getClient().AssignFeatureToPricingTier(featureId, pricingTierId)
 }
 
-func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
+func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
@@ -183,7 +183,7 @@ func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId str
 	})
 }
 
-func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
+func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) (string, error) {
 	return getClient().RemoveFeatureFromPricingTier(featureId, pricingTierId)
 }
 
@@ -234,7 +234,7 @@ func AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant,
 	return getClient().AssignFeatureToTenant(featureId, tenantId)
 }
 
-func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error {
+func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
@@ -246,7 +246,7 @@ func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error
 	})
 }
 
-func RemoveFeatureFromTenant(featureId string, tenantId string) error {
+func RemoveFeatureFromTenant(featureId string, tenantId string) (string, error) {
 	return getClient().RemoveFeatureFromTenant(featureId, tenantId)
 }
 
@@ -297,7 +297,7 @@ func AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, err
 	return getClient().AssignFeatureToUser(featureId, userId)
 }
 
-func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
+func (c Client) RemoveFeatureFromUser(featureId string, userId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
@@ -309,7 +309,7 @@ func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
 	})
 }
 
-func RemoveFeatureFromUser(featureId string, userId string) error {
+func RemoveFeatureFromUser(featureId string, userId string) (string, error) {
 	return getClient().RemoveFeatureFromUser(featureId, userId)
 }
 
