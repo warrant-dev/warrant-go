@@ -20,7 +20,7 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.ObjectTypeParams) (*warrant.ObjectType, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/object-types", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/object-types", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +33,8 @@ func (c Client) Create(params *warrant.ObjectTypeParams) (*warrant.ObjectType, e
 	if err != nil {
 		return nil, warrant.WrapError("Invalid response from server", err)
 	}
+	wookie := resp.Header.Get("Warrant-Token")
+	newObjectType.Wookie = wookie
 	return &newObjectType, nil
 }
 
@@ -41,7 +43,7 @@ func Create(params *warrant.ObjectTypeParams) (*warrant.ObjectType, error) {
 }
 
 func (c Client) Get(objectTypeId string, params *warrant.ObjectTypeParams) (*warrant.ObjectType, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/object-types/%s", objectTypeId), nil, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/object-types/%s", objectTypeId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +64,7 @@ func Get(objectTypeId string, params *warrant.ObjectTypeParams) (*warrant.Object
 }
 
 func (c Client) Update(objectTypeId string, params *warrant.ObjectTypeParams) (*warrant.ObjectType, error) {
-	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/object-types/%s", objectTypeId), params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v2/object-types/%s", objectTypeId), params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +77,8 @@ func (c Client) Update(objectTypeId string, params *warrant.ObjectTypeParams) (*
 	if err != nil {
 		return nil, warrant.WrapError("Invalid response from server", err)
 	}
+	wookie := resp.Header.Get("Warrant-Token")
+	updatedObjectType.Wookie = wookie
 	return &updatedObjectType, nil
 }
 
@@ -83,7 +87,7 @@ func Update(objectTypeId string, params *warrant.ObjectTypeParams) (*warrant.Obj
 }
 
 func (c Client) BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.ObjectType, error) {
-	resp, err := c.apiClient.MakeRequest("PUT", "/v1/object-types", params, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("PUT", "/v2/object-types", params, &warrant.RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +100,10 @@ func (c Client) BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.Object
 	if err != nil {
 		return nil, warrant.WrapError("Invalid response from server", err)
 	}
+	wookie := resp.Header.Get("Warrant-Token")
+	for i := range updatedObjectTypes {
+		updatedObjectTypes[i].Wookie = wookie
+	}
 	return updatedObjectTypes, nil
 }
 
@@ -103,41 +111,42 @@ func BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.ObjectType, error
 	return getClient().BatchUpdate(params)
 }
 
-func (c Client) Delete(objectTypeId string) error {
-	_, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/object-types/%s", objectTypeId), nil, &warrant.RequestOptions{})
+func (c Client) Delete(objectTypeId string) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v2/object-types/%s", objectTypeId), nil, &warrant.RequestOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	wookie := resp.Header.Get("Warrant-Token")
+	return wookie, nil
 }
 
-func Delete(objectTypeId string) error {
+func Delete(objectTypeId string) (string, error) {
 	return getClient().Delete(objectTypeId)
 }
 
-func (c Client) ListObjectTypes(listParams *warrant.ListObjectTypeParams) ([]warrant.ObjectType, error) {
+func (c Client) ListObjectTypes(listParams *warrant.ListObjectTypeParams) (warrant.ListResponse[warrant.ObjectType], error) {
+	var objectTypesListResponse warrant.ListResponse[warrant.ObjectType]
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return objectTypesListResponse, warrant.WrapError("Could not parse listParams", err)
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/object-types?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/object-types?%s", queryParams.Encode()), objectTypesListResponse, &listParams.RequestOptions)
 	if err != nil {
-		return nil, err
+		return objectTypesListResponse, err
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+		return objectTypesListResponse, warrant.WrapError("Error reading response", err)
 	}
-	var objectTypes []warrant.ObjectType
-	err = json.Unmarshal([]byte(body), &objectTypes)
+	err = json.Unmarshal([]byte(body), &objectTypesListResponse)
 	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
+		return objectTypesListResponse, warrant.WrapError("Invalid response from server", err)
 	}
-	return objectTypes, nil
+	return objectTypesListResponse, nil
 }
 
-func ListObjectTypes(listParams *warrant.ListObjectTypeParams) ([]warrant.ObjectType, error) {
+func ListObjectTypes(listParams *warrant.ListObjectTypeParams) (warrant.ListResponse[warrant.ObjectType], error) {
 	return getClient().ListObjectTypes(listParams)
 }
 
