@@ -85,12 +85,31 @@ type WarrantCheck struct {
 }
 
 func (warrantCheck WarrantCheck) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
-		"objectType": warrantCheck.Object.GetObjectType(),
-		"objectId":   warrantCheck.Object.GetObjectId(),
-		"relation":   warrantCheck.Relation,
-		"subject":    warrantCheck.Subject,
-		"context":    warrantCheck.Context,
+	var m map[string]interface{}
+	subject, ok := warrantCheck.Subject.(*Subject)
+	if ok {
+		m = map[string]interface{}{
+			"objectType": warrantCheck.Object.GetObjectType(),
+			"objectId":   warrantCheck.Object.GetObjectId(),
+			"relation":   warrantCheck.Relation,
+			"subject": map[string]interface{}{
+				"objectType": subject.GetObjectType(),
+				"objectId":   subject.GetObjectId(),
+				"relation":   subject.GetRelation(),
+			},
+			"context": warrantCheck.Context,
+		}
+	} else {
+		m = map[string]interface{}{
+			"objectType": warrantCheck.Object.GetObjectType(),
+			"objectId":   warrantCheck.Object.GetObjectId(),
+			"relation":   warrantCheck.Relation,
+			"subject": map[string]interface{}{
+				"objectType": warrantCheck.Subject.GetObjectType(),
+				"objectId":   warrantCheck.Subject.GetObjectId(),
+			},
+			"context": warrantCheck.Context,
+		}
 	}
 
 	return json.Marshal(m)
