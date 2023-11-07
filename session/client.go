@@ -32,6 +32,7 @@ func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionP
 	if err != nil {
 		return "", warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {
@@ -67,6 +68,7 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 	if err != nil {
 		return "", warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var response map[string]string
 	err = json.Unmarshal([]byte(body), &response)
 	if err != nil {

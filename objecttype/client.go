@@ -28,6 +28,7 @@ func (c Client) Create(params *warrant.ObjectTypeParams) (*warrant.ObjectType, e
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var newObjectType warrant.ObjectType
 	err = json.Unmarshal([]byte(body), &newObjectType)
 	if err != nil {
@@ -51,6 +52,7 @@ func (c Client) Get(objectTypeId string, params *warrant.ObjectTypeParams) (*war
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var foundObjectType warrant.ObjectType
 	err = json.Unmarshal([]byte(body), &foundObjectType)
 	if err != nil {
@@ -72,6 +74,7 @@ func (c Client) Update(objectTypeId string, params *warrant.ObjectTypeParams) (*
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var updatedObjectType warrant.ObjectType
 	err = json.Unmarshal([]byte(body), &updatedObjectType)
 	if err != nil {
@@ -95,6 +98,7 @@ func (c Client) BatchUpdate(params []warrant.ObjectTypeParams) ([]warrant.Object
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var updatedObjectTypes []warrant.ObjectType
 	err = json.Unmarshal([]byte(body), &updatedObjectTypes)
 	if err != nil {
@@ -116,6 +120,7 @@ func (c Client) Delete(objectTypeId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 	warrantToken := resp.Header.Get("Warrant-Token")
 	return warrantToken, nil
 }
@@ -139,6 +144,7 @@ func (c Client) ListObjectTypes(listParams *warrant.ListObjectTypeParams) (warra
 	if err != nil {
 		return objectTypesListResponse, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	err = json.Unmarshal([]byte(body), &objectTypesListResponse)
 	if err != nil {
 		return objectTypesListResponse, warrant.WrapError("Invalid response from server", err)

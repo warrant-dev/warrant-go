@@ -28,6 +28,7 @@ func (c Client) Create(params *warrant.ObjectParams) (*warrant.Object, error) {
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var newObject warrant.Object
 	err = json.Unmarshal([]byte(body), &newObject)
 	if err != nil {
@@ -49,6 +50,7 @@ func (c Client) BatchCreate(params []warrant.ObjectParams) ([]warrant.Object, er
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var newObjects []warrant.Object
 	err = json.Unmarshal([]byte(body), &newObjects)
 	if err != nil {
@@ -70,6 +72,7 @@ func (c Client) Get(objectType string, objectId string, params *warrant.ObjectPa
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var foundObject warrant.Object
 	err = json.Unmarshal([]byte(body), &foundObject)
 	if err != nil {
@@ -91,6 +94,7 @@ func (c Client) Update(objectType string, objectId string, params *warrant.Objec
 	if err != nil {
 		return nil, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var updatedObject warrant.Object
 	err = json.Unmarshal([]byte(body), &updatedObject)
 	if err != nil {
@@ -108,6 +112,7 @@ func (c Client) Delete(objectType string, objectId string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 	warrantToken := resp.Header.Get("Warrant-Token")
 	return warrantToken, nil
 }
@@ -121,6 +126,7 @@ func (c Client) BatchDelete(params []warrant.ObjectParams) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 	warrantToken := resp.Header.Get("Warrant-Token")
 	return warrantToken, nil
 }
@@ -144,6 +150,7 @@ func (c Client) ListObjects(listParams *warrant.ListObjectParams) (warrant.ListR
 	if err != nil {
 		return objectsListResponse, warrant.WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	err = json.Unmarshal([]byte(body), &objectsListResponse)
 	if err != nil {
 		return objectsListResponse, warrant.WrapError("Invalid response from server", err)

@@ -32,6 +32,7 @@ func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var createdWarrant Warrant
 	err = json.Unmarshal([]byte(body), &createdWarrant)
 	if err != nil {
@@ -55,6 +56,7 @@ func (c WarrantClient) BatchCreate(params []WarrantParams) ([]Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var createdWarrants []Warrant
 	err = json.Unmarshal([]byte(body), &createdWarrants)
 	if err != nil {
@@ -76,6 +78,7 @@ func (c WarrantClient) Delete(params *WarrantParams) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 	warrantToken := resp.Header.Get("Warrant-Token")
 	return warrantToken, nil
 }
@@ -89,6 +92,7 @@ func (c WarrantClient) BatchDelete(params []WarrantParams) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
 	warrantToken := resp.Header.Get("Warrant-Token")
 	return warrantToken, nil
 }
@@ -112,6 +116,7 @@ func (c WarrantClient) Query(queryString string, params *QueryParams) (ListRespo
 	if err != nil {
 		return queryResponse, WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	err = json.Unmarshal([]byte(body), &queryResponse)
 	if err != nil {
 		return queryResponse, WrapError("Invalid response from server", err)
@@ -251,6 +256,7 @@ func (c WarrantClient) makeAuthorizeRequest(params *AccessCheckRequest) (*Warran
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var result WarrantCheckResult
 	err = json.Unmarshal([]byte(body), &result)
 	if err != nil {
