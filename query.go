@@ -2,7 +2,6 @@ package warrant
 
 type QueryParams struct {
 	ListParams
-	lastId *string
 }
 
 type QueryResponse struct {

@@ -1,12 +1,10 @@
 package feature
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 
-	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v5"
+	"github.com/warrant-dev/warrant-go/v5/object"
 )
 
 type Client struct {
@@ -20,20 +18,24 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/features", params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeFeature,
+		RequestOptions: params.RequestOptions,
+	}
+	if params.FeatureId != "" {
+		objectParams.ObjectId = params.FeatureId
+	}
+	if params.Meta != nil {
+		objectParams.Meta = params.Meta
+	}
+	object, err := object.Create(&objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var newFeature warrant.Feature
-	err = json.Unmarshal([]byte(body), &newFeature)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &newFeature, nil
+	return &warrant.Feature{
+		FeatureId: object.ObjectId,
+		Meta:      object.Meta,
+	}, nil
 }
 
 func Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
@@ -41,98 +43,115 @@ func Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
 }
 
 func (c Client) Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/features/%s", featureId), nil, &params.RequestOptions)
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeFeature,
+		ObjectId:       featureId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Get(warrant.ObjectTypeFeature, featureId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var foundFeature warrant.Feature
-	err = json.Unmarshal([]byte(body), &foundFeature)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &foundFeature, nil
+	return &warrant.Feature{
+		FeatureId: object.ObjectId,
+		Meta:      object.Meta,
+	}, nil
 }
 
 func Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
 	return getClient().Get(featureId, params)
 }
 
-func (c Client) Delete(featureId string) error {
-	resp, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/features/%s", featureId), nil, &warrant.RequestOptions{})
+func (c Client) Update(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeFeature,
+		ObjectId:       featureId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Update(warrant.ObjectTypeFeature, featureId, &objectParams)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, err := io.ReadAll(resp.Body)
-		errMsg := ""
-		if err == nil {
-			errMsg = string(msg)
-		}
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, errMsg),
-		}
-	}
-	return nil
+	return &warrant.Feature{
+		FeatureId: object.ObjectId,
+		Meta:      object.Meta,
+	}, nil
 }
 
-func Delete(featureId string) error {
+func Update(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
+	return getClient().Update(featureId, params)
+}
+
+func (c Client) Delete(featureId string) (string, error) {
+	return object.Delete(warrant.ObjectTypeFeature, featureId)
+}
+
+func Delete(featureId string) (string, error) {
 	return getClient().Delete(featureId)
 }
 
-func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	var featuresListResponse warrant.ListResponse[warrant.Feature]
+
+	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
+		ListParams: listParams.ListParams,
+		ObjectType: warrant.ObjectTypeFeature,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return featuresListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/features?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	features := make([]warrant.Feature, 0)
+	for _, object := range objectsListResponse.Results {
+		features = append(features, warrant.Feature{
+			FeatureId: object.ObjectId,
+			Meta:      object.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	featuresListResponse = warrant.ListResponse[warrant.Feature]{
+		Results:    features,
+		PrevCursor: objectsListResponse.PrevCursor,
+		NextCursor: objectsListResponse.NextCursor,
 	}
-	var permissions []warrant.Feature
-	err = json.Unmarshal([]byte(body), &permissions)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return permissions, nil
+
+	return featuresListResponse, nil
 }
 
-func ListFeatures(listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
+func ListFeatures(listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
 	return getClient().ListFeatures(listParams)
 }
 
-func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	var featuresListResponse warrant.ListResponse[warrant.Feature]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select feature where pricing-tier:%s is *", pricingTierId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return featuresListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/pricing-tiers/%s/features?%s", pricingTierId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	features := make([]warrant.Feature, 0)
+	for _, queryResult := range queryResponse.Results {
+		features = append(features, warrant.Feature{
+			FeatureId: queryResult.ObjectId,
+			Meta:      queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	featuresListResponse = warrant.ListResponse[warrant.Feature]{
+		Results:    features,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var features []warrant.Feature
-	err = json.Unmarshal([]byte(body), &features)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return features, nil
+
+	return featuresListResponse, nil
 }
 
-func ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
+func ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
 	return getClient().ListFeaturesForPricingTier(pricingTierId, listParams)
 }
 
@@ -152,7 +171,7 @@ func AssignFeatureToPricingTier(featureId string, pricingTierId string) (*warran
 	return getClient().AssignFeatureToPricingTier(featureId, pricingTierId)
 }
 
-func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
+func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
@@ -164,33 +183,38 @@ func (c Client) RemoveFeatureFromPricingTier(featureId string, pricingTierId str
 	})
 }
 
-func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) error {
+func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) (string, error) {
 	return getClient().RemoveFeatureFromPricingTier(featureId, pricingTierId)
 }
 
-func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	var featuresListResponse warrant.ListResponse[warrant.Feature]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select feature where tenant:%s is *", tenantId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return featuresListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s/features?%s", tenantId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	features := make([]warrant.Feature, 0)
+	for _, queryResult := range queryResponse.Results {
+		features = append(features, warrant.Feature{
+			FeatureId: queryResult.ObjectId,
+			Meta:      queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	featuresListResponse = warrant.ListResponse[warrant.Feature]{
+		Results:    features,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var features []warrant.Feature
-	err = json.Unmarshal([]byte(body), &features)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return features, nil
+
+	return featuresListResponse, nil
 }
 
-func ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
+func ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
 	return getClient().ListFeaturesForTenant(tenantId, listParams)
 }
 
@@ -210,7 +234,7 @@ func AssignFeatureToTenant(featureId string, tenantId string) (*warrant.Warrant,
 	return getClient().AssignFeatureToTenant(featureId, tenantId)
 }
 
-func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error {
+func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
@@ -222,33 +246,38 @@ func (c Client) RemoveFeatureFromTenant(featureId string, tenantId string) error
 	})
 }
 
-func RemoveFeatureFromTenant(featureId string, tenantId string) error {
+func RemoveFeatureFromTenant(featureId string, tenantId string) (string, error) {
 	return getClient().RemoveFeatureFromTenant(featureId, tenantId)
 }
 
-func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	var featuresListResponse warrant.ListResponse[warrant.Feature]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select feature where user:%s is *", userId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return featuresListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/features?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	features := make([]warrant.Feature, 0)
+	for _, queryResult := range queryResponse.Results {
+		features = append(features, warrant.Feature{
+			FeatureId: queryResult.ObjectId,
+			Meta:      queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	featuresListResponse = warrant.ListResponse[warrant.Feature]{
+		Results:    features,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var features []warrant.Feature
-	err = json.Unmarshal([]byte(body), &features)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return features, nil
+
+	return featuresListResponse, nil
 }
 
-func ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) ([]warrant.Feature, error) {
+func ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
 	return getClient().ListFeaturesForUser(userId, listParams)
 }
 
@@ -268,7 +297,7 @@ func AssignFeatureToUser(featureId string, userId string) (*warrant.Warrant, err
 	return getClient().AssignFeatureToUser(featureId, userId)
 }
 
-func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
+func (c Client) RemoveFeatureFromUser(featureId string, userId string) (string, error) {
 	return warrant.NewClient(c.apiClient.Config).Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypeFeature,
 		ObjectId:   featureId,
@@ -280,7 +309,7 @@ func (c Client) RemoveFeatureFromUser(featureId string, userId string) error {
 	})
 }
 
-func RemoveFeatureFromUser(featureId string, userId string) error {
+func RemoveFeatureFromUser(featureId string, userId string) (string, error) {
 	return getClient().RemoveFeatureFromUser(featureId, userId)
 }
 

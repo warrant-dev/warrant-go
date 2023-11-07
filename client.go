@@ -24,7 +24,7 @@ func NewClient(config ClientConfig) WarrantClient {
 }
 
 func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/warrants", params, &RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -32,11 +32,14 @@ func (c WarrantClient) Create(params *WarrantParams) (*Warrant, error) {
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var createdWarrant Warrant
 	err = json.Unmarshal([]byte(body), &createdWarrant)
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
+	warrantToken := resp.Header.Get("Warrant-Token")
+	createdWarrant.WarrantToken = warrantToken
 	return &createdWarrant, nil
 }
 
@@ -44,25 +47,8 @@ func Create(params *WarrantParams) (*Warrant, error) {
 	return getClient().Create(params)
 }
 
-func (c WarrantClient) Delete(params *WarrantParams) error {
-	_, err := c.apiClient.MakeRequest("DELETE", "/v1/warrants", params, &RequestOptions{})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func Delete(params *WarrantParams) error {
-	return getClient().Delete(params)
-}
-
-func (c WarrantClient) Query(queryString string, params *QueryParams) (*QueryResponse, error) {
-	queryParams, err := query.Values(params)
-	if err != nil {
-		return nil, WrapError("Could not parse params", err)
-	}
-
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), nil, &params.RequestOptions)
+func (c WarrantClient) BatchCreate(params []WarrantParams) ([]Warrant, error) {
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/warrants", params, &RequestOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -70,15 +56,75 @@ func (c WarrantClient) Query(queryString string, params *QueryParams) (*QueryRes
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
-	var queryResponse QueryResponse
-	err = json.Unmarshal([]byte(body), &queryResponse)
+	defer resp.Body.Close()
+	var createdWarrants []Warrant
+	err = json.Unmarshal([]byte(body), &createdWarrants)
 	if err != nil {
 		return nil, WrapError("Invalid response from server", err)
 	}
-	return &queryResponse, nil
+	warrantToken := resp.Header.Get("Warrant-Token")
+	for i := range createdWarrants {
+		createdWarrants[i].WarrantToken = warrantToken
+	}
+	return createdWarrants, nil
 }
 
-func Query(queryString string, params *QueryParams) (*QueryResponse, error) {
+func BatchCreate(params []WarrantParams) ([]Warrant, error) {
+	return getClient().BatchCreate(params)
+}
+
+func (c WarrantClient) Delete(params *WarrantParams) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
+}
+
+func Delete(params *WarrantParams) (string, error) {
+	return getClient().Delete(params)
+}
+
+func (c WarrantClient) BatchDelete(params []WarrantParams) (string, error) {
+	resp, err := c.apiClient.MakeRequest("DELETE", "/v2/warrants", params, &RequestOptions{})
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	warrantToken := resp.Header.Get("Warrant-Token")
+	return warrantToken, nil
+}
+
+func BatchDelete(params []WarrantParams) (string, error) {
+	return getClient().BatchDelete(params)
+}
+
+func (c WarrantClient) Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
+	var queryResponse ListResponse[QueryResult]
+	queryParams, err := query.Values(params)
+	if err != nil {
+		return queryResponse, WrapError("Could not parse params", err)
+	}
+
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/query?q=%s&%s", url.QueryEscape(queryString), queryParams.Encode()), queryResponse, &params.RequestOptions)
+	if err != nil {
+		return queryResponse, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return queryResponse, WrapError("Error reading response", err)
+	}
+	defer resp.Body.Close()
+	err = json.Unmarshal([]byte(body), &queryResponse)
+	if err != nil {
+		return queryResponse, WrapError("Invalid response from server", err)
+	}
+	return queryResponse, nil
+}
+
+func Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
 	return getClient().Query(queryString, params)
 }
 
@@ -201,7 +247,7 @@ func CheckHasFeature(params *FeatureCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) makeAuthorizeRequest(params *AccessCheckRequest) (*WarrantCheckResult, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v2/authorize", params, &params.RequestOptions)
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/check", params, &params.RequestOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -210,6 +256,7 @@ func (c WarrantClient) makeAuthorizeRequest(params *AccessCheckRequest) (*Warran
 	if err != nil {
 		return nil, WrapError("Error reading response", err)
 	}
+	defer resp.Body.Close()
 	var result WarrantCheckResult
 	err = json.Unmarshal([]byte(body), &result)
 	if err != nil {

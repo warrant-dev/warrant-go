@@ -1,13 +1,10 @@
 package warrant
 
-import "time"
-
 const ObjectTypeTenant = "tenant"
 
 type Tenant struct {
-	TenantId  string    `json:"tenantId"`
-	Name      string    `json:"name,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
+	TenantId string                 `json:"tenantId"`
+	Meta     map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (tenant Tenant) GetObjectType() string {
@@ -24,6 +21,6 @@ type ListTenantParams struct {
 
 type TenantParams struct {
 	RequestOptions
-	TenantId string `json:"tenantId,omitempty"`
-	Name     string `json:"name,omitempty"`
+	TenantId string                 `json:"tenantId,omitempty"`
+	Meta     map[string]interface{} `json:"meta,omitempty"`
 }

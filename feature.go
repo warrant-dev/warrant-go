@@ -3,7 +3,8 @@ package warrant
 const ObjectTypeFeature = "feature"
 
 type Feature struct {
-	FeatureId string `json:"featureId"`
+	FeatureId string                 `json:"featureId"`
+	Meta      map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (feature Feature) GetObjectType() string {
@@ -20,5 +21,6 @@ type ListFeatureParams struct {
 
 type FeatureParams struct {
 	RequestOptions
-	FeatureId string `json:"featureId"`
+	FeatureId string                 `json:"featureId"`
+	Meta      map[string]interface{} `json:"meta,omitempty"`
 }

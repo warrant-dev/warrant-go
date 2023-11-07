@@ -1,12 +1,10 @@
 package tenant
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 
-	"github.com/google/go-querystring/query"
 	"github.com/warrant-dev/warrant-go/v5"
+	"github.com/warrant-dev/warrant-go/v5/object"
 )
 
 type Client struct {
@@ -20,20 +18,24 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.TenantParams) (*warrant.Tenant, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/tenants", params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeTenant,
+		RequestOptions: params.RequestOptions,
+	}
+	if params.TenantId != "" {
+		objectParams.ObjectId = params.TenantId
+	}
+	if params.Meta != nil {
+		objectParams.Meta = params.Meta
+	}
+	object, err := object.Create(&objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var newTenant warrant.Tenant
-	err = json.Unmarshal([]byte(body), &newTenant)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &newTenant, nil
+	return &warrant.Tenant{
+		TenantId: object.ObjectId,
+		Meta:     object.Meta,
+	}, nil
 }
 
 func Create(params *warrant.TenantParams) (*warrant.Tenant, error) {
@@ -41,20 +43,30 @@ func Create(params *warrant.TenantParams) (*warrant.Tenant, error) {
 }
 
 func (c Client) BatchCreate(params []warrant.TenantParams) ([]warrant.Tenant, error) {
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/tenants", params, &warrant.RequestOptions{})
+	objectsToCreate := make([]warrant.ObjectParams, 0)
+	for _, tenantParam := range params {
+		objectsToCreate = append(objectsToCreate, warrant.ObjectParams{
+			RequestOptions: tenantParam.RequestOptions,
+			ObjectType:     warrant.ObjectTypeTenant,
+			ObjectId:       tenantParam.TenantId,
+			Meta:           tenantParam.Meta,
+		})
+	}
+
+	createdObjects, err := object.BatchCreate(objectsToCreate)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	tenants := make([]warrant.Tenant, 0)
+	for _, createdObject := range createdObjects {
+		tenants = append(tenants, warrant.Tenant{
+			TenantId: createdObject.ObjectId,
+			Meta:     createdObject.Meta,
+		})
 	}
-	var createdTenants []warrant.Tenant
-	err = json.Unmarshal([]byte(body), &createdTenants)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return createdTenants, nil
+
+	return tenants, nil
 }
 
 func BatchCreate(params []warrant.TenantParams) ([]warrant.Tenant, error) {
@@ -62,20 +74,20 @@ func BatchCreate(params []warrant.TenantParams) ([]warrant.Tenant, error) {
 }
 
 func (c Client) Get(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants/%s", tenantId), nil, &params.RequestOptions)
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeTenant,
+		ObjectId:       tenantId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Get(warrant.ObjectTypeTenant, tenantId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var foundTenant warrant.Tenant
-	err = json.Unmarshal([]byte(body), &foundTenant)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &foundTenant, nil
+	return &warrant.Tenant{
+		TenantId: object.ObjectId,
+		Meta:     object.Meta,
+	}, nil
 }
 
 func Get(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
@@ -83,98 +95,117 @@ func Get(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error)
 }
 
 func (c Client) Update(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
-	resp, err := c.apiClient.MakeRequest("PUT", fmt.Sprintf("/v1/tenants/%s", tenantId), params, &warrant.RequestOptions{})
+	objectParams := warrant.ObjectParams{
+		ObjectType:     warrant.ObjectTypeTenant,
+		ObjectId:       tenantId,
+		RequestOptions: params.RequestOptions,
+		Meta:           params.Meta,
+	}
+	object, err := object.Update(warrant.ObjectTypeTenant, tenantId, &objectParams)
 	if err != nil {
 		return nil, err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var updatedTenant warrant.Tenant
-	err = json.Unmarshal([]byte(body), &updatedTenant)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return &updatedTenant, nil
+	return &warrant.Tenant{
+		TenantId: object.ObjectId,
+		Meta:     object.Meta,
+	}, nil
 }
 
 func Update(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
 	return getClient().Update(tenantId, params)
 }
 
-func (c Client) Delete(tenantId string) error {
-	resp, err := c.apiClient.MakeRequest("DELETE", fmt.Sprintf("/v1/tenants/%s", tenantId), nil, &warrant.RequestOptions{})
-	if err != nil {
-		return err
-	}
-	respStatus := resp.StatusCode
-	if respStatus < 200 || respStatus >= 400 {
-		msg, err := io.ReadAll(resp.Body)
-		errMsg := ""
-		if err == nil {
-			errMsg = string(msg)
-		}
-		return warrant.Error{
-			Message: fmt.Sprintf("HTTP %d %s", respStatus, errMsg),
-		}
-	}
-	return nil
+func (c Client) Delete(tenantId string) (string, error) {
+	return object.Delete(warrant.ObjectTypeTenant, tenantId)
 }
 
-func Delete(tenantId string) error {
+func Delete(tenantId string) (string, error) {
 	return getClient().Delete(tenantId)
 }
 
-func (c Client) ListTenants(listParams *warrant.ListTenantParams) ([]warrant.Tenant, error) {
-	queryParams, err := query.Values(listParams)
-	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+func (c Client) BatchDelete(params []warrant.TenantParams) (string, error) {
+	objectsToDelete := make([]warrant.ObjectParams, 0)
+	for _, tenantParam := range params {
+		objectsToDelete = append(objectsToDelete, warrant.ObjectParams{
+			RequestOptions: tenantParam.RequestOptions,
+			ObjectType:     warrant.ObjectTypeTenant,
+			ObjectId:       tenantParam.TenantId,
+			Meta:           tenantParam.Meta,
+		})
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/tenants?%s", queryParams.Encode()), nil, &listParams.RequestOptions)
+	warrantToken, err := object.BatchDelete(objectsToDelete)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
-	}
-	var tenants []warrant.Tenant
-	err = json.Unmarshal([]byte(body), &tenants)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return tenants, nil
+
+	return warrantToken, nil
 }
 
-func ListTenants(listParams *warrant.ListTenantParams) ([]warrant.Tenant, error) {
+func BatchDelete(params []warrant.TenantParams) (string, error) {
+	return getClient().BatchDelete(params)
+}
+
+func (c Client) ListTenants(listParams *warrant.ListTenantParams) (warrant.ListResponse[warrant.Tenant], error) {
+	var tenantsListResponse warrant.ListResponse[warrant.Tenant]
+
+	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
+		ListParams: listParams.ListParams,
+		ObjectType: warrant.ObjectTypeTenant,
+	})
+	if err != nil {
+		return tenantsListResponse, err
+	}
+
+	tenants := make([]warrant.Tenant, 0)
+	for _, object := range objectsListResponse.Results {
+		tenants = append(tenants, warrant.Tenant{
+			TenantId: object.ObjectId,
+			Meta:     object.Meta,
+		})
+	}
+
+	tenantsListResponse = warrant.ListResponse[warrant.Tenant]{
+		Results:    tenants,
+		PrevCursor: objectsListResponse.PrevCursor,
+		NextCursor: objectsListResponse.NextCursor,
+	}
+
+	return tenantsListResponse, nil
+}
+
+func ListTenants(listParams *warrant.ListTenantParams) (warrant.ListResponse[warrant.Tenant], error) {
 	return getClient().ListTenants(listParams)
 }
 
-func (c Client) ListTenantsForUser(userId string, listParams *warrant.ListTenantParams) ([]warrant.Tenant, error) {
-	queryParams, err := query.Values(listParams)
+func (c Client) ListTenantsForUser(userId string, listParams *warrant.ListTenantParams) (warrant.ListResponse[warrant.Tenant], error) {
+	var tenantsListResponse warrant.ListResponse[warrant.Tenant]
+
+	queryResponse, err := warrant.Query(fmt.Sprintf("select tenant where user:%s is *", userId), &warrant.QueryParams{
+		ListParams: listParams.ListParams,
+	})
 	if err != nil {
-		return nil, warrant.WrapError("Could not parse listParams", err)
+		return tenantsListResponse, err
 	}
 
-	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v1/users/%s/tenants?%s", userId, queryParams.Encode()), nil, &listParams.RequestOptions)
-	if err != nil {
-		return nil, err
+	tenants := make([]warrant.Tenant, 0)
+	for _, queryResult := range queryResponse.Results {
+		tenants = append(tenants, warrant.Tenant{
+			TenantId: queryResult.ObjectId,
+			Meta:     queryResult.Meta,
+		})
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, warrant.WrapError("Error reading response", err)
+
+	tenantsListResponse = warrant.ListResponse[warrant.Tenant]{
+		Results:    tenants,
+		PrevCursor: queryResponse.PrevCursor,
+		NextCursor: queryResponse.NextCursor,
 	}
-	var tenants []warrant.Tenant
-	err = json.Unmarshal([]byte(body), &tenants)
-	if err != nil {
-		return nil, warrant.WrapError("Invalid response from server", err)
-	}
-	return tenants, nil
+
+	return tenantsListResponse, nil
 }
 
-func ListTenantsForUser(userId string, listParams *warrant.ListTenantParams) ([]warrant.Tenant, error) {
+func ListTenantsForUser(userId string, listParams *warrant.ListTenantParams) (warrant.ListResponse[warrant.Tenant], error) {
 	return getClient().ListTenantsForUser(userId, listParams)
 }
 

@@ -3,8 +3,8 @@ package warrant
 const ObjectTypeUser = "user"
 
 type User struct {
-	UserId string `json:"userId"`
-	Email  string `json:"email,omitempty"`
+	UserId string                 `json:"userId"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (user User) GetObjectType() string {
@@ -21,6 +21,6 @@ type ListUserParams struct {
 
 type UserParams struct {
 	RequestOptions
-	UserId string `json:"userId,omitempty"`
-	Email  string `json:"email,omitempty"`
+	UserId string                 `json:"userId,omitempty"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
 }

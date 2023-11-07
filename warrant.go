@@ -5,12 +5,13 @@ import (
 )
 
 type Warrant struct {
-	ObjectType string  `json:"objectType"`
-	ObjectId   string  `json:"objectId"`
-	Relation   string  `json:"relation"`
-	Subject    Subject `json:"subject"`
-	Policy     string  `json:"policy,omitempty"`
-	IsImplicit bool    `json:"isImplicit,omitempty"`
+	ObjectType   string  `json:"objectType"`
+	ObjectId     string  `json:"objectId"`
+	Relation     string  `json:"relation"`
+	Subject      Subject `json:"subject"`
+	Policy       string  `json:"policy,omitempty"`
+	IsImplicit   bool    `json:"isImplicit,omitempty"`
+	WarrantToken string  `json:"warrantToken,omitempty"`
 }
 
 type PolicyContext map[string]interface{}
@@ -27,6 +28,10 @@ func (subject Subject) GetObjectType() string {
 
 func (subject Subject) GetObjectId() string {
 	return subject.ObjectId
+}
+
+func (subject Subject) GetRelation() string {
+	return subject.Relation
 }
 
 type WarrantParams struct {
@@ -64,6 +69,8 @@ type ObjectParams struct {
 
 type ListObjectParams struct {
 	ListParams
+	ObjectType string `json:"objectType,omitempty" url:"objectType,omitempty"`
+	Query      string `json:"q,omitempty" url:"q,omitempty"`
 }
 
 type WarrantObject interface {
@@ -79,12 +86,31 @@ type WarrantCheck struct {
 }
 
 func (warrantCheck WarrantCheck) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
-		"objectType": warrantCheck.Object.GetObjectType(),
-		"objectId":   warrantCheck.Object.GetObjectId(),
-		"relation":   warrantCheck.Relation,
-		"subject":    warrantCheck.Subject,
-		"context":    warrantCheck.Context,
+	var m map[string]interface{}
+	subject, ok := warrantCheck.Subject.(*Subject)
+	if ok {
+		m = map[string]interface{}{
+			"objectType": warrantCheck.Object.GetObjectType(),
+			"objectId":   warrantCheck.Object.GetObjectId(),
+			"relation":   warrantCheck.Relation,
+			"subject": map[string]interface{}{
+				"objectType": subject.GetObjectType(),
+				"objectId":   subject.GetObjectId(),
+				"relation":   subject.GetRelation(),
+			},
+			"context": warrantCheck.Context,
+		}
+	} else {
+		m = map[string]interface{}{
+			"objectType": warrantCheck.Object.GetObjectType(),
+			"objectId":   warrantCheck.Object.GetObjectId(),
+			"relation":   warrantCheck.Relation,
+			"subject": map[string]interface{}{
+				"objectType": warrantCheck.Subject.GetObjectType(),
+				"objectId":   warrantCheck.Subject.GetObjectId(),
+			},
+			"context": warrantCheck.Context,
+		}
 	}
 
 	return json.Marshal(m)

@@ -1,8 +1,9 @@
 package warrant
 
 type ObjectType struct {
-	Type      string                 `json:"type"`
-	Relations map[string]interface{} `json:"relations"`
+	Type         string                 `json:"type"`
+	Relations    map[string]interface{} `json:"relations"`
+	WarrantToken string                 `json:"warrantToken,omitempty"`
 }
 
 type ListObjectTypeParams struct {
