@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ClientVersion string = "5.3.0"
+	ClientVersion string = "6.0.0"
 )
 
 type ApiClient struct {

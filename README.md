@@ -7,7 +7,7 @@ Use [Warrant](https://warrant.dev/) in server-side Go projects.
 ## Installation
 
 ```shell
-go get github.com/warrant-dev/warrant-go/v5
+go get github.com/warrant-dev/warrant-go/v6
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ You can use the Warrant SDK with or without a client. Instantiating a client all
 ### Without a Client
 
 ```go
-import "github.com/warrant-dev/warrant-go/v5"
+import "github.com/warrant-dev/warrant-go/v6"
 
 // Setup
 warrant.ApiKey = "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E="
@@ -33,8 +33,8 @@ tenant, err := tenant.Create(&tenant.TenantParams{})
 
 Instantiate the Warrant client with your API key to get started:
 ```go
-import "github.com/warrant-dev/warrant-go/v5"
-import "github.com/warrant-dev/warrant-go/v5/config"
+import "github.com/warrant-dev/warrant-go/v6"
+import "github.com/warrant-dev/warrant-go/v6/config"
 
 client := warrant.NewClient(config.ClientConfig{
 	ApiKey: "api_test_f5dsKVeYnVSLHGje44zAygqgqXiLJBICbFzCiAg1E=",
@@ -48,8 +48,8 @@ client := warrant.NewClient(config.ClientConfig{
 The API, Authorize, Self-Service endpoints and http client are configurable via the `warrant.ApiEndpoint`, `warrant.AuthorizeEndpoint`, `warrant.SelfServiceDashEndpoint`, and `warrant.HttpClient` attributes:
 
 ```go
-import "github.com/warrant-dev/warrant-go/v5"
-import "github.com/warrant-dev/warrant-go/v5/config"
+import "github.com/warrant-dev/warrant-go/v6"
+import "github.com/warrant-dev/warrant-go/v6/config"
 
 // Without client initialization
 // Set api and authorize endpoints to http://localhost:8000
