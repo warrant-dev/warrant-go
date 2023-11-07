@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/warrant-dev/warrant-go/v5"
+	"github.com/warrant-dev/warrant-go/v6"
 )
 
 type Client struct {

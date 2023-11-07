@@ -5,16 +5,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/warrant-dev/warrant-go/v5"
-	"github.com/warrant-dev/warrant-go/v5/feature"
-	"github.com/warrant-dev/warrant-go/v5/object"
-	"github.com/warrant-dev/warrant-go/v5/objecttype"
-	"github.com/warrant-dev/warrant-go/v5/permission"
-	"github.com/warrant-dev/warrant-go/v5/pricingtier"
-	"github.com/warrant-dev/warrant-go/v5/role"
-	"github.com/warrant-dev/warrant-go/v5/session"
-	"github.com/warrant-dev/warrant-go/v5/tenant"
-	"github.com/warrant-dev/warrant-go/v5/user"
+	"github.com/warrant-dev/warrant-go/v6"
+	"github.com/warrant-dev/warrant-go/v6/feature"
+	"github.com/warrant-dev/warrant-go/v6/object"
+	"github.com/warrant-dev/warrant-go/v6/objecttype"
+	"github.com/warrant-dev/warrant-go/v6/permission"
+	"github.com/warrant-dev/warrant-go/v6/pricingtier"
+	"github.com/warrant-dev/warrant-go/v6/role"
+	"github.com/warrant-dev/warrant-go/v6/session"
+	"github.com/warrant-dev/warrant-go/v6/tenant"
+	"github.com/warrant-dev/warrant-go/v6/user"
 )
 
 func setup() {

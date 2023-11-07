@@ -3,8 +3,8 @@ package permission
 import (
 	"fmt"
 
-	"github.com/warrant-dev/warrant-go/v5"
-	"github.com/warrant-dev/warrant-go/v5/object"
+	"github.com/warrant-dev/warrant-go/v6"
+	"github.com/warrant-dev/warrant-go/v6/object"
 )
 
 type Client struct {
