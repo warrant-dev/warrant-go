@@ -102,6 +102,9 @@ func BatchDelete(params []WarrantParams) (string, error) {
 }
 
 func (c WarrantClient) Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
+	if params == nil {
+		params = &QueryParams{}
+	}
 	var queryResponse ListResponse[QueryResult]
 	queryParams, err := query.Values(params)
 	if err != nil {
@@ -129,6 +132,9 @@ func Query(queryString string, params *QueryParams) (ListResponse[QueryResult], 
 }
 
 func (c WarrantClient) Check(params *WarrantCheckParams) (bool, error) {
+	if params == nil {
+		params = &WarrantCheckParams{}
+	}
 	accessCheckRequest := AccessCheckRequest{
 		RequestOptions: params.RequestOptions,
 		Warrants:       []WarrantCheck{params.WarrantCheck},
@@ -152,6 +158,9 @@ func Check(params *WarrantCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckMany(params *WarrantCheckManyParams) (bool, error) {
+	if params == nil {
+		params = &WarrantCheckManyParams{}
+	}
 	warrants := make([]WarrantCheck, 0)
 	for _, warrantCheck := range params.Warrants {
 		warrants = append(warrants, warrantCheck)
@@ -181,6 +190,9 @@ func CheckMany(params *WarrantCheckManyParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
+	if params == nil {
+		params = &PermissionCheckParams{}
+	}
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -204,6 +216,9 @@ func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
+	if params == nil {
+		params = &RoleCheckParams{}
+	}
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -227,6 +242,9 @@ func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
+	if params == nil {
+		params = &FeatureCheckParams{}
+	}
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{

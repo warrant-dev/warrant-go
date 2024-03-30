@@ -18,6 +18,9 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
+	if params == nil {
+		params = &warrant.PermissionParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypePermission,
 		RequestOptions: params.RequestOptions,
@@ -43,6 +46,9 @@ func Create(params *warrant.PermissionParams) (*warrant.Permission, error) {
 }
 
 func (c Client) Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
+	if params == nil {
+		params = &warrant.PermissionParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypePermission,
 		ObjectId:       permissionId,
@@ -64,6 +70,9 @@ func Get(permissionId string, params *warrant.PermissionParams) (*warrant.Permis
 }
 
 func (c Client) Update(permissionId string, params *warrant.PermissionParams) (*warrant.Permission, error) {
+	if params == nil {
+		params = &warrant.PermissionParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypePermission,
 		ObjectId:       permissionId,
@@ -93,6 +102,9 @@ func Delete(permissionId string) (string, error) {
 }
 
 func (c Client) ListPermissions(listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
+	if listParams == nil {
+		listParams = &warrant.ListPermissionParams{}
+	}
 	var permissionsListResponse warrant.ListResponse[warrant.Permission]
 
 	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
@@ -125,6 +137,9 @@ func ListPermissions(listParams *warrant.ListPermissionParams) (warrant.ListResp
 }
 
 func (c Client) ListPermissionsForRole(roleId string, listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
+	if listParams == nil {
+		listParams = &warrant.ListPermissionParams{}
+	}
 	var permissionsListResponse warrant.ListResponse[warrant.Permission]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select permission where role:%s is *", roleId), &warrant.QueryParams{
@@ -188,6 +203,9 @@ func RemovePermissionFromRole(permissionId string, roleId string) (string, error
 }
 
 func (c Client) ListPermissionsForUser(userId string, listParams *warrant.ListPermissionParams) (warrant.ListResponse[warrant.Permission], error) {
+	if listParams == nil {
+		listParams = &warrant.ListPermissionParams{}
+	}
 	var permissionsListResponse warrant.ListResponse[warrant.Permission]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select permission where user:%s is *", userId), &warrant.QueryParams{

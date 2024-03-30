@@ -18,6 +18,9 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	if params == nil {
+		params = &warrant.PricingTierParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypePricingTier,
 		RequestOptions: params.RequestOptions,
@@ -43,6 +46,9 @@ func Create(params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
 }
 
 func (c Client) Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	if params == nil {
+		params = &warrant.PricingTierParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypePricingTier,
 		ObjectId:       pricingTierId,
@@ -64,6 +70,9 @@ func Get(pricingTierId string, params *warrant.PricingTierParams) (*warrant.Pric
 }
 
 func (c Client) Update(pricingTierId string, params *warrant.PricingTierParams) (*warrant.PricingTier, error) {
+	if params == nil {
+		params = &warrant.PricingTierParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypePricingTier,
 		ObjectId:       pricingTierId,
@@ -93,6 +102,9 @@ func Delete(pricingTierId string) (string, error) {
 }
 
 func (c Client) ListPricingTiers(listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
+	if listParams == nil {
+		listParams = &warrant.ListPricingTierParams{}
+	}
 	var pricingTiersListResponse warrant.ListResponse[warrant.PricingTier]
 
 	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
@@ -125,6 +137,9 @@ func ListPricingTiers(listParams *warrant.ListPricingTierParams) (warrant.ListRe
 }
 
 func (c Client) ListPricingTiersForTenant(tenantId string, listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
+	if listParams == nil {
+		listParams = &warrant.ListPricingTierParams{}
+	}
 	var pricingTiersListResponse warrant.ListResponse[warrant.PricingTier]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select pricing-tier where tenant:%s is *", tenantId), &warrant.QueryParams{
@@ -188,6 +203,9 @@ func RemovePricingTierFromTenant(pricingTierId string, tenantId string) (string,
 }
 
 func (c Client) ListPricingTiersForUser(userId string, listParams *warrant.ListPricingTierParams) (warrant.ListResponse[warrant.PricingTier], error) {
+	if listParams == nil {
+		listParams = &warrant.ListPricingTierParams{}
+	}
 	var pricingTiersListResponse warrant.ListResponse[warrant.PricingTier]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select pricing-tier where user:%s is *", userId), &warrant.QueryParams{

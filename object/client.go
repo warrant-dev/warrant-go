@@ -64,6 +64,9 @@ func BatchCreate(params []warrant.ObjectParams) ([]warrant.Object, error) {
 }
 
 func (c Client) Get(objectType string, objectId string, params *warrant.ObjectParams) (*warrant.Object, error) {
+	if params == nil {
+		params = &warrant.ObjectParams{}
+	}
 	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/objects/%s/%s", objectType, objectId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
@@ -136,6 +139,9 @@ func BatchDelete(params []warrant.ObjectParams) (string, error) {
 }
 
 func (c Client) ListObjects(listParams *warrant.ListObjectParams) (warrant.ListResponse[warrant.Object], error) {
+	if listParams == nil {
+		listParams = &warrant.ListObjectParams{}
+	}
 	var objectsListResponse warrant.ListResponse[warrant.Object]
 	queryParams, err := query.Values(listParams)
 	if err != nil {

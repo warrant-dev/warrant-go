@@ -18,6 +18,9 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
+	if params == nil {
+		params = &warrant.FeatureParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeFeature,
 		RequestOptions: params.RequestOptions,
@@ -43,6 +46,9 @@ func Create(params *warrant.FeatureParams) (*warrant.Feature, error) {
 }
 
 func (c Client) Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
+	if params == nil {
+		params = &warrant.FeatureParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeFeature,
 		ObjectId:       featureId,
@@ -64,6 +70,9 @@ func Get(featureId string, params *warrant.FeatureParams) (*warrant.Feature, err
 }
 
 func (c Client) Update(featureId string, params *warrant.FeatureParams) (*warrant.Feature, error) {
+	if params == nil {
+		params = &warrant.FeatureParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeFeature,
 		ObjectId:       featureId,
@@ -93,6 +102,9 @@ func Delete(featureId string) (string, error) {
 }
 
 func (c Client) ListFeatures(listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	if listParams == nil {
+		listParams = &warrant.ListFeatureParams{}
+	}
 	var featuresListResponse warrant.ListResponse[warrant.Feature]
 
 	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
@@ -125,6 +137,9 @@ func ListFeatures(listParams *warrant.ListFeatureParams) (warrant.ListResponse[w
 }
 
 func (c Client) ListFeaturesForPricingTier(pricingTierId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	if listParams == nil {
+		listParams = &warrant.ListFeatureParams{}
+	}
 	var featuresListResponse warrant.ListResponse[warrant.Feature]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select feature where pricing-tier:%s is *", pricingTierId), &warrant.QueryParams{
@@ -188,6 +203,9 @@ func RemoveFeatureFromPricingTier(featureId string, pricingTierId string) (strin
 }
 
 func (c Client) ListFeaturesForTenant(tenantId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	if listParams == nil {
+		listParams = &warrant.ListFeatureParams{}
+	}
 	var featuresListResponse warrant.ListResponse[warrant.Feature]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select feature where tenant:%s is *", tenantId), &warrant.QueryParams{
@@ -251,6 +269,9 @@ func RemoveFeatureFromTenant(featureId string, tenantId string) (string, error) 
 }
 
 func (c Client) ListFeaturesForUser(userId string, listParams *warrant.ListFeatureParams) (warrant.ListResponse[warrant.Feature], error) {
+	if listParams == nil {
+		listParams = &warrant.ListFeatureParams{}
+	}
 	var featuresListResponse warrant.ListResponse[warrant.Feature]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select feature where user:%s is *", userId), &warrant.QueryParams{

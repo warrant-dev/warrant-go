@@ -19,6 +19,9 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (string, error) {
+	if params == nil {
+		params = &warrant.AuthorizationSessionParams{}
+	}
 	sessionParams := map[string]interface{}{
 		"type":   "sess",
 		"userId": params.UserId,
@@ -46,6 +49,9 @@ func CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (str
 }
 
 func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParams) (string, error) {
+	if params == nil {
+		params = &warrant.SelfServiceSessionParams{}
+	}
 	sessionParams := map[string]interface{}{
 		"type":                "ssdash",
 		"userId":              params.UserId,

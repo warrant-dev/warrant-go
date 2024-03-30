@@ -18,6 +18,9 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.TenantParams) (*warrant.Tenant, error) {
+	if params == nil {
+		params = &warrant.TenantParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeTenant,
 		RequestOptions: params.RequestOptions,
@@ -74,6 +77,9 @@ func BatchCreate(params []warrant.TenantParams) ([]warrant.Tenant, error) {
 }
 
 func (c Client) Get(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
+	if params == nil {
+		params = &warrant.TenantParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeTenant,
 		ObjectId:       tenantId,
@@ -95,6 +101,9 @@ func Get(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error)
 }
 
 func (c Client) Update(tenantId string, params *warrant.TenantParams) (*warrant.Tenant, error) {
+	if params == nil {
+		params = &warrant.TenantParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeTenant,
 		ObjectId:       tenantId,
@@ -147,6 +156,9 @@ func BatchDelete(params []warrant.TenantParams) (string, error) {
 }
 
 func (c Client) ListTenants(listParams *warrant.ListTenantParams) (warrant.ListResponse[warrant.Tenant], error) {
+	if listParams == nil {
+		listParams = &warrant.ListTenantParams{}
+	}
 	var tenantsListResponse warrant.ListResponse[warrant.Tenant]
 
 	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
@@ -179,6 +191,9 @@ func ListTenants(listParams *warrant.ListTenantParams) (warrant.ListResponse[war
 }
 
 func (c Client) ListTenantsForUser(userId string, listParams *warrant.ListTenantParams) (warrant.ListResponse[warrant.Tenant], error) {
+	if listParams == nil {
+		listParams = &warrant.ListTenantParams{}
+	}
 	var tenantsListResponse warrant.ListResponse[warrant.Tenant]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select tenant where user:%s is *", userId), &warrant.QueryParams{
