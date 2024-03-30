@@ -101,6 +101,36 @@ func BatchDelete(params []WarrantParams) (string, error) {
 	return getClient().BatchDelete(params)
 }
 
+func (c WarrantClient) ListWarrants(listParams *ListWarrantParams) (ListResponse[Warrant], error) {
+	if listParams == nil {
+		listParams = &ListWarrantParams{}
+	}
+	var warrantsListResponse ListResponse[Warrant]
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return warrantsListResponse, WrapError("Could not parse listParams", err)
+	}
+
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/warrants?%s", queryParams.Encode()), warrantsListResponse, &listParams.RequestOptions)
+	if err != nil {
+		return warrantsListResponse, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return warrantsListResponse, WrapError("Error reading response", err)
+	}
+	defer resp.Body.Close()
+	err = json.Unmarshal([]byte(body), &warrantsListResponse)
+	if err != nil {
+		return warrantsListResponse, WrapError("Invalid response from server", err)
+	}
+	return warrantsListResponse, nil
+}
+
+func ListWarrants(listParams *ListWarrantParams) (ListResponse[Warrant], error) {
+	return getClient().ListWarrants(listParams)
+}
+
 func (c WarrantClient) Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
 	if params == nil {
 		params = &QueryParams{}

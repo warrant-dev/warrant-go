@@ -44,6 +44,12 @@ type WarrantParams struct {
 
 type ListWarrantParams struct {
 	ListParams
+	ObjectType      string `json:"objectType,omitempty" url:"objectType,omitempty"`
+	ObjectId        string `json:"objectId,omitempty" url:"objectId,omitempty"`
+	Relation        string `json:"relation,omitempty" url:"relation,omitempty"`
+	SubjectType     string `json:"subjectType,omitempty" url:"subjectType,omitempty"`
+	SubjectId       string `json:"subjectId,omitempty" url:"subjectId,omitempty"`
+	SubjectRelation string `json:"subjectRelation,omitempty" url:"subjectRelation,omitempty"`
 }
 
 type Object struct {
