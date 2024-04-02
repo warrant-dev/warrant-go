@@ -590,7 +590,7 @@ func TestMultiTenancy(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	user2, err := user.Create(&warrant.UserParams{})
+	user2, err := user.Create(nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1749,12 +1749,21 @@ func TestSessions(t *testing.T) {
 	}
 	assert.NotEmpty(authzSessionToken)
 
-	ssDashUrl, err := session.CreateSelfServiceSession((&warrant.SelfServiceSessionParams{
+	authzSessionTokenWithTenant, err := session.CreateAuthorizationSession(&warrant.AuthorizationSessionParams{
+		UserId:   user1.UserId,
+		TenantId: tenant1.TenantId,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotEmpty(authzSessionTokenWithTenant)
+
+	ssDashUrl, err := session.CreateSelfServiceSession(&warrant.SelfServiceSessionParams{
 		UserId:              user1.UserId,
 		TenantId:            tenant1.TenantId,
 		RedirectUrl:         "http://localhost:8080",
 		SelfServiceStrategy: warrant.SelfServiceStrategyFGAC,
-	}))
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1783,11 +1792,22 @@ func TestWarrants(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	newPermission, err := permission.Create(&warrant.PermissionParams{
+	permission1, err := permission.Create(&warrant.PermissionParams{
 		PermissionId: "perm1",
 		Meta: map[string]interface{}{
 			"name":        "Permission 1",
 			"description": "Permission with id 1",
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	permission2, err := permission.Create(&warrant.PermissionParams{
+		PermissionId: "perm2",
+		Meta: map[string]interface{}{
+			"name":        "Permission 2",
+			"description": "Permission with id 2",
 		},
 	})
 	if err != nil {
@@ -1801,7 +1821,7 @@ func TestWarrants(t *testing.T) {
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
-				ObjectId:   newPermission.PermissionId,
+				ObjectId:   permission1.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
@@ -1815,9 +1835,9 @@ func TestWarrants(t *testing.T) {
 	}
 	assert.False(checkResult)
 
-	newWarrant, err := warrant.Create(&warrant.WarrantParams{
+	permission1Warrant, err := warrant.Create(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
-		ObjectId:   newPermission.PermissionId,
+		ObjectId:   permission1.PermissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -1827,7 +1847,7 @@ func TestWarrants(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.NotNil(newWarrant.WarrantToken)
+	assert.NotNil(permission1Warrant.WarrantToken)
 
 	checkResult, err = warrant.Check(&warrant.WarrantCheckParams{
 		RequestOptions: warrant.RequestOptions{
@@ -1836,7 +1856,7 @@ func TestWarrants(t *testing.T) {
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
-				ObjectId:   newPermission.PermissionId,
+				ObjectId:   permission1.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
@@ -1850,23 +1870,78 @@ func TestWarrants(t *testing.T) {
 	}
 	assert.True(checkResult)
 
+	permission2Warrant, err := warrant.Create(&warrant.WarrantParams{
+		ObjectType: warrant.ObjectTypePermission,
+		ObjectId:   permission2.PermissionId,
+		Relation:   "member",
+		Subject: warrant.Subject{
+			ObjectType: warrant.ObjectTypeUser,
+			ObjectId:   newUser.UserId,
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotNil(permission2Warrant.WarrantToken)
+
+	warrantsList, err := warrant.ListWarrants(&warrant.ListWarrantParams{
+		ObjectType: warrant.ObjectTypePermission,
+		ObjectId:   permission1.PermissionId,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(1, len(warrantsList.Results))
+	assert.Equal("permission", warrantsList.Results[0].ObjectType)
+	assert.Equal("perm1", warrantsList.Results[0].ObjectId)
+	assert.Equal("member", warrantsList.Results[0].Relation)
+	assert.Equal("user", warrantsList.Results[0].Subject.ObjectType)
+	assert.Equal(newUser.UserId, warrantsList.Results[0].Subject.ObjectId)
+
+	warrantsList, err = warrant.ListWarrants(&warrant.ListWarrantParams{
+		SubjectType: warrant.ObjectTypeUser,
+		SubjectId:   newUser.UserId,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(2, len(warrantsList.Results))
+	assert.Equal("permission", warrantsList.Results[0].ObjectType)
+	assert.Equal("perm1", warrantsList.Results[0].ObjectId)
+	assert.Equal("member", warrantsList.Results[0].Relation)
+	assert.Equal("user", warrantsList.Results[0].Subject.ObjectType)
+	assert.Equal(newUser.UserId, warrantsList.Results[0].Subject.ObjectId)
+	assert.Equal("permission", warrantsList.Results[1].ObjectType)
+	assert.Equal("perm2", warrantsList.Results[1].ObjectId)
+	assert.Equal("member", warrantsList.Results[1].Relation)
+	assert.Equal("user", warrantsList.Results[1].Subject.ObjectType)
+	assert.Equal(newUser.UserId, warrantsList.Results[1].Subject.ObjectId)
+
 	queryResult, err := warrant.Query(fmt.Sprintf("select * where %s:%s is *", "user", newUser.UserId), &warrant.QueryParams{})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	assert.Equal(1, len(queryResult.Results))
+	assert.Equal(2, len(queryResult.Results))
 	assert.Equal("permission", queryResult.Results[0].ObjectType)
 	assert.Equal("perm1", queryResult.Results[0].ObjectId)
-	assert.Equal("member", queryResult.Results[0].Warrant.Relation)
+	assert.Equal("member", queryResult.Results[0].Relation)
 	assert.NotNil(queryResult.Results[0].Meta)
 	assert.Equal("Permission 1", queryResult.Results[0].Meta["name"])
 	assert.Equal("Permission with id 1", queryResult.Results[0].Meta["description"])
+	assert.Equal("permission", queryResult.Results[1].ObjectType)
+	assert.Equal("perm2", queryResult.Results[1].ObjectId)
+	assert.Equal("member", queryResult.Results[1].Relation)
+	assert.NotNil(queryResult.Results[1].Meta)
+	assert.Equal("Permission 2", queryResult.Results[1].Meta["name"])
+	assert.Equal("Permission with id 2", queryResult.Results[1].Meta["description"])
 
 	warrantToken, err := warrant.Delete(&warrant.WarrantParams{
 		ObjectType: warrant.ObjectTypePermission,
-		ObjectId:   newPermission.PermissionId,
+		ObjectId:   permission1.PermissionId,
 		Relation:   "member",
 		Subject: warrant.Subject{
 			ObjectType: warrant.ObjectTypeUser,
@@ -1885,7 +1960,7 @@ func TestWarrants(t *testing.T) {
 		WarrantCheck: warrant.WarrantCheck{
 			Object: warrant.Object{
 				ObjectType: warrant.ObjectTypePermission,
-				ObjectId:   newPermission.PermissionId,
+				ObjectId:   permission1.PermissionId,
 			},
 			Relation: "member",
 			Subject: warrant.Subject{
@@ -1906,7 +1981,13 @@ func TestWarrants(t *testing.T) {
 	}
 	assert.NotNil(warrantToken)
 
-	warrantToken, err = permission.Delete(newPermission.PermissionId)
+	warrantToken, err = permission.Delete(permission1.PermissionId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.NotNil(warrantToken)
+
+	warrantToken, err = permission.Delete(permission2.PermissionId)
 	if err != nil {
 		t.Fatal(err)
 	}
