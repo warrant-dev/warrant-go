@@ -108,7 +108,7 @@ func (c WarrantClient) ListWarrants(listParams *ListWarrantParams) (ListResponse
 	var warrantsListResponse ListResponse[Warrant]
 	queryParams, err := query.Values(listParams)
 	if err != nil {
-		return warrantsListResponse, WrapError("Could not parse listParams", err)
+		return warrantsListResponse, WrapError("Error parsing ListWarrantParams", err)
 	}
 
 	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/warrants?%s", queryParams.Encode()), warrantsListResponse, &listParams.RequestOptions)
