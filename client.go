@@ -101,7 +101,40 @@ func BatchDelete(params []WarrantParams) (string, error) {
 	return getClient().BatchDelete(params)
 }
 
+func (c WarrantClient) ListWarrants(listParams *ListWarrantParams) (ListResponse[Warrant], error) {
+	if listParams == nil {
+		listParams = &ListWarrantParams{}
+	}
+	var warrantsListResponse ListResponse[Warrant]
+	queryParams, err := query.Values(listParams)
+	if err != nil {
+		return warrantsListResponse, WrapError("Error parsing ListWarrantParams", err)
+	}
+
+	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/warrants?%s", queryParams.Encode()), warrantsListResponse, &listParams.RequestOptions)
+	if err != nil {
+		return warrantsListResponse, err
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return warrantsListResponse, WrapError("Error reading response", err)
+	}
+	defer resp.Body.Close()
+	err = json.Unmarshal([]byte(body), &warrantsListResponse)
+	if err != nil {
+		return warrantsListResponse, WrapError("Invalid response from server", err)
+	}
+	return warrantsListResponse, nil
+}
+
+func ListWarrants(listParams *ListWarrantParams) (ListResponse[Warrant], error) {
+	return getClient().ListWarrants(listParams)
+}
+
 func (c WarrantClient) Query(queryString string, params *QueryParams) (ListResponse[QueryResult], error) {
+	if params == nil {
+		params = &QueryParams{}
+	}
 	var queryResponse ListResponse[QueryResult]
 	queryParams, err := query.Values(params)
 	if err != nil {
@@ -129,6 +162,9 @@ func Query(queryString string, params *QueryParams) (ListResponse[QueryResult], 
 }
 
 func (c WarrantClient) Check(params *WarrantCheckParams) (bool, error) {
+	if params == nil {
+		params = &WarrantCheckParams{}
+	}
 	accessCheckRequest := AccessCheckRequest{
 		RequestOptions: params.RequestOptions,
 		Warrants:       []WarrantCheck{params.WarrantCheck},
@@ -152,6 +188,9 @@ func Check(params *WarrantCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckMany(params *WarrantCheckManyParams) (bool, error) {
+	if params == nil {
+		params = &WarrantCheckManyParams{}
+	}
 	warrants := make([]WarrantCheck, 0)
 	for _, warrantCheck := range params.Warrants {
 		warrants = append(warrants, warrantCheck)
@@ -181,6 +220,9 @@ func CheckMany(params *WarrantCheckManyParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
+	if params == nil {
+		params = &PermissionCheckParams{}
+	}
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -204,6 +246,9 @@ func CheckUserHasPermission(params *PermissionCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckUserHasRole(params *RoleCheckParams) (bool, error) {
+	if params == nil {
+		params = &RoleCheckParams{}
+	}
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{
@@ -227,6 +272,9 @@ func CheckUserHasRole(params *RoleCheckParams) (bool, error) {
 }
 
 func (c WarrantClient) CheckHasFeature(params *FeatureCheckParams) (bool, error) {
+	if params == nil {
+		params = &FeatureCheckParams{}
+	}
 	return c.Check(&WarrantCheckParams{
 		RequestOptions: params.RequestOptions,
 		WarrantCheck: WarrantCheck{

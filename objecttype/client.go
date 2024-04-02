@@ -44,6 +44,9 @@ func Create(params *warrant.ObjectTypeParams) (*warrant.ObjectType, error) {
 }
 
 func (c Client) Get(objectTypeId string, params *warrant.ObjectTypeParams) (*warrant.ObjectType, error) {
+	if params == nil {
+		params = &warrant.ObjectTypeParams{}
+	}
 	resp, err := c.apiClient.MakeRequest("GET", fmt.Sprintf("/v2/object-types/%s", objectTypeId), nil, &params.RequestOptions)
 	if err != nil {
 		return nil, err
@@ -130,6 +133,9 @@ func Delete(objectTypeId string) (string, error) {
 }
 
 func (c Client) ListObjectTypes(listParams *warrant.ListObjectTypeParams) (warrant.ListResponse[warrant.ObjectType], error) {
+	if listParams == nil {
+		listParams = &warrant.ListObjectTypeParams{}
+	}
 	var objectTypesListResponse warrant.ListResponse[warrant.ObjectType]
 	queryParams, err := query.Values(listParams)
 	if err != nil {

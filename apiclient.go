@@ -54,7 +54,7 @@ func (client ApiClient) MakeRequest(method string, path string, payload interfac
 	if client.Config.ApiKey != "" {
 		request.Header.Add("Authorization", fmt.Sprintf("ApiKey %s", client.Config.ApiKey))
 	}
-	if options.WarrantToken != "" {
+	if options != nil && options.WarrantToken != "" {
 		request.Header.Add("Warrant-Token", options.WarrantToken)
 	}
 	request.Header.Add("User-Agent", fmt.Sprintf("warrant-go/%s", ClientVersion))

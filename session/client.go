@@ -19,12 +19,17 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (string, error) {
-	sessionParams := map[string]interface{}{
-		"type":   "sess",
-		"userId": params.UserId,
-		"ttl":    params.TTL,
+	if params == nil {
+		params = &warrant.AuthorizationSessionParams{}
 	}
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
+	sessionParams := map[string]interface{}{
+		"type":     "sess",
+		"userId":   params.UserId,
+		"tenantId": params.TenantId,
+		"ttl":      params.TTL,
+		"context":  params.Context,
+	}
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -46,6 +51,9 @@ func CreateAuthorizationSession(params *warrant.AuthorizationSessionParams) (str
 }
 
 func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParams) (string, error) {
+	if params == nil {
+		params = &warrant.SelfServiceSessionParams{}
+	}
 	sessionParams := map[string]interface{}{
 		"type":                "ssdash",
 		"userId":              params.UserId,
@@ -60,7 +68,7 @@ func (c Client) CreateSelfServiceSession(params *warrant.SelfServiceSessionParam
 		sessionParams["objectId"] = params.ObjectId
 	}
 
-	resp, err := c.apiClient.MakeRequest("POST", "/v1/sessions", sessionParams, &warrant.RequestOptions{})
+	resp, err := c.apiClient.MakeRequest("POST", "/v2/sessions", sessionParams, &warrant.RequestOptions{})
 	if err != nil {
 		return "", err
 	}

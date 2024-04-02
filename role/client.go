@@ -18,6 +18,9 @@ func NewClient(config warrant.ClientConfig) Client {
 }
 
 func (c Client) Create(params *warrant.RoleParams) (*warrant.Role, error) {
+	if params == nil {
+		params = &warrant.RoleParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeRole,
 		RequestOptions: params.RequestOptions,
@@ -43,6 +46,9 @@ func Create(params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
+	if params == nil {
+		params = &warrant.RoleParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeRole,
 		ObjectId:       roleId,
@@ -64,6 +70,9 @@ func Get(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
 }
 
 func (c Client) Update(roleId string, params *warrant.RoleParams) (*warrant.Role, error) {
+	if params == nil {
+		params = &warrant.RoleParams{}
+	}
 	objectParams := warrant.ObjectParams{
 		ObjectType:     warrant.ObjectTypeRole,
 		ObjectId:       roleId,
@@ -93,6 +102,9 @@ func Delete(roleId string) (string, error) {
 }
 
 func (c Client) ListRoles(listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant.Role], error) {
+	if listParams == nil {
+		listParams = &warrant.ListRoleParams{}
+	}
 	var rolesListResponse warrant.ListResponse[warrant.Role]
 
 	objectsListResponse, err := object.ListObjects(&warrant.ListObjectParams{
@@ -125,6 +137,9 @@ func ListRoles(listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant
 }
 
 func (c Client) ListRolesForUser(userId string, listParams *warrant.ListRoleParams) (warrant.ListResponse[warrant.Role], error) {
+	if listParams == nil {
+		listParams = &warrant.ListRoleParams{}
+	}
 	var rolesListResponse warrant.ListResponse[warrant.Role]
 
 	queryResponse, err := warrant.Query(fmt.Sprintf("select role where user:%s is *", userId), &warrant.QueryParams{
